@@ -211,4 +211,8 @@ public class Gui {
 			return null;
 		}
 	}
+	
+	public void showAboutDialog() {
+		AboutDialog.showDialog(mainWindow);
+	}
 }
