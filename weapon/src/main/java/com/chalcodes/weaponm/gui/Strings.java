@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
-class Strings {
+public class Strings {
 	public static final String TERMINAL = "TERMINAL";
+	public static final String DATABASE_MENU = "DATABASE_MENU";
+	public static final String OPEN_ACTION = "OPEN_ACTION";
 
 	private static final Logger log = LoggerFactory.getLogger(Strings.class.getSimpleName());
 	private static final ResourceBundle bundle = ResourceBundle.getBundle("com/chalcodes/weaponm/Strings");

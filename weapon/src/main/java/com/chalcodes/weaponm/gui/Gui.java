@@ -3,12 +3,17 @@ package com.chalcodes.weaponm.gui;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.lang.reflect.Constructor;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +47,11 @@ public class Gui {
 	private final EventSupport eventSupport;
 	private final DatabaseManager dbm;
 	private final ActionManager actionManager;
+	private final JFileChooser databaseFileChooser;
 	
 	public Gui() {
 		log.info("{} started", APP_TITLE);
-		// this supposedly sets the app title in the menu bar on os x...
+		// this is supposed to set the app title in the menu bar on OS X
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_TITLE);
 		setLookAndFeel();
 		
@@ -55,8 +61,10 @@ public class Gui {
 		dockControl = new CControl(mainWindow);
 		eventSupport = new SwingEventSupport();
 		dbm = new DatabaseManager(eventSupport);
-		actionManager = new ActionManager(eventSupport, dbm);
+		actionManager = new ActionManager(this, eventSupport, dbm);
+		databaseFileChooser = new JFileChooser();
 		
+		configureFileChoosers();
 		configureDocking();
 		configureMainWindow();
 		loadAppleExtensions();
@@ -92,6 +100,12 @@ public class Gui {
 		} catch (Throwable t) {
 			log.error("falling back to Metal look & feel", t);
 		}
+	}
+	
+	private void configureFileChoosers() {
+		databaseFileChooser.setFileFilter(new FileNameExtensionFilter("Weapon M databases", "wmd"));
+		databaseFileChooser.setAcceptAllFileFilterUsed(false);
+		databaseFileChooser.setMultiSelectionEnabled(false);
 	}
 
 	private void configureDocking() {
@@ -131,12 +145,12 @@ public class Gui {
 			}
 		});
 		mainWindow.add(dockControl.getContentArea());
-		// TODO mainWindow.setJMenuBar(actionManager.getMenuBar());
+		mainWindow.setJMenuBar(actionManager.getMenuBar());
 		mainWindow.setExtendedState(mainWindow.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		mainWindow.pack();		
 	}
 	
-	protected void loadAppleExtensions() {
+	private void loadAppleExtensions() {
 		if (System.getProperty("os.name").contains("OS X")) {
 			try {
 				Class<?> klass = Class.forName("krum.weaponm.gui.AppleExtensions");
@@ -146,6 +160,53 @@ public class Gui {
 			} catch (Throwable t) {
 				log.error("error loading Apple extensions", t);
 			}
+		}
+	}
+	
+	/**
+	 * Thread-safe.
+	 * 
+	 * @param message
+	 * @param title
+	 * @param messageType
+	 */
+	public void showMessageDialog(final Object message, final String title, final int messageType) {
+		if(SwingUtilities.isEventDispatchThread()) {
+			JOptionPane.showMessageDialog(mainWindow, message, title, messageType);
+		}
+		else {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JOptionPane.showMessageDialog(mainWindow, message, title, messageType);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * Not thread-safe.
+	 * 
+	 * @param message
+	 * @param title
+	 * @param optionType
+	 * @param messageType
+	 * @param options
+	 * @param initialValue
+	 * @return
+	 */
+	public int showOptionDialog(Object message, String title, int optionType,
+			int messageType, Object[] options, Object initialValue) {
+		return JOptionPane.showOptionDialog(mainWindow, message, title,
+				optionType, messageType, null, options, initialValue);
+	}
+	
+	public File showDatabaseOpenDialog() {
+		if(databaseFileChooser.showOpenDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
+			return databaseFileChooser.getSelectedFile();
+		}
+		else {
+			return null;
 		}
 	}
 }

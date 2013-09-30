@@ -1,20 +1,22 @@
 package com.chalcodes.weaponm.gui.action;
 
+import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.event.Event;
 import com.chalcodes.weaponm.event.EventListener;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
+import com.chalcodes.weaponm.gui.Gui;
+import com.chalcodes.weaponm.gui.Strings;
 
 /**
  * Maintains collections of actions and UI elements that are enabled and
@@ -23,8 +25,8 @@ import com.chalcodes.weaponm.event.EventType;
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public class ActionManager implements EventListener {
-	private static final Logger log =
-			LoggerFactory.getLogger(ActionManager.class.getSimpleName());
+//	private static final Logger log =
+//			LoggerFactory.getLogger(ActionManager.class.getSimpleName());
 	private final JMenuBar menuBar = new JMenuBar();
 	
 	private final Set<AbstractAction> enableOnLoad = new HashSet<AbstractAction>(); // disable on unload
@@ -32,20 +34,92 @@ public class ActionManager implements EventListener {
 	private final Set<AbstractAction> enableOnConnect = new HashSet<AbstractAction>(); // disable on disconnect
 	private final Set<AbstractAction> disableOnConnect = new HashSet<AbstractAction>(); // enable on disconnect
 	
-	public ActionManager(EventSupport eventSupport, DatabaseManager dbm) {
-		// TODO moar
-		populateMenuBar();
+	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm) {
+		populateMenuBar(gui, eventSupport, dbm);
 		eventSupport.addEventListener(this, EventType.DB_OPENED);
+		eventSupport.addEventListener(this, EventType.DB_CLOSED);
+		eventSupport.addEventListener(this, EventType.NET_CONNECTED);
+		eventSupport.addEventListener(this, EventType.NET_DISCONNECTED);
+	}
+	
+	public JMenuBar getMenuBar() {
+		return menuBar;
 	}
 
-	private void populateMenuBar() {
-		// TODO Auto-generated method stub
-		
+	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm) {
+		JMenu dbMenu = new JMenu();
+		setText(dbMenu, Strings.DATABASE_MENU);
+		dbMenu.add(new OpenDatabaseAction(gui, dbm));
+		menuBar.add(dbMenu);
 	}
 
 	@Override
 	public void onEvent(Event event) {
-		// TODO Auto-generated method stub
-		
+		switch(event.getType()) {
+		case DB_OPENED:
+			for(AbstractAction action : enableOnLoad) {
+				action.setEnabled(true);
+			}
+			for(JMenu menu : enableOnLoadMenus) {
+				menu.setEnabled(true);
+			}
+			break;
+		case DB_CLOSED:
+			for(AbstractAction action : enableOnLoad) {
+				action.setEnabled(false);
+			}
+			for(JMenu menu : enableOnLoadMenus) {
+				menu.setEnabled(false);
+			}
+			break;
+		case NET_CONNECTED:
+			for(AbstractAction action : enableOnConnect) {
+				action.setEnabled(true);
+			}
+			for(AbstractAction action : disableOnConnect) {
+				action.setEnabled(false);
+			}
+			break;
+		case NET_DISCONNECTED:
+			for(AbstractAction action : enableOnConnect) {
+				action.setEnabled(false);
+			}
+			for(AbstractAction action : disableOnConnect) {
+				action.setEnabled(true);
+			}
+			break;
+		}
+	}
+	
+	/**
+	 * Sets the text and keyboard mnemonic for an action.
+	 * 
+	 * @param action the action
+	 * @param key a key constant from {@link com.chalcodes.weaponm.gui.Strings}
+	 */
+	static void setText(AbstractAction action, String key) {
+		String raw = Strings.getString(key);
+		String stripped = raw.replace("_", "");
+		action.putValue(Action.NAME, stripped);
+		int idx = raw.indexOf('_');
+		if(idx != -1 && idx < stripped.length()) {
+			action.putValue(Action.MNEMONIC_KEY, KeyEvent.getExtendedKeyCodeForChar(stripped.charAt(idx)));
+		}
+	}
+	
+	/**
+	 * Sets the text and keyboard mnemonic for a button, menu, or menu item.
+	 * 
+	 * @param button the button
+	 * @param key a key constant from {@link com.chalcodes.weaponm.gui.Strings}
+	 */
+	static void setText(AbstractButton button, String key) {
+		String raw = Strings.getString(key);
+		String stripped = raw.replace("_", "");
+		button.setText(stripped);
+		int idx = raw.indexOf('_');
+		if(idx != -1 && idx < stripped.length()) {
+			button.setMnemonic(stripped.charAt(idx));
+		}
 	}
 }
