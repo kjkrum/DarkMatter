@@ -85,20 +85,22 @@ public class Gui {
 	private void setLookAndFeel() {
 		String laf = AppSettings.getLookAndFeel();
 		try {
-			if ("Nimbus".equals(laf)) {
-				for (LookAndFeelInfo info : UIManager
-						.getInstalledLookAndFeels()) {
-					if ("Nimbus".equals(info.getName())) {
-						UIManager.setLookAndFeel(info.getClassName());
-						break;
-					}
-				}
-			} else if ("System".equals(laf)) {
+			if ("System".equals(laf)) {
 				UIManager.setLookAndFeel(UIManager
 						.getSystemLookAndFeelClassName());
 			}
+			else {
+				for (LookAndFeelInfo info : UIManager
+				.getInstalledLookAndFeels()) {
+					if (info.getName().equals(laf)) {
+						UIManager.setLookAndFeel(info.getClassName());
+						return;
+					}
+				}
+				log.warn("unable to locate \"{}\" look & feel", laf);
+			}
 		} catch (Throwable t) {
-			log.error("falling back to Metal look & feel", t);
+			log.error("error setting look & feel", t);
 		}
 	}
 	
