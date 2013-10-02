@@ -29,7 +29,6 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.chalcodes.weaponm.AppSettings;
 import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.database.DatabaseManager;
-import com.chalcodes.weaponm.event.Event;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.gui.action.ActionManager;
 
@@ -74,9 +73,19 @@ public class Gui {
 		mainWindow.setVisible(visible);
 	}
 	
-	public void dispatchEvent(Event event) {
-		eventSupport.dispatchEvent(event);
-	}
+//	/**
+//	 * Delegate for {@Link EventSupport#dispatchEvent(Event)}.
+//	 */
+//	public void dispatchEvent(Event event) {
+//		eventSupport.dispatchEvent(event);
+//	}
+//	
+//	/**
+//	 * Delegate for {@Link EventSupport#dispatchEvent(EventType)}.
+//	 */
+//	public void dispatchEvent(EventType type) {
+//		eventSupport.dispatchEvent(type);
+//	}
 	
 	ImageIcon getIcon() {
 		return icon;
