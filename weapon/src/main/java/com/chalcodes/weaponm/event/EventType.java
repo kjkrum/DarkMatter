@@ -22,8 +22,18 @@ public enum EventType {
 	DB_DIRTY,
 	
 	DB_SAVED,
+
+	NET_DISCONNECTED,
+	
+	NET_CONNECTING,
 	
 	NET_CONNECTED,
 	
-	NET_DISCONNECTED
+	/**
+	 * A network error.
+	 * <p>
+	 * Parameters: {@link EventParam#ERROR}
+	 */
+	NET_ERROR
+
 }

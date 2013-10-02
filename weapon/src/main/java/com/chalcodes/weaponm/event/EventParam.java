@@ -4,5 +4,10 @@ public enum EventParam {
 	/**
 	 * (String) Game text with byte values mapped to characters 0-255.
 	 */
-	TEXT
+	TEXT,
+	
+	/**
+	 * (Throwable) The cause of an error event.
+	 */
+	ERROR
 }

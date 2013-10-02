@@ -28,6 +28,34 @@ public class Event {
 		}
 	}
 	
+	/**
+	 * 
+	 * 
+	 * @param type the event type
+	 * @param params alternating EventParam keys and Object values
+	 */
+	public Event(EventType type, Object... params) {
+		this.type = type;
+		if(params.length > 0) {
+			this.params = new HashMap<EventParam, Object>();
+			try {
+				for(int i = 0; i < params.length; i += 2) {
+					EventParam key = (EventParam) params[i];
+					if(this.params.containsKey(key)) {
+						throw new IllegalArgumentException("params array must not contain duplicate EventParam keys");
+					}
+					this.params.put(key, params[i + 1]);
+				}
+			}
+			catch(ArrayIndexOutOfBoundsException | ClassCastException e) {
+				throw new IllegalArgumentException("params array must contain pairs of EventParam keys and corresponding values", e);
+			}
+		}
+		else {
+			this.params = null;
+		}
+	}
+	
 	public EventType getType() {
 		return type;
 	}

@@ -62,12 +62,13 @@ abstract public class EventSupport {
 	abstract public void dispatchEvent(Event event);
 
 	/**
-	 * Convenience method to dispatch a new event with no parameters.
+	 * Convenience method to dispatch a new event.
 	 * 
 	 * @param type the event type
+	 * @param params pairs of corresponding {@link EventType}s and values
 	 */
-	public void dispatchEvent(EventType type) {
-		dispatchEvent(new Event(type, null));		
+	public void dispatchEvent(EventType type, Object... params) {
+		dispatchEvent(new Event(type, params));		
 	}
 
 }
