@@ -59,7 +59,7 @@ public class Gui {
 		icon = new ImageIcon(getClass()
 				.getResource("/com/chalcodes/weaponm/DarkMatter5.png"));
 		dockControl = new CControl(mainWindow);
-		eventSupport = new SwingEventSupport();
+		eventSupport = new GuiEventSupport();
 		dbm = new DatabaseManager(eventSupport);
 		actionManager = new ActionManager(this, eventSupport, dbm);
 		databaseFileChooser = new JFileChooser();
