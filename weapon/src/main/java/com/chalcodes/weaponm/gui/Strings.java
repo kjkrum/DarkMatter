@@ -25,7 +25,7 @@ public class Strings {
 			return bundle.getString(key);
 		}
 		else {
-			log.warn("missing resource for key {}", key);
+			log.warn("missing resource for key \"{}\"", key);
 			return "";
 		}
 	}
