@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 
@@ -14,7 +18,7 @@ import com.chalcodes.weaponm.event.EventType;
  */
 public class NetworkManager {
 	static final int BUFFER_SIZE = 8192;
-	//private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
+	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
 	private final EventSupport eventSupport;
 	private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 	private State state;
@@ -57,12 +61,22 @@ public class NetworkManager {
 			eventSupport.dispatchEvent(EventType.NET_CONNECTING);
 			break;
 		case CONNECTED:
+			try {
+				// this convinces TWGS we're a proper Telnet client
+				write("\u00FF\u00FC\u00F6");
+			}
+			catch(IOException e) {
+				log.error("error sending Telnet handshake", e);
+				disconnect();
+				break;
+			}
 			eventSupport.dispatchEvent(EventType.NET_CONNECTED);
 			break;
 		case DISCONNECTED:
 			networkThread = null;
 			channel = null;
 			eventSupport.dispatchEvent(EventType.NET_DISCONNECTED);
+			break;
 		}
 	}
 
@@ -86,7 +100,10 @@ public class NetworkManager {
 		if(locked) {
 			throw new NetworkLockedException();
 		}
-		else if(state == State.CONNECTED) {
+		else if(state != State.CONNECTED){
+			throw new IOException("Network is not connected.");
+		}
+		else {
 			int copied = 0;
 			while(copied < string.length()) {
 				while(writeBuffer.hasRemaining()) {
@@ -107,9 +124,6 @@ public class NetworkManager {
 					writeBuffer.clear();
 				}				
 			}
-		}
-		else {
-			throw new IOException("Network is not connected.");
 		}
 	}
 	

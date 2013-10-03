@@ -107,12 +107,7 @@ class NetworkSession implements Runnable {
 			@Override
 			public void run() {
 				manager.setChannel(channel);
-				try {
-					// this convinces TWGS we're a proper Telnet client
-					manager.write("\u00FF\u00FC\u00F6");
-				} catch (IOException e) {
-					// not this class's problem
-				}
+				manager.setState(State.CONNECTED);
 			}
 		});
 	}
