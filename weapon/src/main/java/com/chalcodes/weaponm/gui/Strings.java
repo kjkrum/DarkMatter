@@ -16,9 +16,11 @@ public class Strings {
 	public static final String OPEN_ACTION = "OPEN_ACTION";
 	public static final String WEAPON_MENU = "WEAPON_MENU";
 	public static final String ABOUT_ACTION = "ABOUT_ACTION";
+	public static final String CREDITS_ACTION = "CREDITS_ACTION";
 	
 	private static final Logger log = LoggerFactory.getLogger(Strings.class.getSimpleName());
 	private static final ResourceBundle bundle = ResourceBundle.getBundle("com/chalcodes/weaponm/Strings");
+
 	
 	public static String getString(String key) {
 		if(bundle.containsKey(key)) {

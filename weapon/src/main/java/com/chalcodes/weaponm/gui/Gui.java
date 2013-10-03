@@ -47,6 +47,7 @@ public class Gui {
 	private final DatabaseManager dbm;
 	private final ActionManager actionManager;
 	private final JFileChooser databaseFileChooser;
+	private final CreditsWindow creditsWindow;
 	
 	public Gui() {
 		log.info("{} started", APP_TITLE);
@@ -62,6 +63,7 @@ public class Gui {
 		dbm = new DatabaseManager(eventSupport);
 		actionManager = new ActionManager(this, eventSupport, dbm);
 		databaseFileChooser = new JFileChooser();
+		creditsWindow = new CreditsWindow(icon);
 		
 		configureFileChoosers();
 		configureDocking();
@@ -223,5 +225,11 @@ public class Gui {
 	
 	public void showAboutDialog() {
 		AboutDialog.showDialog(mainWindow);
+	}
+
+	public void showCreditsDialog() {
+		creditsWindow.setVisible(true);
+		creditsWindow.toFront();
+		creditsWindow.setLocationRelativeTo(mainWindow);
 	}
 }

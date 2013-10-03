@@ -7,18 +7,19 @@ import javax.swing.AbstractAction;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.Strings;
 
-class ShowAboutDialogAction extends AbstractAction {
+class ShowCreditsWindowAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 	
 	private final Gui gui;
 	
-	ShowAboutDialogAction(Gui gui) {
+	ShowCreditsWindowAction(Gui gui) {
 		this.gui = gui;
-		ActionManager.setText(this, Strings.ABOUT_ACTION);
+		ActionManager.setText(this, Strings.CREDITS_ACTION);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		gui.showAboutDialog();
+		gui.showCreditsDialog();		
 	}
+
 }

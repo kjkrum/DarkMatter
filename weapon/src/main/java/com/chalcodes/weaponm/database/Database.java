@@ -10,10 +10,15 @@ public class Database implements Serializable {
 
 	static final Object lock = new Object();
 	
+	private final LoginOptions loginOptions = new LoginOptions();
 	private Sector[] sectors;
 	
 	Database() {
 		restoreTransients();
+	}
+	
+	public LoginOptions getLoginOptions() {
+		return loginOptions;
 	}
 	
 	/**
