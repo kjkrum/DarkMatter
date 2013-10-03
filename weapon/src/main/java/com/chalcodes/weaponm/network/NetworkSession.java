@@ -2,6 +2,7 @@ package com.chalcodes.weaponm.network;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.util.List;
@@ -24,6 +25,8 @@ class NetworkSession implements Runnable {
 	private final String host;
 	private final int port;
 	private final EventSupport eventSupport;
+	private final ByteBuffer readBuffer = ByteBuffer.allocateDirect(NetworkManager.BUFFER_SIZE);
+	private final StringBuilder sb = new StringBuilder();
 	private SocketChannel channel;
 	
 	NetworkSession(NetworkManager manager, String host, int port, EventSupport eventSupport) {
@@ -37,18 +40,33 @@ class NetworkSession implements Runnable {
 	public void run() {
 		log.debug("network thread started");
 		try {
+			// run once
 			InetSocketAddress address = new InetSocketAddress(host, port);
 			channel = SocketChannel.open(address);
 			channel.configureBlocking(true);
 			reportChannel();
-			// TODO stuff
-			// read from network
-			// write to parser
-			// parser returns event list
-			// dispatch event list
+			
+			// main loop
+			while(!Thread.currentThread().isInterrupted()) {
+				int bytesRead = channel.read(readBuffer);
+				if(bytesRead == -1) break;
+
+				// TODO these StringBuilder shenanigans are fake
+				// actually put chars in a CharBuffer and write to parser
+				// parser returns list of events to be dispatched
+				
+				readBuffer.flip();
+				while(readBuffer.hasRemaining()) {
+					sb.append((char) readBuffer.get());
+				}
+				dispatchEvent(new Event(EventType.GAME_TEXT, EventParam.TEXT, sb.toString()));
+				sb.setLength(0);
+				readBuffer.clear();
+			}
+
 		}
 		catch(ClosedByInterruptException e) {
-			// normal result of a commanded disconnect
+			// normal result of being interrupted
 		}
 		catch(Throwable t) {
 			log.error("network error", t);
@@ -88,7 +106,13 @@ class NetworkSession implements Runnable {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				manager.setChannel(channel);				
+				manager.setChannel(channel);
+				try {
+					// this convinces TWGS we're a proper Telnet client
+					manager.write("\u00FF\u00FC\u00F6");
+				} catch (IOException e) {
+					// not this class's problem
+				}
 			}
 		});
 	}

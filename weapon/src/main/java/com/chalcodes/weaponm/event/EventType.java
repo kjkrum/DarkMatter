@@ -13,7 +13,7 @@ public enum EventType {
 	 * <p>
 	 * Parameters: {@link EventParam#TEXT}
 	 */
-	TEXT,
+	GAME_TEXT,
 	
 	DB_OPENED,
 	
