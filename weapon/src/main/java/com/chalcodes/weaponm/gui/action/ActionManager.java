@@ -48,12 +48,12 @@ public class ActionManager implements EventListener {
 
 	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm) {
 		final JMenu dbMenu = new JMenu();
-		setText(dbMenu, Strings.DATABASE_MENU);
+		setText(dbMenu, "DATABASE_MENU");
 		dbMenu.add(new OpenDatabaseAction(gui, dbm));
 		menuBar.add(dbMenu);
 		
 		final JMenu weaponMenu = new JMenu();
-		setText(weaponMenu, Strings.WEAPON_MENU);
+		setText(weaponMenu, "WEAPON_MENU");
 		weaponMenu.add(new ShowAboutDialogAction(gui));
 		weaponMenu.add(new ShowCreditsWindowAction(gui));
 		menuBar.add(weaponMenu);

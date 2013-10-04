@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.gui.Gui;
-import com.chalcodes.weaponm.gui.Strings;
 
 public class OpenDatabaseAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -23,7 +22,7 @@ public class OpenDatabaseAction extends AbstractAction {
 	public OpenDatabaseAction(Gui gui, DatabaseManager dbm) {
 		this.gui = gui;
 		this.dbm = dbm;
-		ActionManager.setText(this, Strings.OPEN_ACTION);
+		ActionManager.setText(this, "OPEN_ACTION");
 	}
 	
 	@Override

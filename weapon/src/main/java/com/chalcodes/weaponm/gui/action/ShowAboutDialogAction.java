@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import com.chalcodes.weaponm.gui.Gui;
-import com.chalcodes.weaponm.gui.Strings;
 
 class ShowAboutDialogAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -14,7 +13,7 @@ class ShowAboutDialogAction extends AbstractAction {
 	
 	ShowAboutDialogAction(Gui gui) {
 		this.gui = gui;
-		ActionManager.setText(this, Strings.ABOUT_ACTION);
+		ActionManager.setText(this, "ABOUT_ACTION");
 	}
 	
 	@Override

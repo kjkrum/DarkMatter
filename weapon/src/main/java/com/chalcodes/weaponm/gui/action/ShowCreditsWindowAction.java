@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import com.chalcodes.weaponm.gui.Gui;
-import com.chalcodes.weaponm.gui.Strings;
 
 class ShowCreditsWindowAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -14,7 +13,7 @@ class ShowCreditsWindowAction extends AbstractAction {
 	
 	ShowCreditsWindowAction(Gui gui) {
 		this.gui = gui;
-		ActionManager.setText(this, Strings.CREDITS_ACTION);
+		ActionManager.setText(this, "CREDITS_ACTION");
 	}
 	
 	@Override
