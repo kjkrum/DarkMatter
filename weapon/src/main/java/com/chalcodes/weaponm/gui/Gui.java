@@ -223,6 +223,15 @@ public class Gui {
 		}
 	}
 	
+	public File showDatabaseSaveDialog() {
+		if(databaseFileChooser.showSaveDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
+			return databaseFileChooser.getSelectedFile();
+		}
+		else {
+			return null;
+		}
+	}
+	
 	public void showAboutDialog() {
 		AboutDialog.showDialog(mainWindow);
 	}
@@ -232,4 +241,5 @@ public class Gui {
 		creditsWindow.toFront();
 		creditsWindow.setLocationRelativeTo(mainWindow);
 	}
+
 }

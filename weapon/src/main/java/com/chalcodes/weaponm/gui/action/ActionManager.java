@@ -50,6 +50,7 @@ public class ActionManager implements EventListener {
 		final JMenu dbMenu = new JMenu();
 		setText(dbMenu, "DATABASE_MENU");
 		dbMenu.add(new OpenDatabaseAction(gui, dbm));
+		dbMenu.add(new NewDatabaseAction(gui, dbm));
 		menuBar.add(dbMenu);
 		
 		final JMenu weaponMenu = new JMenu();
