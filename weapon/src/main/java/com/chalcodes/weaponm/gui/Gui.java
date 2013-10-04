@@ -57,7 +57,7 @@ public class Gui {
 		
 		mainWindow = new JFrame(APP_TITLE);
 		icon = new ImageIcon(getClass()
-				.getResource("/com/chalcodes/weaponm/DarkMatter5.png"));
+				.getResource("/com/chalcodes/weaponm/DarkMatter.png"));
 		dockControl = new CControl(mainWindow);
 		eventSupport = new GuiEventSupport();
 		dbm = new DatabaseManager(eventSupport);
