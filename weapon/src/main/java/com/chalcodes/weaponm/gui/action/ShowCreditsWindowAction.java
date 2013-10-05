@@ -13,12 +13,12 @@ class ShowCreditsWindowAction extends AbstractAction {
 	
 	ShowCreditsWindowAction(Gui gui) {
 		this.gui = gui;
-		ActionManager.setText(this, "CREDITS_ACTION");
+		ActionManager.setText(this, "ACTION_CREDITS");
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		gui.showCreditsDialog();		
+		gui.showCreditsWindow();		
 	}
 
 }

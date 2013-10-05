@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 import javax.swing.ImageIcon;
@@ -153,9 +154,7 @@ public class Gui {
 		mainWindow.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				// TODO call shutdown on gui or action manager
-				log.info("{} exiting", APP_TITLE);
-				System.exit(0);
+				interactiveShutdown();
 			}
 		});
 		mainWindow.add(dockControl.getContentArea());
@@ -249,7 +248,7 @@ public class Gui {
 		AboutDialog.showDialog(mainWindow);
 	}
 
-	public void showCreditsDialog() {
+	public void showCreditsWindow() {
 		creditsWindow.setVisible(true);
 		creditsWindow.toFront();
 		creditsWindow.setLocationRelativeTo(mainWindow);
@@ -257,6 +256,55 @@ public class Gui {
 
 	public int showLoginOptionsDialog(LoginOptions loginOptions) {
 		return LoginOptionsDialog.showDialog(mainWindow, loginOptions);
+	}
+	
+	/**
+	 * Interactively shut down the application.
+	 */
+	public void interactiveShutdown() {
+		if(interactiveClose()) {
+			// TODO fire events
+			log.info("{} exiting", APP_TITLE);
+			System.exit(0);
+		}
+	}
+	
+	/**
+	 * Interactively close the database.
+	 * 
+	 * @return true if the database is now closed, false if it is still open
+	 */
+	public boolean interactiveClose() {
+		if(dbm.isDatabaseOpen()) {
+			String[] options = {
+					Strings.getString("BUTTON_SAVE_CLOSE"),
+					Strings.getString("BUTTON_DISCARD_CLOSE"),
+					Strings.getString("BUTTON_CANCEL_CLOSE")
+					};
+			int option = showOptionDialog(
+					Strings.getString("QUESTION_CLOSE"),
+					Strings.getString("TITLE_CONFIRM_CLOSE"),
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					options,
+					options[0]);
+			if(option == JOptionPane.YES_OPTION) {
+				try {
+					dbm.save();
+					dbm.close();
+				} catch (IOException ex) {
+					log.error("error saving database", ex);
+					showMessageDialog(ex.getMessage(), Strings.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			else if(option == JOptionPane.NO_OPTION) {
+				dbm.close();
+			}
+			else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

@@ -13,7 +13,7 @@ class ShowAboutDialogAction extends AbstractAction {
 	
 	ShowAboutDialogAction(Gui gui) {
 		this.gui = gui;
-		ActionManager.setText(this, "ABOUT_ACTION");
+		ActionManager.setText(this, "ACTION_ABOUT");
 	}
 	
 	@Override

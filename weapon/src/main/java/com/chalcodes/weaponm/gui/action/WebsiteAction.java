@@ -14,7 +14,7 @@ public class WebsiteAction extends AbstractAction {
 	private static final Logger log = LoggerFactory.getLogger(WebsiteAction.class.getSimpleName());
 	
 	public WebsiteAction() {
-		ActionManager.setText(this, "WEBSITE_ACTION");
+		ActionManager.setText(this, "ACTION_WEBSITE");
 	}
 	
 	@Override

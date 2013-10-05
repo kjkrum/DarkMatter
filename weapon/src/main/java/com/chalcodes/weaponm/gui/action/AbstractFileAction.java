@@ -21,7 +21,7 @@ abstract class AbstractFileAction extends AbstractAction {
 	boolean interactiveClobber(File file) {
 		if(file.exists()) {
 			return gui.showYesNoDialog(
-					Strings.getString("CLOBBER_FILE"),
+					Strings.getString("QUESTION_CLOBBER_FILE"),
 					Strings.getString("TITLE_CONFIRM_CLOBBER")
 					) == JOptionPane.YES_OPTION;
 		}

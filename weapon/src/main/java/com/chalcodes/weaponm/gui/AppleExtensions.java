@@ -29,7 +29,7 @@ public class AppleExtensions implements Runnable {
 		app.setAboutHandler(new AboutHandler() {
 			@Override
 			public void handleAbout(AboutEvent evt) {
-				// TODO AboutDialog.showDialog(gui.mainWindow);
+				gui.showAboutDialog();
 			}
 		});
 		
@@ -40,7 +40,7 @@ public class AppleExtensions implements Runnable {
 			public void handleQuitRequestWith(QuitEvent evt, QuitResponse response) {
 				// cancel the OS-initiated quit, then invoke WM's own quit
 				response.cancelQuit();
-				// TODO gui.mainWindow.confirmExit();
+				gui.interactiveShutdown();
 			}
 		});
 	}

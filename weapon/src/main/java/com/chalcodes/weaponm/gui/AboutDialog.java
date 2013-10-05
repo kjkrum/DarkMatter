@@ -63,7 +63,7 @@ public class AboutDialog extends JDialog {
 		imageLabel.setToolTipText("Forged in the fires of Betelgeuse!");
 
 		copyrightPanel.setLayout(new BoxLayout(copyrightPanel, BoxLayout.Y_AXIS));
-		JLabel copyrightLabel1 = new JLabel("Copyright 2012, Kevin Krumwiede");
+		JLabel copyrightLabel1 = new JLabel("Copyright 2012, 2013, Kevin Krumwiede");
 		copyrightLabel1.setAlignmentX(CENTER_ALIGNMENT);
 		copyrightPanel.add(copyrightLabel1);
 		JLabel copyrightLabel2 = new JLabel("Published under the BSD License");
@@ -77,7 +77,7 @@ public class AboutDialog extends JDialog {
 		// this is kind of hackish, but it keeps the scroll pane from widening itself
 		scrollPane.setMaximumSize(new Dimension(imageLabel.getPreferredSize().width, Integer.MAX_VALUE));
 		
-		// this keeps the scroll pane scrolled to the top
+		// this keeps the scroll pane scrolled to the top as text is added
 		DefaultCaret caret = (DefaultCaret) infoTextArea.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		
@@ -94,6 +94,7 @@ public class AboutDialog extends JDialog {
 		infoTextArea.append("Available processors: " + Runtime.getRuntime().availableProcessors());
 		infoTextArea.setEditable(false);
 		
+		// TODO i18n
 		closeButton.setText("Close");
 		closeButton.setMnemonic('o');
 		closeButton.addActionListener(new ActionListener() {
@@ -103,6 +104,7 @@ public class AboutDialog extends JDialog {
 			}
 		});
 		
+		// TODO i18n
 		copyButton.setText("Copy");
 		copyButton.setMnemonic('C');
 		copyButton.addActionListener(new ActionListener() {
@@ -168,7 +170,7 @@ public class AboutDialog extends JDialog {
 								.addPreferredGap(
 										LayoutStyle.ComponentPlacement.RELATED)
 								.addComponent(scrollPane,
-										GroupLayout.PREFERRED_SIZE, 75, // TODO
+										GroupLayout.PREFERRED_SIZE, 75,
 										GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(
 										LayoutStyle.ComponentPlacement.RELATED)

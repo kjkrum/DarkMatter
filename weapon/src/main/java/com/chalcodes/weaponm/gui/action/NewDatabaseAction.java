@@ -6,6 +6,9 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.chalcodes.weaponm.database.Database;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
@@ -13,17 +16,20 @@ import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.LoginOptionsDialog;
 import com.chalcodes.weaponm.gui.Strings;
 
-public class NewDatabaseAction extends AbstractDatabaseAction {
+public class NewDatabaseAction extends AbstractFileAction {
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = LoggerFactory.getLogger(NewDatabaseAction.class.getSimpleName());
+	private final DatabaseManager dbm;
 
 	public NewDatabaseAction(Gui gui, DatabaseManager dbm) {
-		super(gui, dbm);
-		ActionManager.setText(this, "NEW_ACTION");
+		super(gui);
+		this.dbm = dbm;
+		ActionManager.setText(this, "ACTION_NEW");
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(interactiveClose()) {
+		if(gui.interactiveClose()) {
 			LoginOptions tempOptions = new LoginOptions();
 			if(gui.showLoginOptionsDialog(tempOptions) == LoginOptionsDialog.OK_ACTION) {
 				File file = gui.showDatabaseSaveDialog();
