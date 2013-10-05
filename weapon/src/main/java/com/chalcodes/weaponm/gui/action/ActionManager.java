@@ -51,8 +51,12 @@ public class ActionManager implements EventListener {
 		setText(dbMenu, "MENU_DATABASE");
 		dbMenu.add(new OpenDatabaseAction(gui, dbm));
 		dbMenu.add(new NewDatabaseAction(gui, dbm));
-		dbMenu.add(new SaveDatabaseAction(gui, dbm));
-		dbMenu.add(new CloseDatabaseAction(dbm));
+		AbstractAction saveAction = new SaveDatabaseAction(gui, dbm);
+		enableOnLoad.add(saveAction);
+		dbMenu.add(saveAction);
+		AbstractAction closeAction = new CloseDatabaseAction(gui);
+		enableOnLoad.add(closeAction);
+		dbMenu.add(closeAction);
 		menuBar.add(dbMenu);
 		
 		final JMenu weaponMenu = new JMenu();

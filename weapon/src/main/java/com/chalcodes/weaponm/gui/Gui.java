@@ -32,6 +32,7 @@ import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.action.ActionManager;
 
 /**
@@ -71,25 +72,14 @@ public class Gui {
 		configureDocking();
 		configureMainWindow();
 		loadAppleExtensions();
+		
+		eventSupport.dispatchEvent(EventType.DB_CLOSED);
+		eventSupport.dispatchEvent(EventType.NET_DISCONNECTED);
 	}
 
 	public void setVisible(boolean visible) {
 		mainWindow.setVisible(visible);
 	}
-	
-//	/**
-//	 * Delegate for {@Link EventSupport#dispatchEvent(Event)}.
-//	 */
-//	public void dispatchEvent(Event event) {
-//		eventSupport.dispatchEvent(event);
-//	}
-//	
-//	/**
-//	 * Delegate for {@Link EventSupport#dispatchEvent(EventType)}.
-//	 */
-//	public void dispatchEvent(EventType type) {
-//		eventSupport.dispatchEvent(type);
-//	}
 	
 	ImageIcon getIcon() {
 		return icon;
