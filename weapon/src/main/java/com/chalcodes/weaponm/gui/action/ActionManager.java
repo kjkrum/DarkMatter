@@ -57,6 +57,7 @@ public class ActionManager implements EventListener {
 		setText(weaponMenu, "WEAPON_MENU");
 		weaponMenu.add(new ShowAboutDialogAction(gui));
 		weaponMenu.add(new ShowCreditsWindowAction(gui));
+		weaponMenu.add(new WebsiteAction());
 		menuBar.add(weaponMenu);
 	}
 

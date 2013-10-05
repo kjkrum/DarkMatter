@@ -29,6 +29,7 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.chalcodes.weaponm.AppSettings;
 import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.database.DatabaseManager;
+import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.gui.action.ActionManager;
 
@@ -214,6 +215,18 @@ public class Gui {
 				optionType, messageType, null, options, initialValue);
 	}
 	
+	/**
+	 * Not thread-safe.
+	 * 
+	 * @param message
+	 * @param title
+	 * @return
+	 */
+	public int showYesNoDialog(Object message, String title) {
+		return JOptionPane.showConfirmDialog(mainWindow, message, title,
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+	}
+	
 	public File showDatabaseOpenDialog() {
 		if(databaseFileChooser.showOpenDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
 			return databaseFileChooser.getSelectedFile();
@@ -240,6 +253,10 @@ public class Gui {
 		creditsWindow.setVisible(true);
 		creditsWindow.toFront();
 		creditsWindow.setLocationRelativeTo(mainWindow);
+	}
+
+	public int showLoginOptionsDialog(LoginOptions loginOptions) {
+		return LoginOptionsDialog.showDialog(mainWindow, loginOptions);
 	}
 
 }

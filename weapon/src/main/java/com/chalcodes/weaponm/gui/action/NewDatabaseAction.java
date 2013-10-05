@@ -1,9 +1,17 @@
 package com.chalcodes.weaponm.gui.action;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
+import com.chalcodes.weaponm.database.Database;
 import com.chalcodes.weaponm.database.DatabaseManager;
+import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.gui.Gui;
+import com.chalcodes.weaponm.gui.LoginOptionsDialog;
+import com.chalcodes.weaponm.gui.Strings;
 
 public class NewDatabaseAction extends AbstractDatabaseAction {
 	private static final long serialVersionUID = 1L;
@@ -16,36 +24,35 @@ public class NewDatabaseAction extends AbstractDatabaseAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(interactiveClose()) {
-			// create a standalone LoginOptions because we don't have a db yet
-//			LoginOptions dialogOptions = new LoginOptions();
-//			if(LoginOptionsDialog.showDialog(gui.mainWindow, dialogOptions) == LoginOptionsDialog.OK_ACTION) {
-//				if(gui.databaseFileChooser.showSaveDialog(gui.mainWindow) == JFileChooser.APPROVE_OPTION) {
-//					File file = gui.databaseFileChooser.getSelectedFile();
-//					String filename = file.getPath();
-//					if(!filename.endsWith(".wmd")) {
-//						file = new File(filename + ".wmd");
-//					}
-//					if(gui.confirmOverwrite(file)) {
-//						try {
-//							Database database = gui.weapon.dbm.create(file);
-//							// copy new login options to database
-//							LoginOptions dbOptions = database.getLoginOptions();
-//							dbOptions.setTitle(dialogOptions.getTitle());
-//							dbOptions.setHost(dialogOptions.getHost());
-//							dbOptions.setPort(dialogOptions.getPort());
-//							dbOptions.setGame(dialogOptions.getGame());
-//							dbOptions.setName(dialogOptions.getName());
-//							dbOptions.setPassword(dialogOptions.getPassword());
-//							dbOptions.setAutoLogin(dialogOptions.isAutoLogin());
-//							gui.weapon.dbm.save();
-//							gui.weapon.autoLoadScripts();
-//						} catch (Throwable t) {
-//							log.error("error creating database", t);
-//							gui.threadSafeMessageDialog(t.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-//						}
-//					}
-//				}
-//			}			
+			LoginOptions tempOptions = new LoginOptions();
+			if(gui.showLoginOptionsDialog(tempOptions) == LoginOptionsDialog.OK_ACTION) {
+				File file = gui.showDatabaseSaveDialog();
+				if(file != null) {
+					String filename = file.getPath();
+					if(!filename.endsWith(".wmd")) {
+						file = new File(filename + ".wmd");
+					}
+					if(interactiveClobber(file)) {
+						try {
+							Database db = dbm.create(file);
+							LoginOptions dbOptions = db.getLoginOptions();
+							dbOptions.setTitle(tempOptions.getTitle());
+							dbOptions.setHost(tempOptions.getHost());
+							dbOptions.setPort(tempOptions.getPort());
+							dbOptions.setGame(tempOptions.getGame());
+							dbOptions.setName(tempOptions.getName());
+							dbOptions.setPassword(tempOptions.getPassword());
+							dbOptions.setAutoLogin(tempOptions.isAutoLogin());
+							dbm.save();
+							// TODO fire events
+						}
+						catch(IOException ex) {
+							log.error("error creating database", ex);
+							gui.showMessageDialog(ex.getMessage(), Strings.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+			}
 		}
 	}
 }

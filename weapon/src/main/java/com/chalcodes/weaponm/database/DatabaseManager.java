@@ -41,7 +41,7 @@ public class DatabaseManager {
 		return database != null;
 	}
 	
-	public Database create(File file) throws IOException, ClassNotFoundException {
+	public Database create(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if(!lockFile.createNewFile()) {
 			throw new IOException("Lock file " + lockFile.getPath() + " exists.");

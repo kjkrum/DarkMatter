@@ -2,7 +2,6 @@ package com.chalcodes.weaponm.gui.action;
 
 import java.io.IOException;
 
-import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
@@ -12,14 +11,13 @@ import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.Strings;
 
-@SuppressWarnings("serial")
-abstract class AbstractDatabaseAction extends AbstractAction {
+@SuppressWarnings("serial") // class is abstract
+abstract class AbstractDatabaseAction extends AbstractFileAction {
 	final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
-	final Gui gui;
 	final DatabaseManager dbm;
 
 	AbstractDatabaseAction(Gui gui, DatabaseManager dbm) {
-		this.gui = gui;
+		super(gui);
 		this.dbm = dbm;
 	}
 	
