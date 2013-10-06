@@ -3,7 +3,6 @@ package com.chalcodes.weaponm.gui.action;
 import java.io.File;
 
 import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
 
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.Strings;
@@ -22,8 +21,7 @@ abstract class AbstractFileAction extends AbstractAction {
 		if(file.exists()) {
 			return gui.showYesNoDialog(
 					Strings.getString("QUESTION_CLOBBER_FILE"),
-					Strings.getString("TITLE_CONFIRM_CLOBBER")
-					) == JOptionPane.YES_OPTION;
+					Strings.getString("TITLE_CONFIRM_CLOBBER"));
 		}
 		return true;
 	}

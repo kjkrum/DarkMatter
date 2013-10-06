@@ -211,9 +211,10 @@ public class Gui {
 	 * @param title
 	 * @return
 	 */
-	public int showYesNoDialog(Object message, String title) {
+	public boolean showYesNoDialog(Object message, String title) {
 		return JOptionPane.showConfirmDialog(mainWindow, message, title,
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) ==
+				JOptionPane.YES_OPTION;
 	}
 	
 	public File showDatabaseOpenDialog() {
@@ -252,11 +253,24 @@ public class Gui {
 	 * Interactively shut down the application.
 	 */
 	public void interactiveShutdown() {
-		if(interactiveClose()) {
-			// TODO fire events
-			log.info("{} exiting", APP_TITLE);
-			System.exit(0);
+		if(dbm.isDatabaseOpen()) {
+			if(interactiveClose()) {
+				shutdown();
+			}
 		}
+		else {
+			if(showYesNoDialog(
+					Strings.getString("QUESTION_EXIT"),
+					Strings.getString("TITLE_CONFIRM_EXIT"))) {
+				shutdown();
+			}
+		}
+	}
+	
+	private void shutdown() {
+		// TODO fire events
+		log.info("{} exiting", APP_TITLE);
+		System.exit(0);
 	}
 	
 	/**
