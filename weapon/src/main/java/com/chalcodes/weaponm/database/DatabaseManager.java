@@ -29,11 +29,16 @@ public class DatabaseManager {
 	private final EventSupport eventSupport;
 	private File file;
 	private Database database;
+	
+	// TODO think about synchronization when not drunk
+	// consider that none of these methods are interactive, so will not block network
+	// maybe just need to sync private save(...)
+	// other threads won't exist during open/create, and will be killed by close event
+	// database reference doesn't change even if file name changes
 
 	/**
 	 * 
-	 * @param eventSupport
-	 *            the GUI's event dispatcher
+	 * @param eventSupport the GUI's event dispatcher
 	 */
 	public DatabaseManager(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
@@ -46,8 +51,8 @@ public class DatabaseManager {
 	public Database create(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
-			throw new IOException("Lock file " + lockFile.getPath()
-					+ " exists.");
+			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+					.replace("{}", lockFile.getPath()));
 		}
 		Database database = new Database();
 		save(file, database);
@@ -63,8 +68,8 @@ public class DatabaseManager {
 	public Database open(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
-			throw new IOException("Lock file " + lockFile.getPath()
-					+ " exists.");
+			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+					.replace("{}", lockFile.getPath()));
 		}
 		try {
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(
@@ -100,17 +105,17 @@ public class DatabaseManager {
 			else { // ClassNotFoundException, ClassCastException
 				throw new IOException(Strings.getString(
 						"MESSAGE_FILE_INCOMPATIBLE").replace("{}",
-						file.getPath()), e);
+								file.getPath()), e);
 			}
 		}
 	}
 
-	synchronized public void save() throws IOException {
+	public void save() throws IOException {
 		save(file, database);
 		log.info("database saved");
 	}
 
-	synchronized public void saveAs(File newFile) throws IOException {
+	public void saveAs(File newFile) throws IOException {
 		// create new lock file
 		File lockFile = new File(newFile.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
@@ -124,7 +129,7 @@ public class DatabaseManager {
 		log.info("database saved as '{}'", file.getPath());
 	}
 
-	synchronized public void saveCopy(File copyFile) throws IOException {
+	public void saveCopy(File copyFile) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
 			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
@@ -135,44 +140,38 @@ public class DatabaseManager {
 		log.info("database copied to {}", copyFile.getPath());
 	}
 
-	protected void save(File file, Database database) throws IOException {
-		if (file.isDirectory())
-			throw new IOException(Strings.getString("MESSAGE_FILE_IS_DIR"));
-		File tmpFile = new File(file.getPath() + ".tmp");
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
-				tmpFile));
-		try {
-			out.writeObject(database);
-		} finally {
-			out.close();
-		}
-		if (file.exists() && !file.delete()) {
-			throw new IOException(Strings.getString("MESSAGE_DELETE_FAILED"));
-		}
-		if (!tmpFile.renameTo(file)) {
-			throw new IOException(Strings.getString("MESSAGE_RENAME_FAILED"));
+	private void save(File file, Database database) throws IOException {
+		synchronized(Database.lock) {
+			if (file.isDirectory())
+				throw new IOException(Strings.getString("MESSAGE_FILE_IS_DIR"));
+			File tmpFile = new File(file.getPath() + ".tmp");
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
+					tmpFile));
+			try {
+				out.writeObject(database);
+			} finally {
+				out.close();
+			}
+			if (file.exists() && !file.delete()) {
+				throw new IOException(Strings.getString("MESSAGE_DELETE_FAILED"));
+			}
+			if (!tmpFile.renameTo(file)) {
+				throw new IOException(Strings.getString("MESSAGE_RENAME_FAILED"));
+			}
 		}
 	}
 
 	public void close() {
 		if (file != null) {
-			// TODO weapon.scripts.unloadAll();
-			// TODO weapon.network.disconnect();
+			eventSupport.dispatchEvent(EventType.DB_CLOSED);
 			new File(file.getPath() + ".lock").delete();
 			file = null;
 			database = null;
-			// TODO lexer.removeEventListener(parser);
-			// TODO parser = null;
-			// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
-			// null, false);
-			eventSupport.dispatchEvent(EventType.DB_CLOSED);
+			// TODO reset lexer/parser
 			log.info("database closed");
 		}
-
 	}
 
-	// export xml
-	// import xml
-	// merge
+	// TODO export, import, merge
 
 }
