@@ -10,6 +10,10 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.menu.SingleCDockableListMenuPiece;
+import bibliothek.gui.dock.facile.menu.RootMenuPiece;
+
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.event.Event;
 import com.chalcodes.weaponm.event.EventListener;
@@ -34,8 +38,8 @@ public class ActionManager implements EventListener {
 	private final Set<AbstractAction> enableOnConnect = new HashSet<AbstractAction>(); // disable on disconnect
 	private final Set<AbstractAction> disableOnConnect = new HashSet<AbstractAction>(); // enable on disconnect
 	
-	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm) {
-		populateMenuBar(gui, eventSupport, dbm);
+	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm, CControl dockControl) {
+		populateMenuBar(gui, eventSupport, dbm, dockControl);
 		eventSupport.addEventListener(this, EventType.DB_OPENED);
 		eventSupport.addEventListener(this, EventType.DB_CLOSED);
 		eventSupport.addEventListener(this, EventType.NET_CONNECTED);
@@ -46,7 +50,7 @@ public class ActionManager implements EventListener {
 		return menuBar;
 	}
 
-	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm) {
+	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm, CControl dockControl) {
 		final JMenu dbMenu = new JMenu();
 		setText(dbMenu, "MENU_DATABASE");
 		dbMenu.add(new OpenDatabaseAction(gui, dbm));
@@ -58,6 +62,12 @@ public class ActionManager implements EventListener {
 		enableOnLoad.add(closeAction);
 		dbMenu.add(closeAction);
 		menuBar.add(dbMenu);
+		
+		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl);
+		final JMenu viewMenu = new RootMenuPiece("", true, piece).getMenu();
+		enableOnLoadMenus.add(viewMenu);
+		setText(viewMenu, "MENU_VIEW");
+		menuBar.add(viewMenu);
 		
 		final JMenu weaponMenu = new JMenu();
 		setText(weaponMenu, "MENU_WEAPON");

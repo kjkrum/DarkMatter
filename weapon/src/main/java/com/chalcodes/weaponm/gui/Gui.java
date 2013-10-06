@@ -64,7 +64,7 @@ public class Gui {
 		dockControl = new CControl(mainWindow);
 		eventSupport = new GuiEventSupport();
 		dbm = new DatabaseManager(eventSupport);
-		actionManager = new ActionManager(this, eventSupport, dbm);
+		actionManager = new ActionManager(this, eventSupport, dbm, dockControl);
 		databaseFileChooser = new JFileChooser();
 		creditsWindow = new CreditsWindow(icon);
 		

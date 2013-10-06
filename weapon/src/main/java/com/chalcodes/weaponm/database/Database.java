@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+// TODO all setters everywhere should fire dirty event iff value changed
+
 public class Database implements Serializable {
 	private static final long serialVersionUID = 1L;
 
