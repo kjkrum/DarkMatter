@@ -30,11 +30,12 @@ public class DatabaseManager {
 	private File file;
 	private Database database;
 	
-	// TODO think about synchronization when not drunk
-	// consider that none of these methods are interactive, so will not block network
-	// maybe just need to sync private save(...)
-	// other threads won't exist during open/create, and will be killed by close event
-	// database reference doesn't change even if file name changes
+	/* 
+	 * none of these methods are interactive, so will not block network
+	 * only need to sync in private save method
+	 * network thread won't exist during open/create and will be killed by close
+	 * database reference doesn't change even if file name changes
+	 */
 
 	/**
 	 * 
@@ -141,23 +142,23 @@ public class DatabaseManager {
 	}
 
 	private void save(File file, Database database) throws IOException {
-		synchronized(Database.lock) {
-			if (file.isDirectory())
-				throw new IOException(Strings.getString("MESSAGE_FILE_IS_DIR"));
-			File tmpFile = new File(file.getPath() + ".tmp");
-			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
-					tmpFile));
-			try {
+		if (file.isDirectory())
+			throw new IOException(Strings.getString("MESSAGE_FILE_IS_DIR"));
+		File tmpFile = new File(file.getPath() + ".tmp");
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
+				tmpFile));
+		try {
+			synchronized(Database.lock) {
 				out.writeObject(database);
-			} finally {
-				out.close();
 			}
-			if (file.exists() && !file.delete()) {
-				throw new IOException(Strings.getString("MESSAGE_DELETE_FAILED"));
-			}
-			if (!tmpFile.renameTo(file)) {
-				throw new IOException(Strings.getString("MESSAGE_RENAME_FAILED"));
-			}
+		} finally {
+			out.close();
+		}
+		if (file.exists() && !file.delete()) {
+			throw new IOException(Strings.getString("MESSAGE_DELETE_FAILED"));
+		}
+		if (!tmpFile.renameTo(file)) {
+			throw new IOException(Strings.getString("MESSAGE_RENAME_FAILED"));
 		}
 	}
 

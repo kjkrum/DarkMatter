@@ -64,6 +64,8 @@ public class ActionManager implements EventListener {
 		weaponMenu.add(new ShowAboutDialogAction(gui));
 		weaponMenu.add(new ShowCreditsWindowAction(gui));
 		weaponMenu.add(new WebsiteAction());
+		weaponMenu.addSeparator();
+		weaponMenu.add(new ExitAction(gui));
 		menuBar.add(weaponMenu);
 	}
 
