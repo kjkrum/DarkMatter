@@ -13,14 +13,15 @@ import org.slf4j.LoggerFactory;
 import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
+import com.chalcodes.weaponm.gui.Strings;
 
 /**
- * Manages serialization and deserialization of databases.  This class
- * primarily exists so that {@link Database} doesn't have to expose methods
- * like <tt>close()</tt>.  Although this class is public, scripts cannot
- * normally obtain a reference to the Weapon's instance of it.  Its methods
- * are intended to be called only in the UI thread.
- *
+ * Manages serialization and deserialization of databases. This class primarily
+ * exists so that {@link Database} doesn't have to expose methods like
+ * <tt>close()</tt>. Although this class is public, scripts cannot normally
+ * obtain a reference to the Weapon's instance of it. Its methods are intended
+ * to be called only in the UI thread.
+ * 
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public class DatabaseManager {
@@ -28,24 +29,26 @@ public class DatabaseManager {
 	private final EventSupport eventSupport;
 	private File file;
 	private Database database;
-	
+
 	/**
 	 * 
-	 * @param eventSupport the GUI's event dispatcher
+	 * @param eventSupport
+	 *            the GUI's event dispatcher
 	 */
 	public DatabaseManager(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
 	}
-	
+
 	public boolean isDatabaseOpen() {
 		return database != null;
 	}
-	
+
 	public Database create(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
-		if(!lockFile.createNewFile()) {
-			throw new IOException("Lock file " + lockFile.getPath() + " exists.");
-		}		
+		if (!lockFile.createNewFile()) {
+			throw new IOException("Lock file " + lockFile.getPath()
+					+ " exists.");
+		}
 		Database database = new Database();
 		save(file, database);
 		close();
@@ -56,52 +59,63 @@ public class DatabaseManager {
 		log.info("database created in {}", file.getPath());
 		return database;
 	}
-	
+
 	public Database open(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
-		if(!lockFile.createNewFile()) {
-			throw new IOException("Lock file " + lockFile.getPath() + " exists.");
-		}		
+		if (!lockFile.createNewFile()) {
+			throw new IOException("Lock file " + lockFile.getPath()
+					+ " exists.");
+		}
 		try {
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(
+					file));
 			try {
 				this.database = (Database) in.readObject();
+			} finally {
+				in.close();
 			}
-			finally { in.close(); }
 			this.file = file;
 			// TODO parser = new DataParser(weapon, lexer, database);
 			eventSupport.dispatchEvent(EventType.DB_OPENED);
-			if(database.isInitialized()) {
-				// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED, database, true);
+			if (database.isInitialized()) {
+				// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
+				// database, true);
 			}
 			// TODO if(database.getStardockSector() != null) {
-			//	weapon.gui.firePropertyChange(GUI.STARDOCK_DISCOVERED, null, database.getStardockSector().getNumber());
-			//}
+			// weapon.gui.firePropertyChange(GUI.STARDOCK_DISCOVERED, null,
+			// database.getStardockSector().getNumber());
+			// }
 			// TODO if(database.getYou().getSector() != null) {
-			//	weapon.gui.firePropertyChange(GUI.SHIP_SECTOR, null, database.getYou().getSector().getNumber());
-			//}
+			// weapon.gui.firePropertyChange(GUI.SHIP_SECTOR, null,
+			// database.getYou().getSector().getNumber());
+			// }
 			log.info("database loaded from {}", file.getPath());
-			// TODO weapon.gui.updateTitles(database.getLoginOptions().getTitle());
+			// TODO
+			// weapon.gui.updateTitles(database.getLoginOptions().getTitle());
 			return database;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			lockFile.delete();
-			if(e instanceof IOException) throw (IOException) e;
+			if (e instanceof IOException)
+				throw (IOException) e;
 			else { // ClassNotFoundException, ClassCastException
-				throw new IOException("The file \"" + file.getPath() + "\" is not a compatible Weapon M database.", e); 
+				throw new IOException(Strings.getString(
+						"MESSAGE_FILE_INCOMPATIBLE").replace("{}",
+						file.getPath()), e);
 			}
 		}
 	}
-	
+
 	synchronized public void save() throws IOException {
 		save(file, database);
 		log.info("database saved");
 	}
-	
+
 	synchronized public void saveAs(File newFile) throws IOException {
 		// create new lock file
 		File lockFile = new File(newFile.getPath() + ".lock");
-		if(!lockFile.createNewFile()) {
-			throw new IOException("Lock file " + lockFile.getPath() + " exists.");
+		if (!lockFile.createNewFile()) {
+			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+					.replace("{}", lockFile.getPath()));
 		}
 		save(newFile, database);
 		// delete old lock file
@@ -109,39 +123,39 @@ public class DatabaseManager {
 		file = newFile;
 		log.info("database saved as '{}'", file.getPath());
 	}
-	
+
 	synchronized public void saveCopy(File copyFile) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
-		if(!lockFile.createNewFile()) {
-			throw new IOException("Lock file " + lockFile.getPath() + " exists.");
+		if (!lockFile.createNewFile()) {
+			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+					.replace("{}", lockFile.getPath()));
 		}
 		save(copyFile, database);
 		lockFile.delete();
 		log.info("database copied to {}", copyFile.getPath());
 	}
-	
+
 	protected void save(File file, Database database) throws IOException {
-		if(file.isDirectory()) throw new IOException("Target file is a directory.");
+		if (file.isDirectory())
+			throw new IOException(Strings.getString("MESSAGE_FILE_IS_DIR"));
 		File tmpFile = new File(file.getPath() + ".tmp");
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(tmpFile));
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
+				tmpFile));
 		try {
 			out.writeObject(database);
 		} finally {
 			out.close();
 		}
-		if(file.exists() && !file.delete()) {
-			throw new IOException("Save incomplete: could not delete old file.");
+		if (file.exists() && !file.delete()) {
+			throw new IOException(Strings.getString("MESSAGE_DELETE_FAILED"));
 		}
-		if(!tmpFile.renameTo(file)) {
-			throw new IOException("Save incomplete: could not rename temp file.");
+		if (!tmpFile.renameTo(file)) {
+			throw new IOException(Strings.getString("MESSAGE_RENAME_FAILED"));
 		}
 	}
-	
-	/**
-	 * Nulls database references and shuts down network and scripts.
-	 */
+
 	public void close() {
-		if(file != null) {
+		if (file != null) {
 			// TODO weapon.scripts.unloadAll();
 			// TODO weapon.network.disconnect();
 			new File(file.getPath() + ".lock").delete();
@@ -149,17 +163,16 @@ public class DatabaseManager {
 			database = null;
 			// TODO lexer.removeEventListener(parser);
 			// TODO parser = null;
-			// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED, null, false);
+			// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
+			// null, false);
 			eventSupport.dispatchEvent(EventType.DB_CLOSED);
 			log.info("database closed");
 		}
-		
+
 	}
-	
+
 	// export xml
 	// import xml
 	// merge
-
-	
 
 }

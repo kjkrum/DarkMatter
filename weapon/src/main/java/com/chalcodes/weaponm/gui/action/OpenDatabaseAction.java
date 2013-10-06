@@ -33,7 +33,7 @@ public class OpenDatabaseAction extends AbstractFileAction {
 					dbm.open(file);
 				} catch (IOException ex) {
 					log.error("error opening database", ex);
-					gui.showMessageDialog(ex.getMessage(), Strings.getString("DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
+					gui.showMessageDialog(ex.getMessage(), Strings.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
