@@ -1,6 +1,7 @@
 package com.chalcodes.weaponm.gui;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -22,6 +23,10 @@ import org.slf4j.LoggerFactory;
 import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.event.CDockableStateListener;
+import bibliothek.gui.dock.common.intern.AbstractCDockable;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.station.screen.ScreenDockWindowFactory;
 import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
@@ -31,6 +36,8 @@ import com.chalcodes.weaponm.AppSettings;
 import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
+import com.chalcodes.weaponm.event.Event;
+import com.chalcodes.weaponm.event.EventListener;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.action.ActionManager;
@@ -70,6 +77,7 @@ public class Gui {
 		
 		configureFileChoosers();
 		configureDocking();
+		createDockables();
 		configureMainWindow();
 		loadAppleExtensions();
 		
@@ -81,8 +89,8 @@ public class Gui {
 		mainWindow.setVisible(visible);
 	}
 	
-	ImageIcon getIcon() {
-		return icon;
+	Image getIconImage() {
+		return icon.getImage();
 	}
 
 	private void setLookAndFeel() {
@@ -136,6 +144,39 @@ public class Gui {
 
 		// give it a default size
 		dockControl.getContentArea().setPreferredSize(new Dimension(640, 480));
+		
+		// add listener to close all dockables when db is closed
+		EventListener listener = new EventListener() {
+			@Override
+			public void onEvent(Event event) {
+				for(int i = 0; i < dockControl.getCDockableCount(); ++i) {
+					dockControl.getCDockable(i).setVisible(false);
+				}
+			}
+		};
+		eventSupport.addEventListener(listener, EventType.DB_CLOSED);
+		// TODO restore layout when db is opened
+	}
+	
+	private void createDockables() {
+		dockControl.addDockable(new Terminal().getDockable());
+		dockControl.addDockable(new Terminal().getDockable()); // TODO remove
+		
+		// add state listener to all dockables
+		CDockableStateListener listener = new CDockableStateListener() {
+			@Override
+			public void extendedModeChanged(CDockable arg0, ExtendedMode arg1) {
+				// ignored
+			}
+			@Override
+			public void visibilityChanged(CDockable cd) {
+				((AbstractCDockable) cd).toFront();			
+			}
+		};
+		
+		for(int i = 0; i < dockControl.getCDockableCount(); ++i) {
+			dockControl.getCDockable(i).addCDockableStateListener(listener);
+		}
 	}
 
 	private void configureMainWindow() {
@@ -253,6 +294,7 @@ public class Gui {
 	 * Interactively shut down the application.
 	 */
 	public void interactiveShutdown() {
+		// TODO different behavior if db is clean?
 		if(dbm.isDatabaseOpen()) {
 			if(interactiveClose()) {
 				shutdown();

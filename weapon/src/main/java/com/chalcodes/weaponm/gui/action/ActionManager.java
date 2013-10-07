@@ -63,10 +63,13 @@ public class ActionManager implements EventListener {
 		dbMenu.add(closeAction);
 		menuBar.add(dbMenu);
 		
-		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl);
-		final JMenu viewMenu = new RootMenuPiece("", true, piece).getMenu();
-		enableOnLoadMenus.add(viewMenu);
+		final JMenu viewMenu = new JMenu();
 		setText(viewMenu, "MENU_VIEW");
+		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl);
+		final RootMenuPiece root = new RootMenuPiece(viewMenu);
+		root.add(piece);
+		enableOnLoadMenus.add(viewMenu);
+
 		menuBar.add(viewMenu);
 		
 		final JMenu weaponMenu = new JMenu();
@@ -91,10 +94,12 @@ public class ActionManager implements EventListener {
 			}
 			break;
 		case DB_CLOSED:
+			//log.debug("handling DB_CLOSED");
 			for(AbstractAction action : enableOnLoad) {
 				action.setEnabled(false);
 			}
 			for(JMenu menu : enableOnLoadMenus) {
+				//log.debug("disabling {}", menu);
 				menu.setEnabled(false);
 			}
 			break;

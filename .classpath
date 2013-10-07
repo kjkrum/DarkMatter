@@ -15,7 +15,7 @@
 	<classpathentry kind="lib" path="lib/logback-classic-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/logback-core-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.2.jar"/>
-	<classpathentry kind="lib" path="lib/docking-frames-common.jar"/>
+	<classpathentry kind="lib" path="lib/docking-frames-common-1.1.2-P8c-kjkrum.jar"/>
 	<classpathentry kind="lib" path="lib/docking-frames-core.jar"/>
 	<classpathentry kind="lib" path="lib/docking-frames-ext-glass.jar"/>
 	<classpathentry kind="lib" path="lib/glasslib.jar"/>

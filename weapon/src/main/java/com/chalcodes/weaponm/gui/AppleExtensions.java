@@ -24,7 +24,7 @@ public class AppleExtensions implements Runnable {
 	public void run() {
 		Application app = Application.getApplication();
 
-		app.setDockIconImage(gui.getIcon().getImage());
+		app.setDockIconImage(gui.getIconImage());
 		
 		app.setAboutHandler(new AboutHandler() {
 			@Override
