@@ -34,6 +34,10 @@ public class BugSense {
 		REPORT_URL = tmp;
 	}
 	
+	public static void report(Throwable t, boolean handled) throws IOException {
+		report(Thread.currentThread(), t, handled);
+	}
+	
 	public static void report(Thread thread, Throwable t, boolean handled) throws IOException {
 		System.out.println(spitJson(thread, t, handled));
 		
@@ -76,9 +80,9 @@ public class BugSense {
 		sb.append(Integer.toString(Runtime.getRuntime().availableProcessors()));
 		sb.append("\",\"Thread\":\"");
 		sb.append(thread.getName());
-		sb.append("\"}},\"exception\":{\"handled\":\"");
+		sb.append("\"}},\"exception\":{\"handled\":");
 		sb.append(handled ? '0' : '1');
-		sb.append("\",\"message\":\"");
+		sb.append(",\"message\":\"");
 		sb.append(t.getMessage());
 		sb.append("\",\"where\":\"");
 		StackTraceElement[] elements = t.getStackTrace();
@@ -112,4 +116,12 @@ public class BugSense {
 		
 		return sb.toString();
 	}
+	
+//	public static void main(String[] args) {
+//		try {
+//			BugSense.report(new RuntimeException("Test"), true);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }
