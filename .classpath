@@ -15,10 +15,9 @@
 	<classpathentry kind="lib" path="lib/logback-classic-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/logback-core-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.2.jar"/>
-	<classpathentry kind="lib" path="lib/docking-frames-common-1.1.2-P8c-kjkrum.jar"/>
-	<classpathentry kind="lib" path="lib/docking-frames-core.jar"/>
-	<classpathentry kind="lib" path="lib/docking-frames-ext-glass.jar"/>
-	<classpathentry kind="lib" path="lib/glasslib.jar"/>
-	<classpathentry kind="lib" path="lib/OrangeExtensions-1.4.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OrangeExtensions"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Glass"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
