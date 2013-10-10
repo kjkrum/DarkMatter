@@ -67,10 +67,21 @@ public class ActionManager implements EventListener {
 		setText(viewMenu, "MENU_VIEW");
 		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl);
 		final RootMenuPiece root = new RootMenuPiece(viewMenu);
+		root.setDisableWhenEmpty(false);
+		root.setEnableWhenNotEmpty(false);
 		root.add(piece);
+		//viewMenu.addSeparator();
+		// TODO save/load layout actions
+		// multiple perspectives? per database or global?
 		enableOnLoadMenus.add(viewMenu);
-
 		menuBar.add(viewMenu);
+		
+		final JMenu netMenu = new JMenu();
+		setText(netMenu, "MENU_NETWORK");
+		enableOnLoadMenus.add(netMenu);
+		netMenu.addSeparator();
+		netMenu.add(new ShowLoginOptionsDialogAction(gui, dbm));
+		menuBar.add(netMenu);
 		
 		final JMenu weaponMenu = new JMenu();
 		setText(weaponMenu, "MENU_WEAPON");

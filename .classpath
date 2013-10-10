@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Glass"/>
+	<classpathentry kind="src" path="/JTX"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

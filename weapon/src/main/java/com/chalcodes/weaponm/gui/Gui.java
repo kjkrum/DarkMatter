@@ -159,8 +159,13 @@ public class Gui {
 	}
 	
 	private void createDockables() {
-		dockControl.addDockable(new Terminal().getDockable());
-		dockControl.addDockable(new Terminal().getDockable()); // TODO remove
+		try {
+			dockControl.addDockable(new Terminal().getDockable());
+		}
+		catch(IOException e) {
+			// TODO something better
+			e.printStackTrace();
+		}
 		
 		// add state listener to all dockables
 		CDockableStateListener listener = new CDockableStateListener() {

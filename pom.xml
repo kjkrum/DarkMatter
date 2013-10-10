@@ -10,8 +10,8 @@
 	<url>http://http://chalcodes.com/wiki/index.php?title=Weapon_M</url>
 	<licenses>
 		<license>
-			<name>GPLv3</name>
-			<url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+			<name>Modified BSD License</name>
+			<url>http://opensource.org/licenses/BSD-3-Clause</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>

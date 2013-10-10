@@ -48,6 +48,10 @@ public class DatabaseManager {
 	public boolean isDatabaseOpen() {
 		return database != null;
 	}
+	
+	public Database getDatabase() {
+		return database;
+	}
 
 	public Database create(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
