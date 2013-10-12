@@ -66,9 +66,13 @@ public class ActionManager implements EventListener {
 		final JMenu viewMenu = new JMenu();
 		setText(viewMenu, "MENU_VIEW");
 		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl);
-		final RootMenuPiece root = new RootMenuPiece(viewMenu);
+		final RootMenuPiece root = new RootMenuPiece(viewMenu) {
+			@Override
+			protected void updateEnabled() {
+				// do nothing
+			}
+		};
 		root.setDisableWhenEmpty(false);
-		root.setEnableWhenNotEmpty(false);
 		root.add(piece);
 		//viewMenu.addSeparator();
 		// TODO save/load layout actions

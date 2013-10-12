@@ -1,0 +1,47 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!-- A hybrid subset of ANSI X3.64, VT-series, and Telnet emulation
+	for clients of the TradeWars Game Server (TWGS) -->
+
+<LexerSpec>
+	<Package>com.chalcodes.weaponm.emulation.lexer</Package>
+	<Prefix>Emulation</Prefix>
+	<StateListener>false</StateListener>
+	<Loggers>true</Loggers>
+	
+	<State name="DEFAULT"/>
+	<InitialState>DEFAULT</InitialState>
+
+	<RuleGroup>
+		<State name="DEFAULT"/>
+		
+		<!-- match this just to ignore it -->
+		<Rule expr="&#255;[&#251;|&#252;|&#253;|&#254;]."/>
+		<Rule expr="&#27;\[?7h"/>
+
+		<!-- ANSI/VT stuff -->
+		<Rule expr="&#27;\[([0-9]+(;[0-9]+)*)?[Hf]" event="cursorPosition"/>
+		<Rule expr="&#27;\[[0-9]*A" event="cursorUp"/>
+		<Rule expr="&#27;\[[0-9]*B" event="cursorDown"/>
+		<Rule expr="&#27;\[[0-9]*C" event="cursorRight"/>
+		<Rule expr="&#27;\[[0-9]*D" event="cursorLeft"/>
+		<Rule expr="&#27;\[s" event="saveCursor"/>
+		<Rule expr="&#27;\[u" event="restoreCursor"/>
+		<Rule expr="&#27;\[2J" event="clearScreen"/>
+		<Rule expr="&#27;\[K" event="clearLine"/>
+		<Rule expr="&#27;\[[0-9]+(;[0-9]+)*m" event="setAttributes"/>
+		
+		<!-- catch unknown escapes -->
+		<Rule expr="&#27;\[[^a-zA-Z]*[a-zA-Z]" event="unknownEscape" pri="5"/>
+
+		<!-- it's simpler to recognize certain characters in the lexer -->
+		<Rule expr="&#10;" event="lineFeed"/>
+		<Rule expr="&#13;" event="carriageReturn"/>
+		<Rule expr="&#8;" event="backspace"/>
+		<Rule expr="&#9;" event="tab"/>
+		<Rule expr="&#7;" event="bell"/>
+		
+		<!-- literal text -->
+		<Rule expr="." event="literalText" pri="5"/>
+	</RuleGroup>
+</LexerSpec>

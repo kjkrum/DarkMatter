@@ -9,28 +9,60 @@ package com.chalcodes.weaponm.event;
  */
 public enum EventType {
 	/**
-	 * Game text.
+	 * The complete content of a network read.  Scripts cannot register for
+	 * this event.
 	 * <p>
 	 * Parameters: {@link EventParam#TEXT}
 	 */
-	GAME_TEXT,
+	RAW_TEXT,
 	
+	/**
+	 * Text that was matched and consumed by the data parser.  Scripts can use
+	 * this to detect minor events that are not recognized by the data parser.
+	 * <p>
+	 * Parameters: {@link EventParam#TEXT}
+	 */
+	MATCHED_TEXT,
+	
+	/**
+	 * Fired when a database is created or opened.  It's pointless for scripts
+	 * to register for this or any database event, since script lifecycles are
+	 * bounded by the database lifecycle.
+	 */
 	DB_OPENED,
 	
+	/**
+	 * Fired when a database is closed.
+	 */
 	DB_CLOSED,
 	
+	/**
+	 * Fired when the database is modified.
+	 */
 	DB_DIRTY,
 	
+	/**
+	 * Fired when the database is saved.
+	 */
 	DB_SAVED,
 
+	/**
+	 * Fired when the network is disconnected.
+	 */
 	NET_DISCONNECTED,
 	
+	/**
+	 * Fired when a connection attempt begins.
+	 */
 	NET_CONNECTING,
 	
+	/**
+	 * Fired when a connection attempt succeeds.
+	 */
 	NET_CONNECTED,
 	
 	/**
-	 * A network error.
+	 * Details of an error in the network thread.
 	 * <p>
 	 * Parameters: {@link EventParam#ERROR}
 	 */

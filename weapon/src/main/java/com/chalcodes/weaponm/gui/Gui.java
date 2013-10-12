@@ -202,7 +202,7 @@ public class Gui {
 	private void loadAppleExtensions() {
 		if (System.getProperty("os.name").contains("OS X")) {
 			try {
-				Class<?> klass = Class.forName("krum.weaponm.gui.AppleExtensions");
+				Class<?> klass = Class.forName("com.chalcodes.weaponm.gui.AppleExtensions");
 				Constructor<?> ctor = klass.getConstructor(Gui.class);
 				Runnable ext = (Runnable) ctor.newInstance(this);
 				ext.run();

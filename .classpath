@@ -16,9 +16,9 @@
 	<classpathentry kind="lib" path="lib/logback-core-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/OrangeExtensions"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Glass"/>
 	<classpathentry kind="src" path="/JTX"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/[JavaForge]Common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/[JavaForge]DockingFrames"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/[JavaForge]Glass"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
