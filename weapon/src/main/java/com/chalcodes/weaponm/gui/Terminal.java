@@ -15,23 +15,43 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.chalcodes.weaponm.AppSettings;
+import com.chalcodes.weaponm.emulation.Emulation;
+import com.chalcodes.weaponm.emulation.EmulationParser;
+import com.chalcodes.weaponm.emulation.lexer.EmulationLexer;
+import com.chalcodes.weaponm.event.Event;
+import com.chalcodes.weaponm.event.EventListener;
+import com.chalcodes.weaponm.event.EventParam;
+import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.event.EventType;
 
 class Terminal {
-	
 	private final DefaultSingleCDockable dockable;
 	private final SwingScrollbackBuffer buffer;
 	private final SoftFont font;
 	private final SwingDisplay display;
+	private final EmulationLexer lexer;
+	private final EmulationParser parser;
+	private final Emulation emulation;
 	
-	Terminal() throws IOException {
+	Terminal(EventSupport eventSupport) throws IOException, ClassNotFoundException {
 		buffer = new SwingScrollbackBuffer(
 				AppSettings.getBufferColumns(),
 				AppSettings.getBufferLines());
 		font = new VGASoftFont();
 		display = new SwingDisplay(buffer, font, AppSettings.getBufferColumns(), 0);
 		buffer.addBufferObserver(display);
+		lexer = new EmulationLexer();
+		parser = new EmulationParser(buffer);
+		lexer.addEventListener(parser);
+		emulation = new Emulation(lexer);
 		
-		// TODO create parser, connect to buffer
+		eventSupport.addEventListener(new EventListener() {
+			@Override
+			public void onEvent(Event e) {
+				String text = (String) e.getParam(EventParam.TEXT);
+				emulation.write(text);	
+			}			
+		}, EventType.RAW_TEXT);
 		
 		StickyScrollPane scrollPane = new StickyScrollPane(display);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);

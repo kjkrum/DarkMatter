@@ -41,6 +41,7 @@ import com.chalcodes.weaponm.event.EventListener;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.action.ActionManager;
+import com.chalcodes.weaponm.network.NetworkManager;
 
 /**
  * An abstraction of the UI.  This is the real "main class" of the program.
@@ -55,6 +56,7 @@ public class Gui {
 	private final CControl dockControl;
 	private final EventSupport eventSupport;
 	private final DatabaseManager dbm;
+	private final NetworkManager network;
 	private final ActionManager actionManager;
 	private final JFileChooser databaseFileChooser;
 	private final CreditsWindow creditsWindow;
@@ -71,7 +73,8 @@ public class Gui {
 		dockControl = new CControl(mainWindow);
 		eventSupport = new GuiEventSupport();
 		dbm = new DatabaseManager(eventSupport);
-		actionManager = new ActionManager(this, eventSupport, dbm, dockControl);
+		network = new NetworkManager(eventSupport);
+		actionManager = new ActionManager(this, eventSupport, dbm, network, dockControl);
 		databaseFileChooser = new JFileChooser();
 		creditsWindow = new CreditsWindow(icon);
 		
@@ -160,9 +163,9 @@ public class Gui {
 	
 	private void createDockables() {
 		try {
-			dockControl.addDockable(new Terminal().getDockable());
+			dockControl.addDockable(new Terminal(eventSupport).getDockable());
 		}
-		catch(IOException e) {
+		catch(IOException | ClassNotFoundException e) {
 			// TODO something better
 			e.printStackTrace();
 		}

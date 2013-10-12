@@ -21,6 +21,7 @@ import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.Strings;
+import com.chalcodes.weaponm.network.NetworkManager;
 
 /**
  * Maintains collections of actions and UI elements that are enabled and
@@ -38,8 +39,8 @@ public class ActionManager implements EventListener {
 	private final Set<AbstractAction> enableOnConnect = new HashSet<AbstractAction>(); // disable on disconnect
 	private final Set<AbstractAction> disableOnConnect = new HashSet<AbstractAction>(); // enable on disconnect
 	
-	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm, CControl dockControl) {
-		populateMenuBar(gui, eventSupport, dbm, dockControl);
+	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm, NetworkManager network, CControl dockControl) {
+		populateMenuBar(gui, eventSupport, dbm, network, dockControl);
 		eventSupport.addEventListener(this, EventType.DB_OPENED);
 		eventSupport.addEventListener(this, EventType.DB_CLOSED);
 		eventSupport.addEventListener(this, EventType.NET_CONNECTED);
@@ -50,7 +51,7 @@ public class ActionManager implements EventListener {
 		return menuBar;
 	}
 
-	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm, CControl dockControl) {
+	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm, NetworkManager network, CControl dockControl) {
 		final JMenu dbMenu = new JMenu();
 		setText(dbMenu, "MENU_DATABASE");
 		dbMenu.add(new OpenDatabaseAction(gui, dbm));
@@ -83,8 +84,16 @@ public class ActionManager implements EventListener {
 		final JMenu netMenu = new JMenu();
 		setText(netMenu, "MENU_NETWORK");
 		enableOnLoadMenus.add(netMenu);
+		AbstractAction connectAction = new ConnectAction(dbm, network);
+		disableOnConnect.add(connectAction);
+		netMenu.add(connectAction);
+		AbstractAction disconnectAction = new DisconnectAction(network);
+		enableOnConnect.add(disconnectAction);
+		netMenu.add(disconnectAction);
 		netMenu.addSeparator();
-		netMenu.add(new ShowLoginOptionsDialogAction(gui, dbm));
+		AbstractAction optionsAction = new ShowLoginOptionsDialogAction(gui, dbm);
+		disableOnConnect.add(optionsAction);
+		netMenu.add(optionsAction);
 		menuBar.add(netMenu);
 		
 		final JMenu weaponMenu = new JMenu();

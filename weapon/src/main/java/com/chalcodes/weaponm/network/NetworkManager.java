@@ -21,7 +21,7 @@ public class NetworkManager {
 	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
 	private final EventSupport eventSupport;
 	private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
-	private State state;
+	private State state = State.DISCONNECTED;
 	private Thread networkThread;
 	private SocketChannel channel;
 	private long bytesWritten;
@@ -106,8 +106,8 @@ public class NetworkManager {
 		else {
 			int copied = 0;
 			while(copied < string.length()) {
-				while(writeBuffer.hasRemaining()) {
-					writeBuffer.put((byte) string.charAt(copied	));
+				while(writeBuffer.hasRemaining() && copied < string.length()) {
+					writeBuffer.put((byte) string.charAt(copied));
 					++copied;
 				}
 				writeBuffer.flip();
