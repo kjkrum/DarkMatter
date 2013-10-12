@@ -99,6 +99,7 @@
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-base</artifactId>
 				<version>1.1.2-P8c</version>
+				<type>pom</type>
 			</dependency>
 			<dependency>  <!-- chalcodes -->
 				<groupId>org.dockingframes</groupId>

@@ -63,8 +63,9 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-				<groupId>org.dockingframes</groupId>
-				<artifactId>docking-frames-core</artifactId>
+			<groupId>org.dockingframes</groupId>
+			<artifactId>docking-frames-base</artifactId>
+			<type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>org.dockingframes</groupId>
