@@ -98,23 +98,23 @@
 			<dependency>  <!-- chalcodes -->
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-base</artifactId>
-				<version>1.1.2-P8c</version>
+				<version>1.1.2-SNAPSHOT</version>
 				<type>pom</type>
 			</dependency>
 			<dependency>  <!-- chalcodes -->
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-core</artifactId>
-				<version>1.1.2-P8c</version>
+				<version>1.1.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>  <!-- chalcodes -->
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-common</artifactId>
-				<version>1.1.2-P8c</version>
+				<version>1.1.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>  <!-- chalcodes -->
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-ext-glass</artifactId>
-				<version>1.1.2-P8c</version>
+				<version>1.1.2-SNAPSHOT</version>
 			</dependency>
 	    </dependencies>
 	</dependencyManagement>

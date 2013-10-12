@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="weapon/target/classes" path="weapon/src/main/java"/>
-	<classpathentry kind="src" output="weapon/target/classes" path="weapon/src/main/resources"/>
+	<classpathentry kind="src" path="weapon/src/main/java"/>
+	<classpathentry kind="src" path="weapon/target/generated-sources/jplex"/>
+	<classpathentry kind="src" path="weapon/target/generated-resources/jplex"/>
+	<classpathentry kind="src" path="weapon/src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -20,5 +22,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DockingFrames-Glass"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="src" path="/Automaton"/>
+	<classpathentry kind="output" path="weapon/target/classes"/>
 </classpath>
