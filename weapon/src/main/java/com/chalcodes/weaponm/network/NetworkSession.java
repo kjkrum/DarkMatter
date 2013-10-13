@@ -57,7 +57,7 @@ class NetworkSession implements Runnable {
 				
 				readBuffer.flip();
 				while(readBuffer.hasRemaining()) {
-					sb.append((char) readBuffer.get());
+					sb.append((char) (readBuffer.get() & 0xFF));
 				}
 				dispatchEvent(new Event(EventType.RAW_TEXT, EventParam.TEXT, sb.toString()));
 				sb.setLength(0);

@@ -16,7 +16,7 @@
 		<State name="DEFAULT"/>
 		
 		<!-- match this just to ignore it -->
-		<Rule expr="&#255;[&#251;|&#252;|&#253;|&#254;]."/>
+		<Rule expr="&#255;[&#251;&#252;&#253;&#254;]."/>
 		<Rule expr="&#27;\[?7h"/>
 
 		<!-- ANSI/VT stuff -->

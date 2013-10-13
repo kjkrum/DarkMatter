@@ -33,7 +33,6 @@ public class ActionManager implements EventListener {
 //	private static final Logger log =
 //			LoggerFactory.getLogger(ActionManager.class.getSimpleName());
 	private final JMenuBar menuBar = new JMenuBar();
-	
 	private final Set<AbstractAction> enableOnLoad = new HashSet<AbstractAction>(); // disable on unload
 	private final Set<JMenu> enableOnLoadMenus = new HashSet<JMenu>(); // because AbstractAction and JMenu have no ancestor in common that includes setEnabled(...)
 	private final Set<AbstractAction> enableOnConnect = new HashSet<AbstractAction>(); // disable on disconnect

@@ -26,7 +26,6 @@ public class NetworkManager {
 	private SocketChannel channel;
 	private long bytesWritten;
 	private boolean locked;
-	// TODO parser
 
 	public NetworkManager(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
