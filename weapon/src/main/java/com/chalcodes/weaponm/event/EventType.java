@@ -14,7 +14,7 @@ public enum EventType {
 	 * <p>
 	 * Parameters: {@link EventParam#TEXT}
 	 */
-	RAW_TEXT,
+	TEXT_RECEIVED,
 	
 	/**
 	 * Text that was matched and consumed by the data parser.  Scripts can use
@@ -22,7 +22,14 @@ public enum EventType {
 	 * <p>
 	 * Parameters: {@link EventParam#TEXT}
 	 */
-	MATCHED_TEXT,
+	TEXT_MATCHED,
+	
+	/**
+	 * Text that was typed in the terminal or otherwise queued for output.
+	 * 
+	 * Parameters: {@link EventParam#TEXT}
+	 */
+	TEXT_TYPED,
 	
 	/**
 	 * Fired when a database is created or opened.  It's pointless for scripts

@@ -1,6 +1,8 @@
 package com.chalcodes.weaponm.gui;
 
 import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.JScrollPane;
@@ -25,6 +27,7 @@ import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 
 class Terminal {
+	private final EventSupport eventSupport;
 	private final DefaultSingleCDockable dockable;
 	private final SwingScrollbackBuffer buffer;
 	private final SoftFont font;
@@ -34,6 +37,7 @@ class Terminal {
 	private final Emulation emulation;
 	
 	Terminal(EventSupport eventSupport) throws IOException, ClassNotFoundException {
+		this.eventSupport = eventSupport;
 		buffer = new SwingScrollbackBuffer(
 				AppSettings.getBufferColumns(),
 				AppSettings.getBufferLines());
@@ -51,7 +55,7 @@ class Terminal {
 				String text = (String) e.getParam(EventParam.TEXT);
 				emulation.write(text);	
 			}			
-		}, EventType.RAW_TEXT);
+		}, EventType.TEXT_RECEIVED);
 		
 		StickyScrollPane scrollPane = new StickyScrollPane(display);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -62,6 +66,25 @@ class Terminal {
 		dockable.setFocusComponent(scrollPane);
 		dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base().minimalSouth());
 		dockable.setCloseable(true);
+		scrollPane.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char c = e.getKeyChar();
+				switch(c) {
+				case KeyEvent.CHAR_UNDEFINED:
+					break;
+				case KeyEvent.VK_ENTER:
+					send("\r\n");
+					break;
+				case KeyEvent.VK_TAB:
+					send('\t');
+					break;
+				default:
+					send(c);
+					break;
+				}
+			}
+		});
 		// TODO set icon
 	}
 	
@@ -69,4 +92,13 @@ class Terminal {
 		return dockable;
 	}
 	
+	private void send(String string) {
+		Event event = new Event(EventType.TEXT_TYPED, EventParam.TEXT, string);
+		Terminal.this.eventSupport.dispatchEvent(event);
+	}
+	
+	private void send(char c) {
+		Event event = new Event(EventType.TEXT_TYPED, EventParam.TEXT, "" + c);
+		Terminal.this.eventSupport.dispatchEvent(event);		
+	}	
 }

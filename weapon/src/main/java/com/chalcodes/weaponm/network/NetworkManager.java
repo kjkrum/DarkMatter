@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.LogName;
+import com.chalcodes.weaponm.event.Event;
+import com.chalcodes.weaponm.event.EventListener;
+import com.chalcodes.weaponm.event.EventParam;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 
@@ -29,6 +32,26 @@ public class NetworkManager {
 
 	public NetworkManager(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
+		EventListener listener = new EventListener() {
+			@Override
+			public void onEvent(Event event) {
+				switch(event.getType()) {
+				case TEXT_TYPED:
+					String text = (String) event.getParam(EventParam.TEXT);
+					try {
+						write(text);
+					} catch (IOException e) {
+						// ignore
+					}
+					break;
+				case DB_CLOSED:
+					disconnect();
+					break;
+				}				
+			}
+		};
+		eventSupport.addEventListener(listener, EventType.TEXT_TYPED);
+		eventSupport.addEventListener(listener, EventType.DB_CLOSED);
 	}
 	
 	public void connect(String host, int port) {
