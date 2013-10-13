@@ -18,7 +18,7 @@ import com.chalcodes.weaponm.gui.Strings;
 
 public class NewDatabaseAction extends AbstractFileAction {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(NewDatabaseAction.class.getSimpleName());
+	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final DatabaseManager dbm;
 
 	public NewDatabaseAction(Gui gui, DatabaseManager dbm) {

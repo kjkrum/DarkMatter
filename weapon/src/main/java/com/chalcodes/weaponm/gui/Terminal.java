@@ -12,6 +12,10 @@ import krum.jtx.StickyScrollPane;
 import krum.jtx.SwingDisplay;
 import krum.jtx.SwingScrollbackBuffer;
 import krum.jtx.VGASoftFont;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
@@ -27,6 +31,7 @@ import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 
 class Terminal {
+	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final EventSupport eventSupport;
 	private final DefaultSingleCDockable dockable;
 	private final SwingScrollbackBuffer buffer;
@@ -80,6 +85,7 @@ class Terminal {
 					send('\t');
 					break;
 				default:
+					log.debug("key typed: {}", c);
 					send(c);
 					break;
 				}
@@ -98,7 +104,6 @@ class Terminal {
 	}
 	
 	private void send(char c) {
-		Event event = new Event(EventType.TEXT_TYPED, EventParam.TEXT, "" + c);
-		Terminal.this.eventSupport.dispatchEvent(event);		
+		send("" + c);
 	}	
 }

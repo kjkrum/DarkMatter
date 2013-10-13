@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class WebsiteAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(WebsiteAction.class.getSimpleName());
+	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	
 	public WebsiteAction() {
 		ActionManager.setText(this, "ACTION_WEBSITE");

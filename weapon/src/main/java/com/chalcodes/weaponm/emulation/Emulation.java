@@ -15,7 +15,7 @@ import com.chalcodes.weaponm.emulation.lexer.UnderflowException;
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public class Emulation {
-	private static final Logger log = LoggerFactory.getLogger(Emulation.class.getSimpleName());
+	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final CharBuffer buffer = CharBuffer.allocate(4096);
 	private final EmulationLexer lexer;
 	

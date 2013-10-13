@@ -146,6 +146,7 @@ public class NetworkManager {
 					writeBuffer.clear();
 				}				
 			}
+			log.debug("text sent: {}", string);
 		}
 	}
 	

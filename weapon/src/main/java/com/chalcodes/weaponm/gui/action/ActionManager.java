@@ -30,8 +30,7 @@ import com.chalcodes.weaponm.network.NetworkManager;
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public class ActionManager implements EventListener {
-//	private static final Logger log =
-//			LoggerFactory.getLogger(ActionManager.class.getSimpleName());
+	//private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final JMenuBar menuBar = new JMenuBar();
 	private final Set<AbstractAction> enableOnLoad = new HashSet<AbstractAction>(); // disable on unload
 	private final Set<JMenu> enableOnLoadMenus = new HashSet<JMenu>(); // because AbstractAction and JMenu have no ancestor in common that includes setEnabled(...)
