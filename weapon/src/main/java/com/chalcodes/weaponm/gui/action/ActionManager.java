@@ -102,6 +102,10 @@ public class ActionManager implements EventListener {
 		weaponMenu.addSeparator();
 		weaponMenu.add(new ExitAction(gui));
 		menuBar.add(weaponMenu);
+		
+		// set initial enabled states
+		configureNoDatabase();
+		configureNoConnection();
 	}
 
 	@Override
@@ -116,14 +120,7 @@ public class ActionManager implements EventListener {
 			}
 			break;
 		case DB_CLOSED:
-			//log.debug("handling DB_CLOSED");
-			for(AbstractAction action : enableOnLoad) {
-				action.setEnabled(false);
-			}
-			for(JMenu menu : enableOnLoadMenus) {
-				//log.debug("disabling {}", menu);
-				menu.setEnabled(false);
-			}
+			configureNoDatabase();
 			break;
 		case NET_CONNECTED:
 			for(AbstractAction action : enableOnConnect) {
@@ -134,14 +131,28 @@ public class ActionManager implements EventListener {
 			}
 			break;
 		case NET_DISCONNECTED:
-			for(AbstractAction action : enableOnConnect) {
-				action.setEnabled(false);
-			}
-			for(AbstractAction action : disableOnConnect) {
-				action.setEnabled(true);
-			}
+			configureNoConnection();
 			break;
 		}
+	}
+	
+	private void configureNoDatabase() {
+		for(AbstractAction action : enableOnLoad) {
+			action.setEnabled(false);
+		}
+		for(JMenu menu : enableOnLoadMenus) {
+			//log.debug("disabling {}", menu);
+			menu.setEnabled(false);
+		}
+	}
+	
+	private void configureNoConnection() {
+		for(AbstractAction action : enableOnConnect) {
+			action.setEnabled(false);
+		}
+		for(AbstractAction action : disableOnConnect) {
+			action.setEnabled(true);
+		}	
 	}
 	
 	/**

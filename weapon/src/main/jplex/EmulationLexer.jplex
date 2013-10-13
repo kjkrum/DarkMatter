@@ -17,7 +17,7 @@
 		
 		<!-- match this just to ignore it -->
 		<Rule expr="&#255;[&#251;&#252;&#253;&#254;]."/>
-		<Rule expr="&#27;\[7h"/>
+		<Rule expr="&#27;\[\??7h"/>
 		<Rule expr="&#27;\[\?33h"/>
 
 		<!-- ANSI/VT stuff -->

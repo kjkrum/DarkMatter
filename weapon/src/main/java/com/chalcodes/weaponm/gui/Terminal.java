@@ -53,14 +53,23 @@ class Terminal {
 		parser = new EmulationParser(buffer);
 		lexer.addEventListener(parser);
 		emulation = new Emulation(lexer);
-		
-		eventSupport.addEventListener(new EventListener() {
+		EventListener listener = new EventListener() {
 			@Override
 			public void onEvent(Event e) {
-				String text = (String) e.getParam(EventParam.TEXT);
-				emulation.write(text);	
+				switch(e.getType()){
+				case TEXT_RECEIVED:
+					String text = (String) e.getParam(EventParam.TEXT);
+					emulation.write(text);
+					break;
+				case NET_DISCONNECTED:
+					String msg = Strings.getString("DISCONNECTED");
+					emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
+					break;
+				}
 			}			
-		}, EventType.TEXT_RECEIVED);
+		};
+		eventSupport.addEventListener(listener, EventType.TEXT_RECEIVED);
+		eventSupport.addEventListener(listener, EventType.NET_DISCONNECTED);
 		
 		StickyScrollPane scrollPane = new StickyScrollPane(display);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);

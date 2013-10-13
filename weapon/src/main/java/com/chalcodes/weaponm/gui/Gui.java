@@ -83,9 +83,6 @@ public class Gui {
 		createDockables();
 		configureMainWindow();
 		loadAppleExtensions();
-		
-		eventSupport.dispatchEvent(EventType.DB_CLOSED);
-		eventSupport.dispatchEvent(EventType.NET_DISCONNECTED);
 	}
 
 	public void setVisible(boolean visible) {
