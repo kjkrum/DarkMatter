@@ -1,0 +1,54 @@
+<assembly>
+	<id>Linux-Windows-OSX</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<!-- put LICENSE and other misc files in root -->
+	<fileSets>
+		<fileSet>
+			<!--
+			<directory>include</directory>
+			<outputDirectory></outputDirectory>
+			-->
+			<includes>
+			    <include>LICENSE</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<!-- put main jar in root, remapping its name -->
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<includes>
+				<include>com.chalcodes.weaponm:Weapon</include> <!-- was WeaponM -->
+			</includes>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+		</dependencySet>
+		<!-- unpack WeaponM-Scripts into scripts/ -->
+		<!--
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<includes>
+				<include>com.chalcodes.weaponm:WeaponM-Scripts</include>
+			</includes>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<excludes>
+					<exclude>META-INF/**</exclude>
+				</excludes>
+			</unpackOptions>
+			<outputDirectory>scripts</outputDirectory>
+		</dependencySet>
+		-->
+		<!-- put deps in lib/ -->
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<excludes>
+				<exclude>com.chalcodes.weaponm:Weapon</exclude> <!-- was WeaponM -->
+				<!-- <exclude>com.chalcodes.weaponm:WeaponM-Scripts</exclude> -->
+			</excludes>
+			<outputDirectory>lib</outputDirectory>
+		</dependencySet>
+	</dependencySets>
+</assembly>

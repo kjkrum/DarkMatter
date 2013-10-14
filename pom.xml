@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.chalcodes.weaponm</groupId>
-	<artifactId>WeaponM</artifactId>
+	<artifactId>Parent</artifactId>
 	<version>2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Weapon M</name>
@@ -21,10 +21,8 @@
 	</properties>
 	<modules>
 		<module>weapon</module>
-		<!--
-		<module>scripts</module>
+		<!-- <module>scripts</module> -->
 		<module>assembly</module>
-		-->
 	</modules>
 	<repositories>
 		<repository>
@@ -50,15 +48,17 @@
 	</repositories>
 	<dependencyManagement>
 	    <dependencies>
-		    <dependency> <!-- chalcodes -->
+	        <!--
+		    <dependency>
 				<groupId>com.chalcodes.automaton</groupId>
 				<artifactId>Automaton</artifactId>
 				<version>1.12.1</version>
 			</dependency>
+			-->
 			<dependency> <!-- chalcodes -->
 				<groupId>com.chalcodes.jtx</groupId>
 				<artifactId>JTX</artifactId>
-				<version>1.2</version>
+				<version>1.2.1</version>
 			</dependency>
 			<dependency> <!-- central -->
 				<groupId>org.slf4j</groupId>
@@ -95,17 +95,19 @@
 				<artifactId>OrangeExtensions</artifactId>
 				<version>1.4.0</version>
 			</dependency>
-			<dependency>  <!-- chalcodes -->
+			<!-- 
+			<dependency>
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-base</artifactId>
 				<version>1.1.2-SNAPSHOT</version>
 				<type>pom</type>
 			</dependency>
-			<dependency>  <!-- chalcodes -->
+			<dependency>
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-core</artifactId>
 				<version>1.1.2-SNAPSHOT</version>
 			</dependency>
+			-->
 			<dependency>  <!-- chalcodes -->
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-common</artifactId>
