@@ -1,3 +1,13 @@
-/.settings
-/bin
-/weapon/target
+# project stuff
+.settings/
+bin/
+**/target/
+
+# OS-generated stuff
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
