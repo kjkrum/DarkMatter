@@ -52,6 +52,11 @@ public enum EventType {
 	 * Fired when the database is saved.
 	 */
 	DB_SAVED,
+	
+	/**
+	 * Fired when the game title is changed.
+	 */
+	DB_TITLE,
 
 	/**
 	 * Fired when the network is disconnected.

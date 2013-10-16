@@ -9,5 +9,10 @@ public enum EventParam {
 	/**
 	 * (Throwable) The cause of an error event.
 	 */
-	ERROR
+	ERROR,
+	
+	/**
+	 * (String) The title of something.
+	 */
+	TITLE
 }

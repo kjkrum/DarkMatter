@@ -23,8 +23,6 @@ import javax.swing.WindowConstants;
 
 import com.chalcodes.weaponm.database.LoginOptions;
 
-// TODO: i18n
-
 public class LoginOptionsDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
@@ -45,7 +43,7 @@ public class LoginOptionsDialog extends JDialog {
 
 	private JTextField hostField;
 	private JTextField portField; // TODO: make formatted text field?
-	private JComboBox<Character> gameComboBox;
+	private JComboBox<Character> letterComboBox;
 
 	private JTextField nameField;
 	private JPasswordField passwordField;
@@ -70,7 +68,7 @@ public class LoginOptionsDialog extends JDialog {
 		titleField.setText(options.getTitle());
 		hostField.setText(options.getHost());
 		portField.setText(Integer.toString(options.getPort()));
-		gameComboBox.setSelectedItem(new Character(options.getGame()));
+		letterComboBox.setSelectedItem(new Character(options.getGameLetter()));
 		nameField.setText(options.getName());
 		passwordField.setText(options.getPassword());
 		autoLoginCheckBox.setSelected(options.isAutoLogin());
@@ -93,7 +91,7 @@ public class LoginOptionsDialog extends JDialog {
 				++i;
 			}
 		}
-		gameComboBox = new JComboBox<Character>(letters);
+		letterComboBox = new JComboBox<Character>(letters);
 
 		nameField = new JTextField();
 		nameField.addFocusListener(SelectOnFocus.getInstance());
@@ -101,6 +99,7 @@ public class LoginOptionsDialog extends JDialog {
 		passwordField.addFocusListener(SelectOnFocus.getInstance());
 		autoLoginCheckBox = new JCheckBox();
 
+		// TODO get label from UIManager?
 		okButton = new JButton("OK");
 		okButton.setMnemonic('O');
 		okButton.addActionListener(new ActionListener() {
@@ -117,6 +116,7 @@ public class LoginOptionsDialog extends JDialog {
 			}
 		});
 
+		// TODO get label from UIManager?
 		cancelButton = new JButton("Cancel");
 		cancelButton.setMnemonic('C');
 		cancelButton.addActionListener(new ActionListener() {
@@ -127,20 +127,20 @@ public class LoginOptionsDialog extends JDialog {
 			}
 		});
 
-		setTitle("Login Options");
-		JLabel titleLabel = new JLabel("Title");
-		JLabel hostLabel = new JLabel("Host");
-		JLabel portLabel = new JLabel("Port");
-		JLabel gameLabel = new JLabel("Game");
-		JLabel nameLabel = new JLabel("Name");
-		JLabel passwordLabel = new JLabel("Password");
-		JLabel autoLoginLabel = new JLabel("Auto-login");
+		setTitle(Strings.getString("TITLE_LOGIN_OPTIONS"));
+		JLabel titleLabel = new JLabel(Strings.getString("LABEL_TITLE"));
+		JLabel hostLabel = new JLabel(Strings.getString("LABEL_HOST"));
+		JLabel portLabel = new JLabel(Strings.getString("LABEL_PORT"));
+		JLabel letterLabel = new JLabel(Strings.getString("LABEL_GAME_LETTER"));
+		JLabel usernameLabel = new JLabel(Strings.getString("LABEL_USERNAME"));
+		JLabel passwordLabel = new JLabel(Strings.getString("LABEL_PASSWORD"));
+		JLabel autoLoginLabel = new JLabel(Strings.getString("LABEL_AUTOLOGIN"));
 		JPanel gamePanel = new JPanel();
 		gamePanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createEtchedBorder(), "Game"));
+				BorderFactory.createEtchedBorder(), Strings.getString("LABEL_GAME")));
 		JPanel playerPanel = new JPanel();
 		playerPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createEtchedBorder(), "Player"));
+				BorderFactory.createEtchedBorder(), Strings.getString("LABEL_PLAYER")));
 
 		// layout shizzle
 		GroupLayout gamePanelLayout = new GroupLayout(gamePanel);
@@ -166,7 +166,7 @@ public class LoginOptionsDialog extends JDialog {
 																portLabel,
 																GroupLayout.Alignment.TRAILING)
 														.addComponent(
-																gameLabel,
+																letterLabel,
 																GroupLayout.Alignment.TRAILING))
 										.addPreferredGap(
 												LayoutStyle.ComponentPlacement.RELATED)
@@ -185,7 +185,7 @@ public class LoginOptionsDialog extends JDialog {
 																199,
 																Short.MAX_VALUE)
 														.addComponent(
-																gameComboBox,
+																letterComboBox,
 																GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE,
 																GroupLayout.PREFERRED_SIZE)
@@ -242,9 +242,9 @@ public class LoginOptionsDialog extends JDialog {
 												gamePanelLayout
 														.createParallelGroup(
 																GroupLayout.Alignment.BASELINE)
-														.addComponent(gameLabel)
+														.addComponent(letterLabel)
 														.addComponent(
-																gameComboBox,
+																letterComboBox,
 																GroupLayout.PREFERRED_SIZE,
 																GroupLayout.DEFAULT_SIZE,
 																GroupLayout.PREFERRED_SIZE))
@@ -266,7 +266,7 @@ public class LoginOptionsDialog extends JDialog {
 														.createParallelGroup(
 																GroupLayout.Alignment.LEADING)
 														.addComponent(
-																nameLabel,
+																usernameLabel,
 																GroupLayout.Alignment.TRAILING)
 														.addComponent(
 																passwordLabel,
@@ -304,7 +304,7 @@ public class LoginOptionsDialog extends JDialog {
 												playerPanelLayout
 														.createParallelGroup(
 																GroupLayout.Alignment.BASELINE)
-														.addComponent(nameLabel)
+														.addComponent(usernameLabel)
 														.addComponent(
 																nameField,
 																GroupLayout.PREFERRED_SIZE,
@@ -428,10 +428,10 @@ public class LoginOptionsDialog extends JDialog {
 		}
 
 		// game
-		char game = (Character) gameComboBox.getSelectedItem();
-		if (game < 'A' || game > 'Z' || game == 'Q') {
-			gameComboBox.requestFocusInWindow();
-			throw new IllegalStateException("invalid game letter: " + game);
+		char letter = (Character) letterComboBox.getSelectedItem();
+		if (letter < 'A' || letter > 'Z' || letter == 'Q') {
+			letterComboBox.requestFocusInWindow();
+			throw new IllegalStateException("invalid game letter: " + letter);
 		}
 
 		// name
@@ -460,13 +460,13 @@ public class LoginOptionsDialog extends JDialog {
 		options.setTitle(title);
 		options.setHost(host);
 		options.setPort(port);
-		options.setGame(game);
+		options.setGameLetter(letter);
 		options.setName(name);
 		options.setPassword(password);
 		options.setAutoLogin(autoLogin);
 		
 		// this is a bit of a hack
 		//((MainWindow) getParent()).gui.updateTitles(title);
-		// TODO fire title event
+		// TODO fire title event here?
 	}
 }

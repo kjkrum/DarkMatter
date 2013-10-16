@@ -119,6 +119,8 @@ public class Gui {
 		databaseFileChooser.setFileFilter(new FileNameExtensionFilter("Weapon M databases", "wmd"));
 		databaseFileChooser.setAcceptAllFileFilterUsed(false);
 		databaseFileChooser.setMultiSelectionEnabled(false);
+		
+		// TODO listen for db title events to suggest file names
 	}
 
 	private void configureDocking() {
@@ -293,6 +295,7 @@ public class Gui {
 
 	public int showLoginOptionsDialog(LoginOptions loginOptions) {
 		return LoginOptionsDialog.showDialog(mainWindow, loginOptions);
+		// TODO fire title event from here?
 	}
 	
 	/**

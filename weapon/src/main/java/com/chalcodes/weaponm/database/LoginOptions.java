@@ -52,13 +52,13 @@ public class LoginOptions implements Serializable {
 		}
 	}
 
-	public char getGame() {
+	public char getGameLetter() {
 		synchronized (Database.lock) {
 			return game;
 		}
 	}
 
-	public void setGame(char game) {
+	public void setGameLetter(char game) {
 		synchronized (Database.lock) {
 			this.game = game;
 		}
