@@ -21,7 +21,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.DefaultCaret;
 
-import com.chalcodes.weaponm.Version;
+import com.chalcodes.weaponm.Build;
 
 public class AboutDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -81,7 +81,8 @@ public class AboutDialog extends JDialog {
 		DefaultCaret caret = (DefaultCaret) infoTextArea.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		
-		infoTextArea.append("Weapon M version: " + Version.VERSION + "\n");
+		infoTextArea.append("Weapon M version: " + Build.getVersion() + "\n");
+		infoTextArea.append("Build timestamp: " + Build.getTimestamp() + "\n");
 		infoTextArea.append("Java vendor: " + System.getProperty("java.vendor") + "\n");
 		infoTextArea.append("Java version: " + System.getProperty("java.version") + "\n");
 		infoTextArea.append("Runtime name: " + System.getProperty("java.runtime.name") + "\n");

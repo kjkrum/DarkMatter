@@ -7,6 +7,7 @@ import java.nio.channels.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.chalcodes.weaponm.Debug;
 import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.event.Event;
 import com.chalcodes.weaponm.event.EventListener;
@@ -146,7 +147,9 @@ public class NetworkManager {
 					writeBuffer.clear();
 				}				
 			}
-			log.debug("text sent: {}", string);
+			if(Debug.TEXT_SENT) {
+				log.debug("text sent: {}", string);
+			}
 		}
 	}
 	

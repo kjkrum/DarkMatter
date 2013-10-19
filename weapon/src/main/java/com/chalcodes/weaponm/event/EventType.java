@@ -39,7 +39,14 @@ public enum EventType {
 	DB_OPENED,
 	
 	/**
-	 * Fired when a database is closed.
+	 * Fired when a database is closing.  This will kill the network thread
+	 * and unload scripts.
+	 */
+	DB_CLOSING,
+	
+	/**
+	 * Fired when a database is closed.  This will clear the database title
+	 * and hide the dockable panels.
 	 */
 	DB_CLOSED,
 	

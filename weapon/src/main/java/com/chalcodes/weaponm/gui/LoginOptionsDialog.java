@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -28,13 +27,6 @@ public class LoginOptionsDialog extends JDialog {
 
 	public static final int CANCEL_ACTION = 0;
 	public static final int OK_ACTION = 1;
-
-	// acceptable names are 1-41 chars, but supplying it is optional
-	private static final Pattern namePattern = Pattern
-			.compile("[ -\\}]{0,41}");
-	// password can actually be blank
-	private static final Pattern passwordPattern = Pattern
-			.compile("[ -\\}]{0,8}");
 
 	private LoginOptions options;
 	private int action = CANCEL_ACTION;
@@ -69,7 +61,7 @@ public class LoginOptionsDialog extends JDialog {
 		hostField.setText(options.getHost());
 		portField.setText(Integer.toString(options.getPort()));
 		letterComboBox.setSelectedItem(new Character(options.getGameLetter()));
-		nameField.setText(options.getName());
+		nameField.setText(options.getUserName());
 		passwordField.setText(options.getPassword());
 		autoLoginCheckBox.setSelected(options.isAutoLogin());
 		setLocationRelativeTo(parent);
@@ -99,9 +91,7 @@ public class LoginOptionsDialog extends JDialog {
 		passwordField.addFocusListener(SelectOnFocus.getInstance());
 		autoLoginCheckBox = new JCheckBox();
 
-		// TODO get label from UIManager?
-		okButton = new JButton("OK");
-		okButton.setMnemonic('O');
+		okButton = ButtonFactory.newOkButton();
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -111,14 +101,12 @@ public class LoginOptionsDialog extends JDialog {
 					dispose();
 				} catch (IllegalStateException ex) {
 					JOptionPane.showMessageDialog(LoginOptionsDialog.this,
-							ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+							ex.getMessage(), Strings.getString("TITLE_ERROR"), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
 
-		// TODO get label from UIManager?
-		cancelButton = new JButton("Cancel");
-		cancelButton.setMnemonic('C');
+		cancelButton = ButtonFactory.newCancelButton();
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -132,15 +120,13 @@ public class LoginOptionsDialog extends JDialog {
 		JLabel hostLabel = new JLabel(Strings.getString("LABEL_HOST"));
 		JLabel portLabel = new JLabel(Strings.getString("LABEL_PORT"));
 		JLabel letterLabel = new JLabel(Strings.getString("LABEL_GAME_LETTER"));
-		JLabel usernameLabel = new JLabel(Strings.getString("LABEL_USERNAME"));
+		JLabel usernameLabel = new JLabel(Strings.getString("LABEL_USER_NAME"));
 		JLabel passwordLabel = new JLabel(Strings.getString("LABEL_PASSWORD"));
 		JLabel autoLoginLabel = new JLabel(Strings.getString("LABEL_AUTOLOGIN"));
 		JPanel gamePanel = new JPanel();
-		gamePanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createEtchedBorder(), Strings.getString("LABEL_GAME")));
+		gamePanel.setBorder(BorderFactory.createTitledBorder(Strings.getString("LABEL_GAME")));
 		JPanel playerPanel = new JPanel();
-		playerPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createEtchedBorder(), Strings.getString("LABEL_PLAYER")));
+		playerPanel.setBorder(BorderFactory.createTitledBorder(Strings.getString("LABEL_PLAYER")));
 
 		// layout shizzle
 		GroupLayout gamePanelLayout = new GroupLayout(gamePanel);
@@ -436,7 +422,7 @@ public class LoginOptionsDialog extends JDialog {
 
 		// name
 		String name = nameField.getText();
-		if (!namePattern.matcher(name).matches()) {
+		if (!LoginOptions.isValidName(name)) {
 			nameField.requestFocusInWindow();
 			throw new IllegalStateException("invalid name: " + name);
 		}
@@ -444,7 +430,7 @@ public class LoginOptionsDialog extends JDialog {
 		// password
 		@SuppressWarnings("deprecation")
 		String password = passwordField.getText();
-		if (!passwordPattern.matcher(password).matches()) {
+		if (!LoginOptions.isValidPassword(password)) {
 			passwordField.requestFocusInWindow();
 			throw new IllegalStateException("invalid password: " + password);
 		}
@@ -461,7 +447,7 @@ public class LoginOptionsDialog extends JDialog {
 		options.setHost(host);
 		options.setPort(port);
 		options.setGameLetter(letter);
-		options.setName(name);
+		options.setUserName(name);
 		options.setPassword(password);
 		options.setAutoLogin(autoLogin);
 		

@@ -46,7 +46,7 @@ public class NewDatabaseAction extends AbstractFileAction {
 							dbOptions.setHost(tempOptions.getHost());
 							dbOptions.setPort(tempOptions.getPort());
 							dbOptions.setGameLetter(tempOptions.getGameLetter());
-							dbOptions.setName(tempOptions.getName());
+							dbOptions.setUserName(tempOptions.getUserName());
 							dbOptions.setPassword(tempOptions.getPassword());
 							dbOptions.setAutoLogin(tempOptions.isAutoLogin());
 							dbm.save();

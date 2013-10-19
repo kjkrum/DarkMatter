@@ -177,7 +177,7 @@ public class ActionManager implements EventListener {
 	 * @param button the button
 	 * @param key a key constant from {@link com.chalcodes.weaponm.gui.Strings}
 	 */
-	static void setText(AbstractButton button, String key) {
+	public static void setText(AbstractButton button, String key) {
 		String raw = Strings.getString(key);
 		String stripped = raw.replace("_", "");
 		button.setText(stripped);

@@ -105,7 +105,7 @@ public class BugSense {
 		sb.append("\",\"breadcrumbs\":\"\"},\"application_environment\":{\"phone\":\"");
 		sb.append(System.getProperty("os.name"));
 		sb.append("\",\"appver\":\"");
-		sb.append(Version.VERSION);
+		sb.append(Build.getVersion());
 		sb.append("\",\"appname\":\"");
 		sb.append("com.chalcodes.weaponm");
 		sb.append("\",\"osver\":\"");

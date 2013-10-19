@@ -302,16 +302,16 @@ public class Gui {
 	 * Interactively shut down the application.
 	 */
 	public void interactiveShutdown() {
-		// TODO different behavior if db is clean?
-		if(dbm.isDatabaseOpen()) {
-			if(interactiveClose()) {
-				shutdown();
+		if(showYesNoDialog(
+				Strings.getString("QUESTION_EXIT"),
+				Strings.getString("TITLE_CONFIRM_EXIT"))) {
+			// TODO fire event to kill network & scripts
+			if(dbm.isDatabaseDirty()) {
+				if(interactiveClose()) {
+					shutdown();
+				}
 			}
-		}
-		else {
-			if(showYesNoDialog(
-					Strings.getString("QUESTION_EXIT"),
-					Strings.getString("TITLE_CONFIRM_EXIT"))) {
+			else {
 				shutdown();
 			}
 		}

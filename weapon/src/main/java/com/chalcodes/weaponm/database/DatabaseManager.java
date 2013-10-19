@@ -38,6 +38,8 @@ public class DatabaseManager {
 	 */
 
 	/**
+	 * Creates a new <tt>DatabaseManager</tt> using the specified
+	 * <tt>EventSupport</tt>.
 	 * 
 	 * @param eventSupport the GUI's event dispatcher
 	 */
@@ -45,14 +47,42 @@ public class DatabaseManager {
 		this.eventSupport = eventSupport;
 	}
 
+	/**
+	 * Returns true if a database is currently open.
+	 * 
+	 * @return true if a database is open; otherwise false
+	 */
 	public boolean isDatabaseOpen() {
 		return database != null;
 	}
 	
+	/**
+	 * Returns true if the database has been modified since it was opened or
+	 * saved.
+	 * 
+	 * @return true if the database is open and dirty; otherwise false
+	 */
+	public boolean isDatabaseDirty() {
+		// TODO real stuff
+		return isDatabaseOpen();
+	}
+	
+	/**
+	 * Gets the currently open database.
+	 * 
+	 * @return the currently open database, or null if none
+	 */
 	public Database getDatabase() {
 		return database;
 	}
 
+	/**
+	 * Creates a new database in the specified file.
+	 * 
+	 * @param file the file in which to create the database
+	 * @return the newly-created database
+	 * @throws IOException if an error occurs
+	 */
 	public Database create(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
@@ -64,12 +94,18 @@ public class DatabaseManager {
 		close();
 		this.file = file;
 		this.database = database;
-		// TODO parser = new DataParser(weapon, lexer, database);
 		eventSupport.dispatchEvent(EventType.DB_OPENED);
 		log.info("database created in {}", file.getPath());
 		return database;
 	}
 
+	/**
+	 * Opens the database contained in the specified file.
+	 * 
+	 * @param file the file to open
+	 * @return the opened database
+	 * @throws IOException if an error occurs
+	 */
 	public Database open(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
@@ -85,7 +121,6 @@ public class DatabaseManager {
 				in.close();
 			}
 			this.file = file;
-			// TODO parser = new DataParser(weapon, lexer, database);
 			eventSupport.dispatchEvent(EventType.DB_OPENED);
 			if (database.isInitialized()) {
 				// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
@@ -115,11 +150,23 @@ public class DatabaseManager {
 		}
 	}
 
+	/**
+	 * Saves the database in the file currently associated with it.
+	 * 
+	 * @throws IOException if an error occurs
+	 */
 	public void save() throws IOException {
 		save(file, database);
 		log.info("database saved");
 	}
 
+	/**
+	 * Saves the database in the specified file, changing the file associated
+	 * with the database.
+	 * 
+	 * @param newFile the file to save into
+	 * @throws IOException if an error occurs
+	 */
 	public void saveAs(File newFile) throws IOException {
 		// create new lock file
 		File lockFile = new File(newFile.getPath() + ".lock");
@@ -134,6 +181,13 @@ public class DatabaseManager {
 		log.info("database saved as '{}'", file.getPath());
 	}
 
+	/**
+	 * Saves the database in the specified file, without changing the file
+	 * associated with the database.
+	 * 
+	 * @param copyFile the file to copy into
+	 * @throws IOException if an error occurs
+	 */
 	public void saveCopy(File copyFile) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
@@ -166,6 +220,9 @@ public class DatabaseManager {
 		}
 	}
 
+	/**
+	 * Closes the currently open database.
+	 */
 	public void close() {
 		if (file != null) {
 			eventSupport.dispatchEvent(EventType.DB_CLOSED);

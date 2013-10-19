@@ -21,6 +21,7 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.chalcodes.weaponm.AppSettings;
+import com.chalcodes.weaponm.Debug;
 import com.chalcodes.weaponm.emulation.Emulation;
 import com.chalcodes.weaponm.emulation.EmulationParser;
 import com.chalcodes.weaponm.emulation.lexer.EmulationLexer;
@@ -94,7 +95,9 @@ class Terminal {
 					send('\t');
 					break;
 				default:
-					log.debug("key typed: {}", c);
+					if(Debug.KEY_LISTENER) {
+						log.debug("key typed: {}", c);
+					}
 					send(c);
 					break;
 				}
