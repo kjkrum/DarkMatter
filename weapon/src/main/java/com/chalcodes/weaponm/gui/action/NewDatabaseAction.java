@@ -13,7 +13,6 @@ import com.chalcodes.weaponm.database.Database;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.gui.Gui;
-import com.chalcodes.weaponm.gui.LoginOptionsDialog;
 import com.chalcodes.weaponm.gui.Strings;
 
 public class NewDatabaseAction extends AbstractFileAction {
@@ -31,7 +30,7 @@ public class NewDatabaseAction extends AbstractFileAction {
 	public void actionPerformed(ActionEvent e) {
 		if(gui.interactiveClose()) {
 			LoginOptions tempOptions = new LoginOptions();
-			if(gui.showLoginOptionsDialog(tempOptions) == LoginOptionsDialog.OK_ACTION) {
+			if(gui.showLoginOptionsDialog(tempOptions) == JOptionPane.OK_OPTION) {
 				File file = gui.showDatabaseSaveDialog();
 				if(file != null) {
 					String filename = file.getPath();
