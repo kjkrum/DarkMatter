@@ -22,6 +22,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.text.DefaultCaret;
 
 import com.chalcodes.weaponm.Build;
+import com.chalcodes.weaponm.gui.action.ActionManager;
 
 public class AboutDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -95,9 +96,7 @@ public class AboutDialog extends JDialog {
 		infoTextArea.append("Available processors: " + Runtime.getRuntime().availableProcessors());
 		infoTextArea.setEditable(false);
 		
-		// TODO i18n
-		closeButton.setText("Close");
-		closeButton.setMnemonic('o');
+		ActionManager.setText(closeButton, "BUTTON_CLOSE");
 		closeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -105,9 +104,7 @@ public class AboutDialog extends JDialog {
 			}
 		});
 		
-		// TODO i18n
-		copyButton.setText("Copy");
-		copyButton.setMnemonic('C');
+		ActionManager.setText(copyButton, "BUTTON_COPY");
 		copyButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

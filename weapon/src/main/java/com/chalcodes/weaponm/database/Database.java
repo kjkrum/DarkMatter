@@ -3,25 +3,32 @@ package com.chalcodes.weaponm.database;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class Database extends DataObject {
 	private static final long serialVersionUID = 1L;
 	static final Object lock = new Object();
-	private transient final Map<Class<?>, List<DataChangeListener>> changeListeners =
-			new HashMap<Class<?>, List<DataChangeListener>>();
+	private transient DatabaseManager manager;
 	private final LoginOptions loginOptions;
 	private Sector[] sectors;
+	
+	// call this before a new or loaded db is returned by its creator
+	void setManager(DatabaseManager manager) {
+		if(this.manager != null) {
+			throw new IllegalStateException("manager already set");
+		}
+		this.manager = manager; 
+	}
+	
+	DatabaseManager getManager() {
+		return manager;
+	}
 	
 	Database(LoginOptions loginOptions) {
 		this.loginOptions  = loginOptions;
 		restoreTransients();
 	}
 	
-	public LoginOptions getLoginOptions() {
+	LoginOptions getLoginOptions() {
 		return loginOptions;
 	}
 	
@@ -44,6 +51,7 @@ public class Database extends DataObject {
 				sectors[i] = new Sector(this, i + 1);
 			}
 		}
+		fireChanged();
 	}
 	
 	public Sector getSector(int number) {
@@ -52,40 +60,19 @@ public class Database extends DataObject {
 		}
 	}
 	
-	// TODO give scripts access through a proxy
-	void addChangeListener(Class<? extends DataObject> klass, DataChangeListener listener) {
-		if(listener == null) throw new NullPointerException();
-		if(!changeListeners.containsKey(klass)) {
-			changeListeners.put(klass, new LinkedList<DataChangeListener>());
-		}
-		changeListeners.get(klass).add(listener);
-	}
-	
-	// TODO give scripts access through a proxy
-	void removeChangeListener(Class<? extends DataObject> klass, DataChangeListener listener) {
-		if(listener != null && changeListeners.containsKey(klass)) {
-			changeListeners.get(klass).remove(listener);
-		}
-	}
-	
-	// this is only called in the UI thread by DataObject#fireChanged()
-	void fireChanged(DataObject obj) {
-		if(changeListeners.containsKey(obj.getClass())) {
-			for(DataChangeListener listener : changeListeners.get(obj.getClass())) {
-				listener.dataChanged(obj);
-			}
-		}
-		// DataObject#fireChanged() calls #fireChanged()
-	}
-	
-	@Override
-	void setDatabase(Database db) {
-		// ignored - setting this would cause infinite recursion in #fireChanged()
-	}
-	
 	/************************************************************************/
 	
 	void restoreTransients() {
+		setDatabase(this);
+		loginOptions.setDatabase(this);
+		if(isInitialized()) {
+			for(Sector sector : sectors) {
+				sector.setDatabase(this);
+				for(int w : sector.getWarpsOut()) {
+					getSector(w).addWarpFrom(sector.getNumber());
+				}
+			}
+		}
 //		shipTypeNameIndex = new HashMap<String, ShipType>();
 //		for(ShipType shipType : shipTypes) {
 //			shipTypeNameIndex.put(shipType.getName(), shipType);
@@ -112,17 +99,6 @@ public class Database extends DataObject {
 //		for(PlanetType planetType : planetTypes) {
 //			planetTypeIndex.put(planetType.getName(), planetType);
 //		}
-		
-		// TODO set db on loginOptions
-
-		if(isInitialized()) {
-			for(Sector sector : sectors) {
-				sector.setDatabase(this);
-				for(int w : sector.getWarpsOut()) {
-					getSector(w).addWarpFrom(sector.getNumber());
-				}
-			}
-		}		
 	}
 	
 	private void writeObject(ObjectOutputStream out) throws IOException {

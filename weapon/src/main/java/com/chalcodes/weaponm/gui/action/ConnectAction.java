@@ -22,7 +22,7 @@ class ConnectAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(dbm.isDatabaseOpen()) {
-			LoginOptions options = dbm.getDatabase().getLoginOptions();
+			LoginOptions options = dbm.getLoginOptions();
 			network.connect(options.getHost(), options.getPort());
 		}
 	}

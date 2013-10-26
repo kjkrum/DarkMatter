@@ -58,7 +58,7 @@ public enum EventType {
 	/**
 	 * Fired when the database is saved.
 	 */
-	DB_SAVED,
+	DB_CLEAN,
 	
 	/**
 	 * Fired when the game title is changed.

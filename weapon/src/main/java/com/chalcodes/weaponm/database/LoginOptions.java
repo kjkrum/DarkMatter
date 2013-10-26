@@ -7,13 +7,10 @@ import java.util.regex.Pattern;
  */
 public class LoginOptions extends DataObject {
 	private static final long serialVersionUID = 1L;
-	
 	// acceptable names are 1-41 chars, but supplying a name is optional
-	private static final Pattern namePattern = Pattern
-			.compile("[ -\\}]{0,41}");
+	private static final Pattern namePattern = Pattern.compile("[ -\\}]{0,41}");
 	// password can actually be blank
-	private static final Pattern passwordPattern = Pattern
-			.compile("[ -\\}]{0,8}");
+	private static final Pattern passwordPattern = Pattern.compile("[ -\\}]{0,8}");
 
 	private String title = "";
 	private String host = "";

@@ -1,6 +1,5 @@
 package com.chalcodes.weaponm.database;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,27 +7,18 @@ import java.util.Map;
 
 // TODO uncomment things as classes are added
 
-public class Sector implements Serializable, Constants {
+public class Sector extends DataObject implements Constants {
 	private static final long serialVersionUID = 1L;
-	
+	private final int number;
 	//transient List<Trader> traders = new LinkedList<Trader>();
 	//transient List<Alien> aliens = new LinkedList<Alien>();
 	//transient List<Ship> ships = new LinkedList<Ship>();
 	//transient List<Planet> planets = new LinkedList<Planet>();
 	
 	Sector(Database db, int number) {
-		this.db = db;
+		setDatabase(db);
 		this.number = number;
 	}
-
-	private transient Database db;
-	
-	// called by the db manager after deserialization
-	void setDatabase(Database db) {
-		this.db = db;
-	}
-
-	private final int number;
 	
 	public int getNumber() {
 		return number;
@@ -46,7 +36,7 @@ public class Sector implements Serializable, Constants {
 				warpsOutSorted = false;
 			}
 			if(warpsOut.length == 6 || warpsOut.length == warpDensity) fullyMapped = true;
-			Sector warp = db.getSector(sector);
+			Sector warp = getDatabase().getSector(sector);
 			warp.addWarpFrom(number);
 		}
 	}
@@ -62,7 +52,7 @@ public class Sector implements Serializable, Constants {
 			else {
 				// only needed if length changed
 				for (int i = 0; i < warpsOut.length; ++i) {
-					Sector warp = db.getSector(warpsOut[i]);
+					Sector warp = getDatabase().getSector(warpsOut[i]);
 					warp.addWarpFrom(number);
 				}
 			}

@@ -2,6 +2,7 @@ package com.chalcodes.weaponm.emulation;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.util.Arrays;
 
 import krum.jtx.SwingScrollbackBuffer;
@@ -222,8 +223,7 @@ public class EmulationParser implements EmulationEventListener {
 
 	@Override
 	public void bell(CharSequence seq, int off, int len) {
-		// TODO Auto-generated method stub
-		
+		Toolkit.getDefaultToolkit().beep();		
 	}
 
 	@Override

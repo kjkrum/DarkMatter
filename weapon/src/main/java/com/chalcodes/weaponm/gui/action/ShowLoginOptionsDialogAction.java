@@ -21,7 +21,7 @@ class ShowLoginOptionsDialogAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		gui.showLoginOptionsDialog(dbm.getDatabase().getLoginOptions());
+		gui.showLoginOptionsDialog(dbm.getLoginOptions(), true);
 	}
 
 }

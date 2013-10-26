@@ -33,7 +33,5 @@ public class Build {
 		}
 	}
 	
-	// TODO build date, anything else interesting we can get
-	
 	private Build() { }
 }

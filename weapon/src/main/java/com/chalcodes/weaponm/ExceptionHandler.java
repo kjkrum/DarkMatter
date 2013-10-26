@@ -12,8 +12,8 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 		log.error("Uncaught exception in thread {}", thread.getName(), t);
 		try {
 			BugSense.report(thread, t, false);
-		} catch (Throwable th) {
-			log.error("Additional error when sending bug report", th);
+		} catch (Throwable t2) {
+			log.error("Additional error when sending bug report", t2);
 		}
 	}
 

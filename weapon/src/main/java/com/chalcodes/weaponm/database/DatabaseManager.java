@@ -6,10 +6,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.chalcodes.weaponm.event.EventParam;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Strings;
@@ -26,8 +33,13 @@ import com.chalcodes.weaponm.gui.Strings;
 public class DatabaseManager {
 	private final Logger log = LoggerFactory.getLogger(DatabaseManager.class.getSimpleName());
 	private final EventSupport eventSupport;
+	private final Map<DataObject, List<DataChangeListener>> objectListeners =
+			new HashMap<DataObject, List<DataChangeListener>>();
+	private final Map<Class<? extends DataObject>, List<DataChangeListener>> classListeners =
+			new HashMap<Class<? extends DataObject>, List<DataChangeListener>>();
 	private File file;
 	private Database database;
+	private boolean dirty;
 	
 	/* 
 	 * none of these methods are interactive, so will not block network
@@ -62,8 +74,7 @@ public class DatabaseManager {
 	 * @return true if the database is open and dirty; otherwise false
 	 */
 	public boolean isDatabaseDirty() {
-		// TODO real stuff
-		return isDatabaseOpen();
+		return dirty;
 	}
 	
 	/**
@@ -73,6 +84,17 @@ public class DatabaseManager {
 	 */
 	public Database getDatabase() {
 		return database;
+	}
+	
+	/**
+	 * Proxy method for getting the login options from the database.  It's
+	 * done this way because we don't want scripts to have access to the login
+	 * options.
+	 * 
+	 * @return the login options
+	 */
+	public LoginOptions getLoginOptions() {
+		return database.getLoginOptions();
 	}
 
 	/**
@@ -89,10 +111,12 @@ public class DatabaseManager {
 					.replace("{}", lockFile.getPath()));
 		}
 		Database database = new Database(loginOptions);
+		eventSupport.dispatchEvent(EventType.DB_TITLE, EventParam.TITLE, loginOptions.getTitle());
 		save(file, database);
 		close();
 		this.file = file;
 		this.database = database;
+		database.setManager(this);
 		eventSupport.dispatchEvent(EventType.DB_OPENED);
 		log.info("database created in {}", file.getPath());
 		return database;
@@ -120,6 +144,7 @@ public class DatabaseManager {
 				in.close();
 			}
 			this.file = file;
+			database.setManager(this);
 			eventSupport.dispatchEvent(EventType.DB_OPENED);
 			if (database.isInitialized()) {
 				// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
@@ -134,8 +159,7 @@ public class DatabaseManager {
 			// database.getYou().getSector().getNumber());
 			// }
 			log.info("database loaded from {}", file.getPath());
-			// TODO
-			// weapon.gui.updateTitles(database.getLoginOptions().getTitle());
+			eventSupport.dispatchEvent(EventType.DB_TITLE, EventParam.TITLE, database.getLoginOptions().getTitle());
 			return database;
 		} catch (Exception e) {
 			lockFile.delete();
@@ -156,6 +180,10 @@ public class DatabaseManager {
 	 */
 	public void save() throws IOException {
 		save(file, database);
+		if(dirty) {
+			dirty = false;
+			eventSupport.dispatchEvent(EventType.DB_CLEAN);
+		}
 		log.info("database saved");
 	}
 
@@ -177,6 +205,10 @@ public class DatabaseManager {
 		// delete old lock file
 		new File(file.getPath() + ".lock").delete();
 		file = newFile;
+		if(dirty) {
+			dirty = false;
+			eventSupport.dispatchEvent(EventType.DB_CLEAN);
+		}
 		log.info("database saved as '{}'", file.getPath());
 	}
 
@@ -228,6 +260,9 @@ public class DatabaseManager {
 			new File(file.getPath() + ".lock").delete();
 			file = null;
 			database = null;
+			dirty = false;
+			objectListeners.clear();
+			classListeners.clear();
 			// TODO reset lexer/parser
 			log.info("database closed");
 		}
@@ -235,29 +270,69 @@ public class DatabaseManager {
 
 	// TODO export, import, merge
 	
-	/**
-	 * Add a change listener to a data object.  This functionality is not
-	 * public in <tt>DataObject</tt> itself so that scripts are forced to use
-	 * a proxy that tracks their listeners.  This method is not static for the
-	 * same reason.
-	 * 
-	 * @param object
-	 * @param listener
-	 */
 	public void addDataChangeListener(DataObject object, DataChangeListener listener) {
-		object.addChangeListener(listener);
+		if(object == null || listener == null) throw new NullPointerException();
+		if(!objectListeners.containsKey(object)) {
+			objectListeners.put(object, new LinkedList<DataChangeListener>());
+		}
+		objectListeners.get(object).add(listener);
 	}
 	
 	public void removeDataChangeListener(DataObject object, DataChangeListener listener) {
-		object.removeChangeListener(listener);
+		if(object == null || listener == null) return;
+		List<DataChangeListener> listeners = objectListeners.get(object); 
+		if(listeners != null) {
+			listeners.remove(listener);
+			if(listeners.isEmpty()) {
+				objectListeners.remove(object);
+			}
+		}
 	}
 	
-	public void addDataChangeListener(Database db, Class<? extends DataObject> klass, DataChangeListener listener) {
-		db.addChangeListener(klass, listener);
+	public void addDataChangeListener(Class<? extends DataObject> klass, DataChangeListener listener) {
+		if(klass == null || listener == null) throw new NullPointerException();
+		if(!classListeners.containsKey(klass)) {
+			classListeners.put(klass, new LinkedList<DataChangeListener>());
+		}
+		classListeners.get(klass).add(listener);
 	}
 	
-	public void removeDataChangeListener(Database db, Class<? extends DataObject> klass, DataChangeListener listener) {
-		db.removeChangeListener(klass, listener);
+	public void removeDataChangeListener(Class<? extends DataObject> klass, DataChangeListener listener) {
+		if(klass == null || listener == null) return;
+		List<DataChangeListener> listeners = classListeners.get(klass); 
+		if(listeners != null) {
+			listeners.remove(listener);
+			if(listeners.isEmpty()) {
+				classListeners.remove(klass);
+			}
+		}
 	}
-
+	
+	public void fireChanged(final DataObject object) {
+		if(SwingUtilities.isEventDispatchThread()) {
+			if(objectListeners.containsKey(object)) {
+				for(DataChangeListener listener : objectListeners.get(object)) {
+					listener.dataChanged(object);
+				}
+			}
+			Class<? extends DataObject> klass = object.getClass();
+			if(classListeners.containsKey(klass)) {
+				for(DataChangeListener listener : classListeners.get(klass)) {
+					listener.dataChanged(object);
+				}
+			}
+			if(!dirty) {
+				dirty = true;
+				eventSupport.dispatchEvent(EventType.DB_DIRTY);
+			}
+		}
+		else {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					fireChanged(object);
+				}
+			});
+		}
+	}
 }

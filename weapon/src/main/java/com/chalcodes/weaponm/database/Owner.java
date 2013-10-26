@@ -8,7 +8,9 @@ package com.chalcodes.weaponm.database;
 public interface Owner {
 	
 	/**
-	 * Returns the owner's name.
+	 * Gets the owner's name.
+	 * 
+	 * @return the owner's name
 	 */
 	public String getName();
 	

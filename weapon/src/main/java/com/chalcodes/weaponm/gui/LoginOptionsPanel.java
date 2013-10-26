@@ -13,6 +13,9 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 
 import com.chalcodes.weaponm.database.LoginOptions;
+import com.chalcodes.weaponm.event.EventParam;
+import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.event.EventType;
 
 /**
  * This was mocked up in NetBeans and then completed by hand.
@@ -50,8 +53,9 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     final JTextField nameField;
     final JTextField passwordField;
     final JCheckBox autoLoginCheckBox;
+    final EventSupport eventSupport;
 	
-    public LoginOptionsPanel(LoginOptions options) {
+    public LoginOptionsPanel(LoginOptions options, EventSupport eventSupport) {
     	this.options = options;
         gamePanel = new JPanel();
         titleLabel = new JLabel();
@@ -74,6 +78,7 @@ class LoginOptionsPanel extends javax.swing.JPanel {
         passwordField = new JTextField();
         passwordField.addFocusListener(SelectOnFocus.getInstance());
         autoLoginCheckBox = new JCheckBox();
+        this.eventSupport = eventSupport;
         
         initComponents();
         
@@ -156,6 +161,9 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     }
     
     void saveFields() {
+    	if(eventSupport != null) {
+    		eventSupport.dispatchEvent(EventType.DB_TITLE, EventParam.TITLE, titleField.getText());
+    	}
     	options.setTitle(titleField.getText());
     	options.setHost(hostField.getText());
     	options.setPort(Integer.parseInt(portField.getText()));

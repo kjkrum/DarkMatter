@@ -292,9 +292,8 @@ public class Gui {
 		creditsWindow.setLocationRelativeTo(mainWindow);
 	}
 
-	public int showLoginOptionsDialog(LoginOptions loginOptions) {
-		return LoginOptionsDialog.showDialog(mainWindow, loginOptions);
-		// TODO fire title event from here?
+	public int showLoginOptionsDialog(LoginOptions loginOptions, boolean fireTitleEventOnSave) {
+		return LoginOptionsDialog.showDialog(mainWindow, loginOptions, fireTitleEventOnSave ? eventSupport : null);
 	}
 	
 	/**

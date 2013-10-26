@@ -8,12 +8,13 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import com.chalcodes.weaponm.database.LoginOptions;
+import com.chalcodes.weaponm.event.EventSupport;
 
 public class LoginOptionsDialog {
 	// http://docs.oracle.com/javase/tutorial/uiswing/components/dialog.html#stayup
 
-	public static int showDialog(Frame parent, LoginOptions options) {
-		final LoginOptionsPanel panel = new LoginOptionsPanel(options);
+	public static int showDialog(Frame parent, LoginOptions options, EventSupport eventSupport) {
+		final LoginOptionsPanel panel = new LoginOptionsPanel(options, eventSupport);
 		final JOptionPane optionPane = new JOptionPane(panel,
 				JOptionPane.PLAIN_MESSAGE,
 				JOptionPane.OK_CANCEL_OPTION);  

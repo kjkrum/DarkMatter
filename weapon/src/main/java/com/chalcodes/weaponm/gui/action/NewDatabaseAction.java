@@ -29,7 +29,7 @@ public class NewDatabaseAction extends AbstractFileAction {
 	public void actionPerformed(ActionEvent e) {
 		if(gui.interactiveClose()) {
 			LoginOptions options = new LoginOptions();
-			if(gui.showLoginOptionsDialog(options) == JOptionPane.OK_OPTION) {
+			if(gui.showLoginOptionsDialog(options, false) == JOptionPane.OK_OPTION) {
 				File file = gui.showDatabaseSaveDialog();
 				if(file != null) {
 					String filename = file.getPath();
