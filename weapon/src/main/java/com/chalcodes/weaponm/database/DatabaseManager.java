@@ -10,7 +10,6 @@ import java.io.ObjectOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Strings;
@@ -25,7 +24,7 @@ import com.chalcodes.weaponm.gui.Strings;
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public class DatabaseManager {
-	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
+	private final Logger log = LoggerFactory.getLogger(DatabaseManager.class.getSimpleName());
 	private final EventSupport eventSupport;
 	private File file;
 	private Database database;
@@ -83,13 +82,13 @@ public class DatabaseManager {
 	 * @return the newly-created database
 	 * @throws IOException if an error occurs
 	 */
-	public Database create(File file) throws IOException {
+	public Database create(File file, LoginOptions loginOptions) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
 			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
 					.replace("{}", lockFile.getPath()));
 		}
-		Database database = new Database();
+		Database database = new Database(loginOptions);
 		save(file, database);
 		close();
 		this.file = file;
@@ -235,5 +234,30 @@ public class DatabaseManager {
 	}
 
 	// TODO export, import, merge
+	
+	/**
+	 * Add a change listener to a data object.  This functionality is not
+	 * public in <tt>DataObject</tt> itself so that scripts are forced to use
+	 * a proxy that tracks their listeners.  This method is not static for the
+	 * same reason.
+	 * 
+	 * @param object
+	 * @param listener
+	 */
+	public void addDataChangeListener(DataObject object, DataChangeListener listener) {
+		object.addChangeListener(listener);
+	}
+	
+	public void removeDataChangeListener(DataObject object, DataChangeListener listener) {
+		object.removeChangeListener(listener);
+	}
+	
+	public void addDataChangeListener(Database db, Class<? extends DataObject> klass, DataChangeListener listener) {
+		db.addChangeListener(klass, listener);
+	}
+	
+	public void removeDataChangeListener(Database db, Class<? extends DataObject> klass, DataChangeListener listener) {
+		db.removeChangeListener(klass, listener);
+	}
 
 }

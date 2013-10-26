@@ -5,7 +5,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
-import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -131,16 +130,16 @@ class NetworkSession implements Runnable {
 	 * 
 	 * @param events the events
 	 */
-	private void dispatchEvents(final List<Event> events) {
-		// TODO on write, lock the network for the remainder of the list
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				for(Event event : events) {
-					eventSupport.dispatchEvent(event);
-				}
-			}
-		});
-	}
+//	private void dispatchEvents(final List<Event> events) {
+//		// TODO on write, lock the network for the remainder of the list
+//		SwingUtilities.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+//				for(Event event : events) {
+//					eventSupport.dispatchEvent(event);
+//				}
+//			}
+//		});
+//	}
 
 }

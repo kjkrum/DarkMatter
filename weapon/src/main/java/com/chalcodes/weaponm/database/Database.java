@@ -3,19 +3,21 @@ package com.chalcodes.weaponm.database;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-// TODO all setters everywhere should fire dirty event iff value changed
-
-public class Database implements Serializable {
+public class Database extends DataObject {
 	private static final long serialVersionUID = 1L;
-
 	static final Object lock = new Object();
-	
-	private final LoginOptions loginOptions = new LoginOptions();
+	private transient final Map<Class<?>, List<DataChangeListener>> changeListeners =
+			new HashMap<Class<?>, List<DataChangeListener>>();
+	private final LoginOptions loginOptions;
 	private Sector[] sectors;
 	
-	Database() {
+	Database(LoginOptions loginOptions) {
+		this.loginOptions  = loginOptions;
 		restoreTransients();
 	}
 	
@@ -50,6 +52,37 @@ public class Database implements Serializable {
 		}
 	}
 	
+	// TODO give scripts access through a proxy
+	void addChangeListener(Class<? extends DataObject> klass, DataChangeListener listener) {
+		if(listener == null) throw new NullPointerException();
+		if(!changeListeners.containsKey(klass)) {
+			changeListeners.put(klass, new LinkedList<DataChangeListener>());
+		}
+		changeListeners.get(klass).add(listener);
+	}
+	
+	// TODO give scripts access through a proxy
+	void removeChangeListener(Class<? extends DataObject> klass, DataChangeListener listener) {
+		if(listener != null && changeListeners.containsKey(klass)) {
+			changeListeners.get(klass).remove(listener);
+		}
+	}
+	
+	// this is only called in the UI thread by DataObject#fireChanged()
+	void fireChanged(DataObject obj) {
+		if(changeListeners.containsKey(obj.getClass())) {
+			for(DataChangeListener listener : changeListeners.get(obj.getClass())) {
+				listener.dataChanged(obj);
+			}
+		}
+		// DataObject#fireChanged() calls #fireChanged()
+	}
+	
+	@Override
+	void setDatabase(Database db) {
+		// ignored - setting this would cause infinite recursion in #fireChanged()
+	}
+	
 	/************************************************************************/
 	
 	void restoreTransients() {
@@ -79,6 +112,8 @@ public class Database implements Serializable {
 //		for(PlanetType planetType : planetTypes) {
 //			planetTypeIndex.put(planetType.getName(), planetType);
 //		}
+		
+		// TODO set db on loginOptions
 
 		if(isInitialized()) {
 			for(Sector sector : sectors) {

@@ -33,7 +33,6 @@ import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 
 import com.chalcodes.weaponm.AppSettings;
-import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.event.Event;
@@ -50,7 +49,7 @@ import com.chalcodes.weaponm.network.NetworkManager;
  */
 public class Gui {
 	private static final String APP_TITLE = "Weapon M";
-	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
+	private final Logger log = LoggerFactory.getLogger(Gui.class.getSimpleName());
 	private final JFrame mainWindow;
 	private final ImageIcon icon;
 	private final CControl dockControl;

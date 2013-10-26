@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.chalcodes.weaponm.database.Database;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.gui.Gui;
@@ -29,8 +28,8 @@ public class NewDatabaseAction extends AbstractFileAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(gui.interactiveClose()) {
-			LoginOptions tempOptions = new LoginOptions();
-			if(gui.showLoginOptionsDialog(tempOptions) == JOptionPane.OK_OPTION) {
+			LoginOptions options = new LoginOptions();
+			if(gui.showLoginOptionsDialog(options) == JOptionPane.OK_OPTION) {
 				File file = gui.showDatabaseSaveDialog();
 				if(file != null) {
 					String filename = file.getPath();
@@ -39,15 +38,7 @@ public class NewDatabaseAction extends AbstractFileAction {
 					}
 					if(interactiveClobber(file)) {
 						try {
-							Database db = dbm.create(file);
-							LoginOptions dbOptions = db.getLoginOptions();
-							dbOptions.setTitle(tempOptions.getTitle());
-							dbOptions.setHost(tempOptions.getHost());
-							dbOptions.setPort(tempOptions.getPort());
-							dbOptions.setGameLetter(tempOptions.getGameLetter());
-							dbOptions.setUserName(tempOptions.getUserName());
-							dbOptions.setPassword(tempOptions.getPassword());
-							dbOptions.setAutoLogin(tempOptions.isAutoLogin());
+							dbm.create(file, options);
 							dbm.save();
 							// TODO fire events
 						}
