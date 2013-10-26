@@ -11,7 +11,15 @@ public class Database extends DataObject {
 	private final LoginOptions loginOptions;
 	private Sector[] sectors;
 	
-	// call this before a new or loaded db is returned by its creator
+	Database(LoginOptions loginOptions) {
+		this.loginOptions  = loginOptions;
+		restoreTransients();
+	}
+	
+	LoginOptions getLoginOptions() {
+		return loginOptions;
+	}
+	
 	void setManager(DatabaseManager manager) {
 		if(this.manager != null) {
 			throw new IllegalStateException("manager already set");
@@ -21,15 +29,6 @@ public class Database extends DataObject {
 	
 	DatabaseManager getManager() {
 		return manager;
-	}
-	
-	Database(LoginOptions loginOptions) {
-		this.loginOptions  = loginOptions;
-		restoreTransients();
-	}
-	
-	LoginOptions getLoginOptions() {
-		return loginOptions;
 	}
 	
 	/**
@@ -64,7 +63,6 @@ public class Database extends DataObject {
 	
 	void restoreTransients() {
 		setDatabase(this);
-		loginOptions.setDatabase(this);
 		if(isInitialized()) {
 			for(Sector sector : sectors) {
 				sector.setDatabase(this);

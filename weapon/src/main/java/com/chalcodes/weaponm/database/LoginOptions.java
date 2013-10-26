@@ -1,11 +1,12 @@
 package com.chalcodes.weaponm.database;
 
+import java.io.Serializable;
 import java.util.regex.Pattern;
 
 /**
  * Server login settings.
  */
-public class LoginOptions extends DataObject {
+public class LoginOptions implements Serializable {
 	private static final long serialVersionUID = 1L;
 	// acceptable names are 1-41 chars, but supplying a name is optional
 	private static final Pattern namePattern = Pattern.compile("[ -\\}]{0,41}");
@@ -49,10 +50,7 @@ public class LoginOptions extends DataObject {
 			title = "";
 		}
 		synchronized (Database.lock) {
-			if(this.title.equals(title)) {
-				this.title = title;
-				fireChanged();
-			}
+			this.title = title;
 		}
 	}
 
@@ -67,10 +65,7 @@ public class LoginOptions extends DataObject {
 			host = "";
 		}
 		synchronized (Database.lock) {
-			if(!this.host.equals(host)) {
-				this.host = host;
-				fireChanged();
-			}
+			this.host = host;
 		}
 	}
 
@@ -85,10 +80,7 @@ public class LoginOptions extends DataObject {
 			throw new IllegalArgumentException("invalid port: " + port);
 		}
 		synchronized (Database.lock) {
-			if(this.port != port) {
-				this.port = port;
-				fireChanged();
-			}
+			this.port = port;
 		}
 	}
 
@@ -103,10 +95,7 @@ public class LoginOptions extends DataObject {
 			throw new IllegalArgumentException("invalid game letter: " + letter);
 		}
 		synchronized (Database.lock) {
-			if(this.letter != letter) {
-				this.letter = letter;
-				fireChanged();
-			}
+			this.letter = letter;
 		}
 	}
 
@@ -124,10 +113,7 @@ public class LoginOptions extends DataObject {
 			throw new IllegalStateException("user name cannot be empty when auto-login is true");
 		}
 		synchronized (Database.lock) {
-			if(!this.name.equals(name)) {
-				this.name = name;
-				fireChanged();
-			}
+			this.name = name;
 		}
 	}
 
@@ -142,10 +128,7 @@ public class LoginOptions extends DataObject {
 			throw new IllegalArgumentException("invalid password: " + password);
 		}
 		synchronized (Database.lock) {
-			if(!this.password.equals(password)) {
-				this.password = password;
-				fireChanged();
-			}
+			this.password = password;
 		}
 	}
 
@@ -160,10 +143,7 @@ public class LoginOptions extends DataObject {
 			throw new IllegalStateException("auto-login cannot be true when user name is empty");
 		}
 		synchronized (Database.lock) {
-			if(this.autoLogin != autoLogin) {
-				this.autoLogin = autoLogin;
-				fireChanged();
-			}			
+			this.autoLogin = autoLogin;
 		}
 	}
 }

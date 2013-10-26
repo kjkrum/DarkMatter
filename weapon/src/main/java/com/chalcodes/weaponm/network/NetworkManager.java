@@ -27,6 +27,7 @@ public class NetworkManager {
 	private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 	private State state = State.DISCONNECTED;
 	private Thread networkThread;
+	private int threadCount = 0;
 	private SocketChannel channel;
 	private long bytesWritten;
 	private boolean locked;
@@ -58,7 +59,7 @@ public class NetworkManager {
 	public void connect(String host, int port) {
 		if(state == State.DISCONNECTED) {
 			setState(State.CONNECTING);
-			networkThread = new Thread(new NetworkSession(this, host, port, eventSupport));
+			networkThread = new Thread(new NetworkSession(this, host, port, eventSupport), "Network" + threadCount++);
 			networkThread.start();
 		}
 	}

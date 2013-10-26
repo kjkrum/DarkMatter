@@ -13,7 +13,7 @@ abstract public class DataObject implements Serializable {
 	private transient Database db;
 	
 	void setDatabase(Database db) {
-		if(db != null) {
+		if(this.db != null) {
 			throw new IllegalStateException("database already set");
 		}
 		this.db = db;
