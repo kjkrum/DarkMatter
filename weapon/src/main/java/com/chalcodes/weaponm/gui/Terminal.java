@@ -80,7 +80,8 @@ class Terminal {
 		
 		StickyScrollPane scrollPane = new StickyScrollPane(display);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.getViewport().setBackground(Color.DARK_GRAY); // TODO use Color.BLACK
+		scrollPane.getViewport().setBackground(Color.DARK_GRAY);
+		scrollPane.setAutoscrolls(true);
 		
 		// TODO save this ref and do stuff with it
 		new SelectionControl(scrollPane.getViewport(), eventSupport);
