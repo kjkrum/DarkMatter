@@ -94,22 +94,28 @@ class Terminal {
 		scrollPane.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				char c = e.getKeyChar();
-				switch(c) {
-				case KeyEvent.CHAR_UNDEFINED:
-					break;
-				case KeyEvent.VK_ENTER:
-					send("\r\n");
-					break;
-				case KeyEvent.VK_TAB:
-					send('\t');
-					break;
-				default:
-					if(Debug.KEY_LISTENER) {
-						log.debug("key typed: {}", c);
+				int mods = e.getModifiers();
+				if(mods == 0 || mods == KeyEvent.SHIFT_MASK) {
+					char c = e.getKeyChar();
+					switch(c) {
+					case KeyEvent.CHAR_UNDEFINED:
+						break;
+					case KeyEvent.VK_ENTER:
+						send("\r\n");
+						e.consume();
+						break;
+					case KeyEvent.VK_TAB:
+						send('\t');
+						e.consume();
+						break;
+					default:
+						if(Debug.KEY_LISTENER) {
+							log.debug("key typed: {}", c);
+						}
+						send(c);
+						e.consume();
+						break;
 					}
-					send(c);
-					break;
 				}
 			}
 		});
