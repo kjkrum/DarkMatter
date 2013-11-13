@@ -35,10 +35,7 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.chalcodes.weaponm.AppSettings;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
-import com.chalcodes.weaponm.event.Event;
-import com.chalcodes.weaponm.event.EventListener;
 import com.chalcodes.weaponm.event.EventSupport;
-import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.action.ActionManager;
 import com.chalcodes.weaponm.network.NetworkManager;
 
@@ -70,7 +67,7 @@ public class Gui {
 		icon = new ImageIcon(getClass()
 				.getResource("/com/chalcodes/weaponm/DarkMatter.png"));
 		dockControl = new CControl(mainWindow);
-		eventSupport = new GuiEventSupport();
+		eventSupport = new EventSupport();
 		dbm = new DatabaseManager(eventSupport);
 		network = new NetworkManager(eventSupport);
 		actionManager = new ActionManager(this, eventSupport, dbm, network, dockControl);
@@ -146,16 +143,16 @@ public class Gui {
 		// give it a default size
 		dockControl.getContentArea().setPreferredSize(new Dimension(640, 480));
 		
-		// add listener to close all dockables when db is closed
-		EventListener listener = new EventListener() {
-			@Override
-			public void onEvent(Event event) {
-				for(int i = 0; i < dockControl.getCDockableCount(); ++i) {
-					dockControl.getCDockable(i).setVisible(false);
-				}
-			}
-		};
-		eventSupport.addEventListener(listener, EventType.DB_CLOSED);
+		// TODO listener to close all dockables when db is closed
+//		EventListener listener = new EventListener() {
+//			@Override
+//			public void onEvent(Event event) {
+//				for(int i = 0; i < dockControl.getCDockableCount(); ++i) {
+//					dockControl.getCDockable(i).setVisible(false);
+//				}
+//			}
+//		};
+		// TODO eventSupport.addEventListener(listener, EventType.DB_CLOSED);
 		// TODO restore layout when db is opened
 	}
 	
@@ -310,6 +307,9 @@ public class Gui {
 				}
 			}
 			else {
+				if(dbm.isDatabaseOpen()) {
+					dbm.close();
+				}
 				shutdown();
 			}
 		}

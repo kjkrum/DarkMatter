@@ -1,6 +1,8 @@
 package com.chalcodes.weaponm.gui.action;
 
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,10 +17,11 @@ import bibliothek.gui.dock.common.menu.SingleCDockableListMenuPiece;
 import bibliothek.gui.dock.facile.menu.RootMenuPiece;
 
 import com.chalcodes.weaponm.database.DatabaseManager;
-import com.chalcodes.weaponm.event.Event;
-import com.chalcodes.weaponm.event.EventListener;
+import com.chalcodes.weaponm.event.DatabaseStatus;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
+import com.chalcodes.weaponm.event.NetworkStatus;
+import com.chalcodes.weaponm.event.WeaponEvent;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.Strings;
 import com.chalcodes.weaponm.network.NetworkManager;
@@ -29,7 +32,7 @@ import com.chalcodes.weaponm.network.NetworkManager;
  *
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
-public class ActionManager implements EventListener {
+public class ActionManager implements PropertyChangeListener {
 	//private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final JMenuBar menuBar = new JMenuBar();
 	private final Set<AbstractAction> enableOnLoad = new HashSet<AbstractAction>(); // disable on unload
@@ -39,10 +42,8 @@ public class ActionManager implements EventListener {
 	
 	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm, NetworkManager network, CControl dockControl) {
 		populateMenuBar(gui, eventSupport, dbm, network, dockControl);
-		eventSupport.addEventListener(this, EventType.DB_OPENED);
-		eventSupport.addEventListener(this, EventType.DB_CLOSED);
-		eventSupport.addEventListener(this, EventType.NET_CONNECTED);
-		eventSupport.addEventListener(this, EventType.NET_DISCONNECTED);
+		eventSupport.addPropertyChangeListener(EventType.DATABASE_STATUS, this);
+		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATUS, this);
 	}
 	
 	public JMenuBar getMenuBar() {
@@ -107,32 +108,46 @@ public class ActionManager implements EventListener {
 		configureNoDatabase();
 		configureNoConnection();
 	}
+	
+	
 
 	@Override
-	public void onEvent(Event event) {
-		switch(event.getType()) {
-		case DB_OPENED:
-			for(AbstractAction action : enableOnLoad) {
-				action.setEnabled(true);
+	public void propertyChange(PropertyChangeEvent e) {
+		if(e instanceof WeaponEvent) {
+			WeaponEvent evt = (WeaponEvent) e;
+			switch(evt.getType()) {
+			case DATABASE_STATUS:
+				DatabaseStatus dbStatus = (DatabaseStatus) evt.getNewValue();
+				if(dbStatus == DatabaseStatus.OPEN) {
+					for(AbstractAction action : enableOnLoad) {
+						action.setEnabled(true);
+					}
+					for(JMenu menu : enableOnLoadMenus) {
+						menu.setEnabled(true);
+					}
+				}
+				else if(dbStatus == DatabaseStatus.CLOSED) {
+					configureNoDatabase();
+				}
+				break;
+			case NETWORK_STATUS:
+				NetworkStatus netStatus = (NetworkStatus) evt.getNewValue();
+				if(netStatus == NetworkStatus.CONNECTED) {
+					for(AbstractAction action : enableOnConnect) {
+						action.setEnabled(true);
+					}
+					for(AbstractAction action : disableOnConnect) {
+						action.setEnabled(false);
+					}
+				}
+				else if(netStatus == NetworkStatus.DISCONNECTED) {
+					configureNoConnection();
+				}
+				break;
 			}
-			for(JMenu menu : enableOnLoadMenus) {
-				menu.setEnabled(true);
-			}
-			break;
-		case DB_CLOSED:
-			configureNoDatabase();
-			break;
-		case NET_CONNECTED:
-			for(AbstractAction action : enableOnConnect) {
-				action.setEnabled(true);
-			}
-			for(AbstractAction action : disableOnConnect) {
-				action.setEnabled(false);
-			}
-			break;
-		case NET_DISCONNECTED:
-			configureNoConnection();
-			break;
+		}
+		else {
+			// TODO handle plain property changes like JTX selection events
 		}
 	}
 	

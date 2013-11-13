@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.chalcodes.weaponm.event.EventParam;
+import com.chalcodes.weaponm.event.DatabaseStatus;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Strings;
@@ -40,13 +40,6 @@ public class DatabaseManager {
 	private File file;
 	private Database database;
 	private boolean dirty;
-	
-	/* 
-	 * none of these methods are interactive, so will not block network
-	 * only need to sync in private save method
-	 * network thread won't exist during open/create and will be killed by close
-	 * database reference doesn't change even if file name changes
-	 */
 
 	/**
 	 * Creates a new <tt>DatabaseManager</tt> using the specified
@@ -111,13 +104,13 @@ public class DatabaseManager {
 					.replace("{}", lockFile.getPath()));
 		}
 		Database database = new Database(loginOptions);
-		eventSupport.dispatchEvent(EventType.DB_TITLE, EventParam.TITLE, loginOptions.getTitle());
+		eventSupport.firePropertyChange(EventType.DATABASE_TITLE, null, loginOptions.getTitle());
 		save(file, database);
 		close();
 		this.file = file;
 		this.database = database;
 		database.setManager(this);
-		eventSupport.dispatchEvent(EventType.DB_OPENED);
+		eventSupport.firePropertyChange(EventType.DATABASE_STATUS, null, DatabaseStatus.OPEN);
 		log.info("database created in {}", file.getPath());
 		return database;
 	}
@@ -145,7 +138,7 @@ public class DatabaseManager {
 			}
 			this.file = file;
 			database.setManager(this);
-			eventSupport.dispatchEvent(EventType.DB_OPENED);
+			eventSupport.firePropertyChange(EventType.DATABASE_STATUS, null, DatabaseStatus.OPEN);
 			if (database.isInitialized()) {
 				// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
 				// database, true);
@@ -159,7 +152,7 @@ public class DatabaseManager {
 			// database.getYou().getSector().getNumber());
 			// }
 			log.info("database loaded from {}", file.getPath());
-			eventSupport.dispatchEvent(EventType.DB_TITLE, EventParam.TITLE, database.getLoginOptions().getTitle());
+			eventSupport.firePropertyChange(EventType.DATABASE_TITLE, null, database.getLoginOptions().getTitle());
 			return database;
 		} catch (Exception e) {
 			lockFile.delete();
@@ -180,11 +173,11 @@ public class DatabaseManager {
 	 */
 	public void save() throws IOException {
 		save(file, database);
+		log.info("database saved");
 		if(dirty) {
 			dirty = false;
-			eventSupport.dispatchEvent(EventType.DB_CLEAN);
+			eventSupport.firePropertyChange(EventType.DATABASE_DIRTY, null, false);
 		}
-		log.info("database saved");
 	}
 
 	/**
@@ -205,11 +198,11 @@ public class DatabaseManager {
 		// delete old lock file
 		new File(file.getPath() + ".lock").delete();
 		file = newFile;
+		log.info("database saved as '{}'", file.getPath());
 		if(dirty) {
 			dirty = false;
-			eventSupport.dispatchEvent(EventType.DB_CLEAN);
+			eventSupport.firePropertyChange(EventType.DATABASE_DIRTY, null, false);
 		}
-		log.info("database saved as '{}'", file.getPath());
 	}
 
 	/**
@@ -256,7 +249,7 @@ public class DatabaseManager {
 	 */
 	public void close() {
 		if (file != null) {
-			eventSupport.dispatchEvent(EventType.DB_CLOSED);
+			eventSupport.firePropertyChange(EventType.DATABASE_STATUS, null, DatabaseStatus.CLOSED);
 			new File(file.getPath() + ".lock").delete();
 			file = null;
 			database = null;
@@ -323,7 +316,7 @@ public class DatabaseManager {
 			}
 			if(!dirty) {
 				dirty = true;
-				eventSupport.dispatchEvent(EventType.DB_DIRTY);
+				eventSupport.firePropertyChange(EventType.DATABASE_DIRTY, null, true);
 			}
 		}
 		else {

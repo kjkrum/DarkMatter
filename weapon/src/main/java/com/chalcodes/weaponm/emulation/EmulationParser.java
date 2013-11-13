@@ -5,19 +5,19 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.util.Arrays;
 
-import krum.jtx.SwingScrollbackBuffer;
-import krum.jtx.VGABufferElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.chalcodes.jtx.ScrollbackBuffer;
+import com.chalcodes.jtx.VgaBufferElement;
 import com.chalcodes.weaponm.emulation.lexer.EmulationEventListener;
 
 // FIXME: don't assume that buffer extents x is always 0
 
 public class EmulationParser implements EmulationEventListener {
 	private static final Logger log = LoggerFactory.getLogger(EmulationParser.class);
-	private final SwingScrollbackBuffer buffer;
+	private final ScrollbackBuffer buffer;
 
 	/** The cursor position. */
 	private final Point cursor;
@@ -26,7 +26,7 @@ public class EmulationParser implements EmulationEventListener {
 	/** The maximum <tt>y</tt> value the cursor has ever had. */
 	private int maxLine;
 	/** For manipulating character attributes. */
-	private int attributes = VGABufferElement.DEFAULT_VALUE;
+	private int attributes = VgaBufferElement.DEFAULT_VALUE;
 	/**
 	 * The cursor <tt>y</tt> value after the last page clear.  The cursor up
 	 * command cannot move the cursor above this mark.  This is because the
@@ -37,7 +37,7 @@ public class EmulationParser implements EmulationEventListener {
 	/** The cursor position at the last save cursor command. */
 	private final Point cursorMark;	
 	
-	public EmulationParser(SwingScrollbackBuffer buffer) {
+	public EmulationParser(ScrollbackBuffer buffer) {
 		this.buffer = buffer;
 		Rectangle extents = buffer.getExtents();		
 		columns = extents.width;
@@ -81,22 +81,22 @@ public class EmulationParser implements EmulationEventListener {
 		for(int param : params) {
 			switch(param) {
 			case 0:
-				attributes = VGABufferElement.DEFAULT_VALUE;
+				attributes = VgaBufferElement.DEFAULT_VALUE;
 				break;
 			case 1:
-				attributes = VGABufferElement.setBright(attributes, true);
+				attributes = VgaBufferElement.setBright(attributes, true);
 				break;
 			case 2:
-				attributes = VGABufferElement.setBright(attributes, false);
+				attributes = VgaBufferElement.setBright(attributes, false);
 				break;
 			case 4:
-				attributes = VGABufferElement.setUnderlined(attributes, true);
+				attributes = VgaBufferElement.setUnderlined(attributes, true);
 				break;
 			case 5:
-				attributes = VGABufferElement.setBlinking(attributes, true);
+				attributes = VgaBufferElement.setBlinking(attributes, true);
 				break;
 			case 7:
-				attributes = VGABufferElement.setInverted(attributes, true);
+				attributes = VgaBufferElement.setInverted(attributes, true);
 				break;
 			case 30:
 			case 31:
@@ -106,7 +106,7 @@ public class EmulationParser implements EmulationEventListener {
 			case 35:
 			case 36:
 			case 37:
-				attributes = VGABufferElement.setForegroundColor(attributes, param - 30);
+				attributes = VgaBufferElement.setForegroundColor(attributes, param - 30);
 				break;
 			case 40:
 			case 41:
@@ -116,7 +116,7 @@ public class EmulationParser implements EmulationEventListener {
 			case 45:
 			case 46:
 			case 47:
-				attributes = VGABufferElement.setBackgroundColor(attributes, param - 40);
+				attributes = VgaBufferElement.setBackgroundColor(attributes, param - 40);
 				break;
 			default:
 				log.warn("unknown character attribute: {}", param);
@@ -235,7 +235,7 @@ public class EmulationParser implements EmulationEventListener {
 			//}
 		//}
 		int[] values = new int[columns - cursor.x];
-		Arrays.fill(values, VGABufferElement.DEFAULT_VALUE);
+		Arrays.fill(values, VgaBufferElement.DEFAULT_VALUE);
 		buffer.setContent(cursor.x, cursor.y, values, 0, values.length);
 	}
 

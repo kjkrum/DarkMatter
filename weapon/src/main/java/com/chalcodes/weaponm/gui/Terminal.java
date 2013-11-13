@@ -3,15 +3,11 @@ package com.chalcodes.weaponm.gui;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 import javax.swing.JScrollPane;
-
-import krum.jtx.SoftFont;
-import krum.jtx.StickyScrollPane;
-import krum.jtx.SwingDisplay;
-import krum.jtx.SwingScrollbackBuffer;
-import krum.jtx.VGASoftFont;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,61 +16,74 @@ import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
+import com.chalcodes.jtx.Display;
+import com.chalcodes.jtx.ScrollbackBuffer;
+import com.chalcodes.jtx.SoftFont;
+import com.chalcodes.jtx.StickyScrollPane;
+import com.chalcodes.jtx.VgaSoftFont;
+import com.chalcodes.jtx.extensions.SelectionControl;
 import com.chalcodes.weaponm.AppSettings;
 import com.chalcodes.weaponm.Debug;
 import com.chalcodes.weaponm.emulation.Emulation;
 import com.chalcodes.weaponm.emulation.EmulationParser;
 import com.chalcodes.weaponm.emulation.lexer.EmulationLexer;
-import com.chalcodes.weaponm.event.Event;
-import com.chalcodes.weaponm.event.EventListener;
-import com.chalcodes.weaponm.event.EventParam;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
+import com.chalcodes.weaponm.event.NetworkStatus;
+import com.chalcodes.weaponm.event.WeaponEvent;
 
 class Terminal {
 	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final EventSupport eventSupport;
 	private final DefaultSingleCDockable dockable;
-	private final SwingScrollbackBuffer buffer;
+	private final ScrollbackBuffer buffer;
 	private final SoftFont font;
-	private final SwingDisplay display;
+	private final Display display;
 	private final EmulationLexer lexer;
 	private final EmulationParser parser;
 	private final Emulation emulation;
 	
 	Terminal(EventSupport eventSupport) throws IOException, ClassNotFoundException {
-		this.eventSupport = eventSupport;
-		buffer = new SwingScrollbackBuffer(
+		buffer = new ScrollbackBuffer(
 				AppSettings.getBufferColumns(),
 				AppSettings.getBufferLines());
-		font = new VGASoftFont();
-		display = new SwingDisplay(buffer, font, AppSettings.getBufferColumns(), 0);
+		font = new VgaSoftFont();
+		display = new Display(buffer, font, AppSettings.getBufferColumns(), 0);
 		buffer.addBufferObserver(display);
 		lexer = new EmulationLexer();
 		parser = new EmulationParser(buffer);
 		lexer.addEventListener(parser);
 		emulation = new Emulation(lexer);
-		EventListener listener = new EventListener() {
+		this.eventSupport = eventSupport;
+		PropertyChangeListener listener = new PropertyChangeListener() {
 			@Override
-			public void onEvent(Event e) {
-				switch(e.getType()){
+			public void propertyChange(PropertyChangeEvent e) {
+				WeaponEvent evt = (WeaponEvent) e;
+				switch(evt.getType()) {
 				case TEXT_RECEIVED:
-					String text = (String) e.getParam(EventParam.TEXT);
+					String text = (String) evt.getNewValue();
 					emulation.write(text);
 					break;
-				case NET_DISCONNECTED:
-					String msg = Strings.getString("DISCONNECTED");
-					emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
-					break;
+				case NETWORK_STATUS:
+					NetworkStatus oldStatus = (NetworkStatus) evt.getOldValue();
+					NetworkStatus newStatus = (NetworkStatus) evt.getNewValue();
+					if(oldStatus == NetworkStatus.CONNECTED && newStatus == NetworkStatus.DISCONNECTED) {
+						String msg = Strings.getString("DISCONNECTED");
+						emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
+					}
+					break;					
 				}
-			}			
+			}
 		};
-		eventSupport.addEventListener(listener, EventType.TEXT_RECEIVED);
-		eventSupport.addEventListener(listener, EventType.NET_DISCONNECTED);
+		eventSupport.addPropertyChangeListener(EventType.TEXT_RECEIVED, listener);
+		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATUS, listener);
 		
 		StickyScrollPane scrollPane = new StickyScrollPane(display);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.getViewport().setBackground(Color.BLACK);
+		scrollPane.getViewport().setBackground(Color.DARK_GRAY); // TODO use Color.BLACK
+		
+		// TODO save this ref and do stuff with it
+		new SelectionControl(scrollPane.getViewport(), eventSupport);
 		
 		String title = Strings.getString("TITLE_TERMINAL");
 		dockable = new DefaultSingleCDockable("TERMINAL", title, scrollPane);
@@ -111,11 +120,11 @@ class Terminal {
 	}
 	
 	private void send(String string) {
-		Event event = new Event(EventType.TEXT_TYPED, EventParam.TEXT, string);
-		Terminal.this.eventSupport.dispatchEvent(event);
+		WeaponEvent event = new WeaponEvent(EventType.TEXT_TYPED, null, string);
+		eventSupport.firePropertyChange(event);
 	}
 	
 	private void send(char c) {
-		send("" + c);
+		send(new StringBuilder().append(c).toString());
 	}	
 }

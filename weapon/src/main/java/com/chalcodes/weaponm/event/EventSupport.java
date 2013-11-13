@@ -1,74 +1,27 @@
 package com.chalcodes.weaponm.event;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class EventSupport extends PropertyChangeSupport {
+	private static final long serialVersionUID = 1L;
 
-import com.chalcodes.weaponm.LogName;
+	public EventSupport() {
+		// TODO what to use as a source?
+		super("the cake is a lie");
+	}
 
-/**
- * Manages a collection of event listners.  The {@link #dispatchEvent(Event)}
- * method should be implemented to appropriately handle exceptions propagated
- * from listeners.  This class is not thread safe.
- *
- * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
- */
-abstract public class EventSupport {
-	protected final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
-	protected final Map<EventType, Set<EventListener>> listeners =
-			new HashMap<EventType, Set<EventListener>>();
-
-	public void addEventListener(EventListener listener, EventType type) {
-		if(listener == null || type == null) {
-			throw new NullPointerException();
-		}
-		if(!listeners.containsKey(type)) {
-			listeners.put(type, new HashSet<EventListener>());
-		}
-		listeners.get(type).add(listener);
+	public void addPropertyChangeListener(EventType type, PropertyChangeListener listener) {
+		super.addPropertyChangeListener(type.name(), listener);
 	}
 	
-	public void removeEventListener(EventListener listener, EventType type) {
-		if(listener == null || type == null) {
-			return;
-		}
-		Set<EventListener> set = listeners.get(type);
-		if(set != null) {
-			set.remove(listener);
-			if(set.isEmpty()) {
-				listeners.remove(type);
-			}
-		}
+	public void removePropertyChangeListener(EventType type, PropertyChangeListener listener) {
+		super.removePropertyChangeListener(type.name(), listener);
 	}
 	
-	public void removeEventListener(EventListener listener) {
-		if(listener == null) {
-			return;
-		}
-		Set<EventType> copy = new HashSet<EventType>(listeners.keySet()); 
-		for(EventType type : copy) {
-			removeEventListener(listener, type);
-		}
-	}
-	
-	public void removeEventListeners() {
-		listeners.clear();
-	}
-	
-	abstract public void dispatchEvent(Event event);
-
-	/**
-	 * Convenience method to dispatch a new event.
-	 * 
-	 * @param type the event type
-	 * @param params pairs of corresponding {@link EventType}s and values
-	 */
-	public void dispatchEvent(EventType type, Object... params) {
-		dispatchEvent(new Event(type, params));		
+	public void firePropertyChange(EventType type, Object oldValue, Object newValue) {
+		WeaponEvent event = new WeaponEvent(type, oldValue, newValue);
+		super.firePropertyChange(event);
 	}
 
 }

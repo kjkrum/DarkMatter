@@ -13,7 +13,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 
 import com.chalcodes.weaponm.database.LoginOptions;
-import com.chalcodes.weaponm.event.EventParam;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 
@@ -162,7 +161,7 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     
     void saveFields() {
     	if(eventSupport != null) {
-    		eventSupport.dispatchEvent(EventType.DB_TITLE, EventParam.TITLE, titleField.getText());
+    		eventSupport.firePropertyChange(EventType.DATABASE_TITLE, null, titleField.getText());
     	}
     	options.setTitle(titleField.getText());
     	options.setHost(hostField.getText());

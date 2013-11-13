@@ -10,11 +10,12 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 	@Override
 	public void uncaughtException(Thread thread, Throwable t) {
 		log.error("Uncaught exception in thread {}", thread.getName(), t);
-		try {
-			BugSense.report(thread, t, false);
-		} catch (Throwable t2) {
-			log.error("Additional error when sending bug report", t2);
-		}
+		// TODO uncomment
+//		try {
+//			BugSense.report(thread, t, false);
+//		} catch (Throwable t2) {
+//			log.error("Additional error when sending bug report", t2);
+//		}
 	}
 
 }

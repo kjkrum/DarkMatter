@@ -1,5 +1,7 @@
 package com.chalcodes.weaponm.network;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -9,11 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.Debug;
 import com.chalcodes.weaponm.LogName;
-import com.chalcodes.weaponm.event.Event;
-import com.chalcodes.weaponm.event.EventListener;
-import com.chalcodes.weaponm.event.EventParam;
+import com.chalcodes.weaponm.event.DatabaseStatus;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
+import com.chalcodes.weaponm.event.NetworkStatus;
+import com.chalcodes.weaponm.event.WeaponEvent;
 
 /**
  * Network sessions update the manager by posting runnables to the UI thread.
@@ -25,7 +27,7 @@ public class NetworkManager {
 	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
 	private final EventSupport eventSupport;
 	private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
-	private State state = State.DISCONNECTED;
+	private NetworkStatus status = NetworkStatus.DISCONNECTED;
 	private Thread networkThread;
 	private int threadCount = 0;
 	private SocketChannel channel;
@@ -34,84 +36,84 @@ public class NetworkManager {
 
 	public NetworkManager(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
-		EventListener listener = new EventListener() {
+		PropertyChangeListener listener = new PropertyChangeListener() {
 			@Override
-			public void onEvent(Event event) {
-				switch(event.getType()) {
+			public void propertyChange(PropertyChangeEvent e) {
+				WeaponEvent evt = (WeaponEvent) e;
+				switch(evt.getType()) {
 				case TEXT_TYPED:
-					String text = (String) event.getParam(EventParam.TEXT);
+					String text = (String) evt.getNewValue();
 					try {
 						write(text);
-					} catch (IOException e) {
+					} catch (IOException ex) {
 						// ignore
 					}
 					break;
-				case DB_CLOSED:
-					disconnect();
+				case DATABASE_STATUS:
+					DatabaseStatus status = (DatabaseStatus) evt.getNewValue();
+					if(status == DatabaseStatus.CLOSING) {
+						disconnect();
+					}
 					break;
-				}				
+				}
 			}
 		};
-		eventSupport.addEventListener(listener, EventType.TEXT_TYPED);
-		eventSupport.addEventListener(listener, EventType.DB_CLOSED);
+		eventSupport.addPropertyChangeListener(EventType.TEXT_TYPED, listener);
+		eventSupport.addPropertyChangeListener(EventType.DATABASE_STATUS, listener);
 	}
 	
 	public void connect(String host, int port) {
-		if(state == State.DISCONNECTED) {
-			setState(State.CONNECTING);
+		if(status == NetworkStatus.DISCONNECTED) {
+			setStatus(NetworkStatus.CONNECTING);
 			networkThread = new Thread(new NetworkSession(this, host, port, eventSupport), "Network" + threadCount++);
 			networkThread.start();
 		}
 	}
 	
 	public void disconnect() {
-		if(state != State.DISCONNECTED) {
+		if(status != NetworkStatus.DISCONNECTED) {
 			networkThread.interrupt();
 		}
 	}
 	
 	public boolean isConnected() {
-		return state == State.CONNECTED;
+		return status == NetworkStatus.CONNECTED;
 	}
 	
 	public boolean isConnecting() {
-		return state == State.CONNECTING;
+		return status == NetworkStatus.CONNECTING;
 	}
 	
-	void setState(State state) {
-		this.state = state;
-		switch(state) {
-		case CONNECTING:
-			eventSupport.dispatchEvent(EventType.NET_CONNECTING);
-			break;
-		case CONNECTED:
-			try {
-				// this convinces TWGS we're a proper Telnet client
-				write("\u00FF\u00FC\u00F6");
-			}
-			catch(IOException e) {
-				log.error("error sending Telnet handshake", e);
-				disconnect();
+	void setStatus(NetworkStatus newStatus) {
+		if(this.status != newStatus) {
+			NetworkStatus oldStatus = this.status;
+			this.status = newStatus;
+			switch(newStatus) {
+			case CONNECTING:
+				// nothing special, just fire the event
+				break;
+			case CONNECTED:
+				try {
+					// this convinces TWGS we're a proper Telnet client
+					write("\u00FF\u00FC\u00F6");
+				}
+				catch(IOException e) {
+					log.error("error sending Telnet handshake", e);
+					disconnect();
+					break;
+				}
+				break;
+			case DISCONNECTED:
+				networkThread = null;
+				channel = null;
 				break;
 			}
-			eventSupport.dispatchEvent(EventType.NET_CONNECTED);
-			break;
-		case DISCONNECTED:
-			networkThread = null;
-			channel = null;
-			eventSupport.dispatchEvent(EventType.NET_DISCONNECTED);
-			break;
+			eventSupport.firePropertyChange(EventType.NETWORK_STATUS, oldStatus, newStatus);
 		}
 	}
 
 	void setChannel(SocketChannel channel) {
 		this.channel = channel;
-	}
-	
-	static enum State {
-		DISCONNECTED,
-		CONNECTING,
-		CONNECTED
 	}
 	
 	/**
@@ -124,7 +126,7 @@ public class NetworkManager {
 		if(locked) {
 			throw new NetworkLockedException();
 		}
-		else if(state != State.CONNECTED){
+		else if(status != NetworkStatus.CONNECTED){
 			throw new IOException("Network is not connected.");
 		}
 		else {

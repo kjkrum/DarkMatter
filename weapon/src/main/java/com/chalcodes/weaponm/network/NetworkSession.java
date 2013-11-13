@@ -12,11 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.LogName;
-import com.chalcodes.weaponm.event.Event;
-import com.chalcodes.weaponm.event.EventParam;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.network.NetworkManager.State;
+import com.chalcodes.weaponm.event.NetworkStatus;
+import com.chalcodes.weaponm.event.WeaponEvent;
 
 class NetworkSession implements Runnable {
 	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
@@ -58,7 +57,7 @@ class NetworkSession implements Runnable {
 				while(readBuffer.hasRemaining()) {
 					sb.append((char) (readBuffer.get() & 0xFF));
 				}
-				dispatchEvent(new Event(EventType.TEXT_RECEIVED, EventParam.TEXT, sb.toString()));
+				dispatchEvent(EventType.TEXT_RECEIVED, null, sb.toString());
 				sb.setLength(0);
 				readBuffer.clear();
 			}
@@ -69,7 +68,7 @@ class NetworkSession implements Runnable {
 		}
 		catch(Throwable t) {
 			log.error("network error", t);
-			dispatchEvent(new Event(EventType.NET_ERROR, EventParam.ERROR, t));
+			dispatchEvent(EventType.NETWORK_ERROR, null, t);
 		}
 		finally {
 			if(channel != null && channel.isOpen()) {
@@ -79,7 +78,7 @@ class NetworkSession implements Runnable {
 					// ignore
 				}
 			}
-			reportState(State.DISCONNECTED);
+			reportStatus(NetworkStatus.DISCONNECTED);
 			log.debug("network thread exiting");
 		}
 	}
@@ -87,13 +86,13 @@ class NetworkSession implements Runnable {
 	/**
 	 * Posts state changes to the manager in the UI thread.
 	 * 
-	 * @param state the new state
+	 * @param status the new state
 	 */
-	private void reportState(final State state) {
+	private void reportStatus(final NetworkStatus status) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				manager.setState(state);				
+				manager.setStatus(status);				
 			}
 		});
 	}
@@ -106,7 +105,7 @@ class NetworkSession implements Runnable {
 			@Override
 			public void run() {
 				manager.setChannel(channel);
-				manager.setState(State.CONNECTED);
+				manager.setStatus(NetworkStatus.CONNECTED);
 			}
 		});
 	}
@@ -114,22 +113,25 @@ class NetworkSession implements Runnable {
 	/**
 	 * Dispatch a single event in the UI thread.
 	 * 
-	 * @param event the event
+	 * @param type
+	 * @param oldValue
+	 * @param newValue
 	 */
-	private void dispatchEvent(final Event event) {
+	private void dispatchEvent(EventType type, Object oldValue, Object newValue) {
+		final WeaponEvent event = new WeaponEvent(type, oldValue, newValue);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				eventSupport.dispatchEvent(event);				
+				eventSupport.firePropertyChange(event);		
 			}
 		});
 	}
 	
-	/**
-	 * Dispatch a list of events in the UI thread.
-	 * 
-	 * @param events the events
-	 */
+//	/**
+//	 * Dispatch a list of events in the UI thread.
+//	 * 
+//	 * @param events the events
+//	 */
 //	private void dispatchEvents(final List<Event> events) {
 //		// TODO on write, lock the network for the remainder of the list
 //		SwingUtilities.invokeLater(new Runnable() {

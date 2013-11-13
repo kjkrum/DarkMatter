@@ -3,16 +3,22 @@ package com.chalcodes.weaponm.event;
 /**
  * Event type constants.
  * 
- * @see Event
+ * @see WeaponEvent
  *
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public enum EventType {
+	// TODO is source ever used?
+	
 	/**
 	 * The complete content of a network read.  Scripts cannot register for
-	 * this event.
+	 * this event.  It is intended only for terminal and log output.
 	 * <p>
-	 * Parameters: {@link EventParam#TEXT}
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>String</td></tr>
+	 * </table>
 	 */
 	TEXT_RECEIVED,
 	
@@ -20,71 +26,79 @@ public enum EventType {
 	 * Text that was matched and consumed by the data parser.  Scripts can use
 	 * this to detect minor events that are not recognized by the data parser.
 	 * <p>
-	 * Parameters: {@link EventParam#TEXT}
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>String</td></tr>
+	 * </table>
 	 */
 	TEXT_MATCHED,
 	
 	/**
 	 * Text that was typed in the terminal or otherwise queued for output.
-	 * 
-	 * Parameters: {@link EventParam#TEXT}
+	 * <p>
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>char[]</td></tr>
+	 * </table>
 	 */
 	TEXT_TYPED,
 	
 	/**
-	 * Fired when a database is created or opened.  It's pointless for scripts
-	 * to register for this or any database event, since script lifecycles are
-	 * bounded by the database lifecycle.
+	 * The database loaded status.  Scripts cannot register for this event,
+	 * since script lifecycles are bounded by the database lifecycle.
+	 * <p>
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>{@link DatabaseStatus}</td></tr>
+	 * </table>
 	 */
-	DB_OPENED,
+	DATABASE_STATUS,
 	
 	/**
-	 * Fired when a database is closing.  This will kill the network thread
-	 * and unload scripts.
+	 * Fired when the database is modified or saved.
+	 * <p>
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>Boolean</td></tr>
+	 * </table>
 	 */
-	DB_CLOSING,
+	DATABASE_DIRTY,
 	
 	/**
-	 * Fired when a database is closed.  This will clear the database title
-	 * and hide the dockable panels.
+	 * Fired when the database title is loaded or set.
+	 * <p>
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>String</td></tr>
+	 * </table>
 	 */
-	DB_CLOSED,
+	DATABASE_TITLE,
 	
 	/**
-	 * Fired when the database is modified.
+	 * The network connection status.
+	 * <p>
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>{@link NetworkStatus}</td></tr>
+	 * <tr><td>newValue</td><td>{@link NetworkStatus}</td></tr>
+	 * </table>
 	 */
-	DB_DIRTY,
-	
-	/**
-	 * Fired when the database is saved.
-	 */
-	DB_CLEAN,
-	
-	/**
-	 * Fired when the game title is changed.
-	 */
-	DB_TITLE,
+	NETWORK_STATUS,
 
-	/**
-	 * Fired when the network is disconnected.
-	 */
-	NET_DISCONNECTED,
-	
-	/**
-	 * Fired when a connection attempt begins.
-	 */
-	NET_CONNECTING,
-	
-	/**
-	 * Fired when a connection attempt succeeds.
-	 */
-	NET_CONNECTED,
-	
 	/**
 	 * Details of an error in the network thread.
 	 * <p>
-	 * Parameters: {@link EventParam#ERROR}
+	 * <table border="1">
+	 * <tr><td>source</td><td>null</td></tr>
+	 * <tr><td>oldValue</td><td>null</td></tr>
+	 * <tr><td>newValue</td><td>Throwable</td></tr>
+	 * </table>
 	 */
-	NET_ERROR
+	NETWORK_ERROR
 
 }
