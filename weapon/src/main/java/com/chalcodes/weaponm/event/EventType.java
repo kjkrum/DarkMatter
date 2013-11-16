@@ -34,6 +34,9 @@ public enum EventType {
 	 */
 	TEXT_MATCHED,
 	
+	// TODO TEXT_TYPED will go away... everything needs direct
+	// access to network manager to receive NLEs
+	
 	/**
 	 * Text that was typed in the terminal or otherwise queued for output.
 	 * <p>

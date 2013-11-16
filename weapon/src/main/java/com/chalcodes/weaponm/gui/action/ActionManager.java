@@ -1,5 +1,6 @@
 package com.chalcodes.weaponm.gui.action;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -11,6 +12,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.KeyStroke;
 
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.menu.SingleCDockableListMenuPiece;
@@ -36,12 +38,12 @@ public class ActionManager implements PropertyChangeListener {
 	//private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final JMenuBar menuBar = new JMenuBar();
 	private final Set<AbstractAction> enableOnLoad = new HashSet<AbstractAction>(); // disable on unload
-	private final Set<JMenu> enableOnLoadMenus = new HashSet<JMenu>(); // because AbstractAction and JMenu have no ancestor in common that includes setEnabled(...)
+	private final Set<JMenu> enableOnLoadMenus = new HashSet<JMenu>(); // because AbstractAction and JMenu have no common ancestor that includes setEnabled(...)
 	private final Set<AbstractAction> enableOnConnect = new HashSet<AbstractAction>(); // disable on disconnect
 	private final Set<AbstractAction> disableOnConnect = new HashSet<AbstractAction>(); // enable on disconnect
 	
 	public ActionManager(Gui gui, EventSupport eventSupport, DatabaseManager dbm, NetworkManager network, CControl dockControl) {
-		populateMenuBar(gui, eventSupport, dbm, network, dockControl);
+		populateMenus(gui, eventSupport, dbm, network, dockControl);
 		eventSupport.addPropertyChangeListener(EventType.DATABASE_STATUS, this);
 		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATUS, this);
 	}
@@ -50,14 +52,25 @@ public class ActionManager implements PropertyChangeListener {
 		return menuBar;
 	}
 
-	private void populateMenuBar(Gui gui, EventSupport eventSupport, DatabaseManager dbm, NetworkManager network, CControl dockControl) {
+	private void populateMenus(Gui gui, EventSupport eventSupport, DatabaseManager dbm, NetworkManager network, CControl dockControl) {
 		final JMenu dbMenu = new JMenu();
 		setText(dbMenu, "MENU_DATABASE");
-		dbMenu.add(new OpenDatabaseAction(gui, dbm));
-		dbMenu.add(new NewDatabaseAction(gui, dbm));
+		AbstractAction openAction = new OpenDatabaseAction(gui, dbm);
+		openAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		dbMenu.add(openAction);
+		AbstractAction newAction = new NewDatabaseAction(gui, dbm);
+		newAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+		dbMenu.add(newAction);
 		AbstractAction saveAction = new SaveDatabaseAction(gui, dbm);
 		enableOnLoad.add(saveAction);
+		saveAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		dbMenu.add(saveAction);
+		AbstractAction saveAsAction = new SaveAsDatabaseAction(gui, dbm);
+		enableOnLoad.add(saveAsAction);
+		dbMenu.add(saveAsAction);
+		AbstractAction saveCopyAction = new SaveCopyDatabaseAction(gui, dbm);
+		enableOnLoad.add(saveCopyAction);
+		dbMenu.add(saveCopyAction);
 		AbstractAction closeAction = new CloseDatabaseAction(gui);
 		enableOnLoad.add(closeAction);
 		dbMenu.add(closeAction);
@@ -75,8 +88,7 @@ public class ActionManager implements PropertyChangeListener {
 		root.setDisableWhenEmpty(false);
 		root.add(piece);
 		//viewMenu.addSeparator();
-		// TODO save/load layout actions
-		// multiple perspectives? per database or global?
+		// TODO "save" saves to database; "make default" saves to config
 		enableOnLoadMenus.add(viewMenu);
 		menuBar.add(viewMenu);
 		
@@ -101,15 +113,15 @@ public class ActionManager implements PropertyChangeListener {
 		weaponMenu.add(new ShowCreditsWindowAction(gui));
 		weaponMenu.add(new WebsiteAction());
 		weaponMenu.addSeparator();
-		weaponMenu.add(new ExitAction(gui));
+		AbstractAction exitAction = new ExitAction(gui);
+		exitAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+		weaponMenu.add(exitAction);
 		menuBar.add(weaponMenu);
 		
 		// set initial enabled states
 		configureNoDatabase();
 		configureNoConnection();
 	}
-	
-	
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
@@ -147,7 +159,7 @@ public class ActionManager implements PropertyChangeListener {
 			}
 		}
 		else {
-			// TODO handle plain property changes like JTX selection events
+			// ???
 		}
 	}
 	

@@ -58,20 +58,22 @@ class Terminal {
 		PropertyChangeListener listener = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				WeaponEvent evt = (WeaponEvent) e;
-				switch(evt.getType()) {
-				case TEXT_RECEIVED:
-					String text = (String) evt.getNewValue();
-					emulation.write(text);
-					break;
-				case NETWORK_STATUS:
-					NetworkStatus oldStatus = (NetworkStatus) evt.getOldValue();
-					NetworkStatus newStatus = (NetworkStatus) evt.getNewValue();
-					if(oldStatus == NetworkStatus.CONNECTED && newStatus == NetworkStatus.DISCONNECTED) {
-						String msg = Strings.getString("DISCONNECTED");
-						emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
+				if(e instanceof WeaponEvent) {
+					WeaponEvent evt = (WeaponEvent) e;
+					switch(evt.getType()) {
+					case TEXT_RECEIVED:
+						String text = (String) evt.getNewValue();
+						emulation.write(text);
+						break;
+					case NETWORK_STATUS:
+						NetworkStatus oldStatus = (NetworkStatus) evt.getOldValue();
+						NetworkStatus newStatus = (NetworkStatus) evt.getNewValue();
+						if(oldStatus == NetworkStatus.CONNECTED && newStatus == NetworkStatus.DISCONNECTED) {
+							String msg = Strings.getString("DISCONNECTED");
+							emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
+						}
+						break;					
 					}
-					break;					
 				}
 			}
 		};
@@ -82,9 +84,6 @@ class Terminal {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.getViewport().setBackground(Color.DARK_GRAY);
 		scrollPane.setAutoscrolls(true);
-		
-		// TODO save this ref and do stuff with it
-		new SelectionControl(scrollPane.getViewport(), eventSupport);
 		
 		String title = Strings.getString("TITLE_TERMINAL");
 		dockable = new DefaultSingleCDockable("TERMINAL", title, scrollPane);
@@ -120,6 +119,10 @@ class Terminal {
 			}
 		});
 		// TODO set icon
+		
+		// set up selection and clipboard controls
+		SelectionControl selectionControl = new SelectionControl(scrollPane.getViewport(), eventSupport);
+		new TerminalClipboardManager(eventSupport, display, selectionControl);
 	}
 	
 	DefaultSingleCDockable getDockable() {
@@ -133,5 +136,5 @@ class Terminal {
 	
 	private void send(char c) {
 		send(new StringBuilder().append(c).toString());
-	}	
+	}
 }

@@ -15,8 +15,7 @@ public class WeaponEvent extends PropertyChangeEvent {
 	 * @param newValue
 	 */
 	public WeaponEvent(EventType type, Object oldValue, Object newValue) {
-		// TODO what to use as a source?
-		super("herp derp", type.name(), oldValue, newValue);
+		super("", type.name(), oldValue, newValue);
 		this.type = type;
 	}
 

@@ -7,8 +7,7 @@ public class EventSupport extends PropertyChangeSupport {
 	private static final long serialVersionUID = 1L;
 
 	public EventSupport() {
-		// TODO what to use as a source?
-		super("the cake is a lie");
+		super("");
 	}
 
 	public void addPropertyChangeListener(EventType type, PropertyChangeListener listener) {

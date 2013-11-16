@@ -1,5 +1,7 @@
 package com.chalcodes.weaponm;
 
+import java.io.IOException;
+
 import javax.swing.SwingUtilities;
 
 import com.chalcodes.weaponm.gui.Gui;
@@ -16,7 +18,12 @@ public class WeaponM {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new Gui().setVisible(true);
+				try {
+					new Gui().setVisible(true);
+				}
+				catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 	}

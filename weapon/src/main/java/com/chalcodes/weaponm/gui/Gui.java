@@ -56,8 +56,9 @@ public class Gui {
 	private final ActionManager actionManager;
 	private final JFileChooser databaseFileChooser;
 	private final CreditsWindow creditsWindow;
+	private final Terminal terminal;
 	
-	public Gui() {
+	public Gui() throws ClassNotFoundException, IOException {
 		log.info("{} started", APP_TITLE);
 		// this is supposed to set the app title in the menu bar on OS X
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_TITLE);
@@ -73,10 +74,11 @@ public class Gui {
 		actionManager = new ActionManager(this, eventSupport, dbm, network, dockControl);
 		databaseFileChooser = new JFileChooser();
 		creditsWindow = new CreditsWindow(icon);
+		terminal = new Terminal(eventSupport);
 		
 		configureFileChoosers();
 		configureDocking();
-		createDockables();
+		configureDockables();
 		configureMainWindow();
 		loadAppleExtensions();
 	}
@@ -156,14 +158,9 @@ public class Gui {
 		// TODO restore layout when db is opened
 	}
 	
-	private void createDockables() {
-		try {
-			dockControl.addDockable(new Terminal(eventSupport).getDockable());
-		}
-		catch(IOException | ClassNotFoundException e) {
-			// TODO something better
-			e.printStackTrace();
-		}
+	private void configureDockables() {
+		dockControl.addDockable(terminal.getDockable());
+		// TODO moar dockables
 		
 		// add state listener to all dockables
 		CDockableStateListener listener = new CDockableStateListener() {
