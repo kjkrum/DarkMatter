@@ -34,16 +34,14 @@ public enum EventType {
 	 */
 	TEXT_MATCHED,
 	
-	// TODO TEXT_TYPED will go away... everything needs direct
-	// access to network manager to receive NLEs
-	
 	/**
-	 * Text that was typed in the terminal or otherwise queued for output.
+	 * Text that was typed or pasted into the terminal.  Use this only for
+	 * output that should <em>not</em> be retried if the network is locked.
 	 * <p>
 	 * <table border="1">
 	 * <tr><td>source</td><td>null</td></tr>
 	 * <tr><td>oldValue</td><td>null</td></tr>
-	 * <tr><td>newValue</td><td>char[]</td></tr>
+	 * <tr><td>newValue</td><td>String</td></tr>
 	 * </table>
 	 */
 	TEXT_TYPED,

@@ -17,7 +17,7 @@ public class TerminalCopyAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO all the things
-		selectionControl.copySelection();
+		// TODO convert selection and put it on system clipboard
+		selectionControl.clearSelection();
 	}
 }

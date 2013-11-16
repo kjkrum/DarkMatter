@@ -87,10 +87,10 @@ class Terminal {
 		
 		String title = Strings.getString("TITLE_TERMINAL");
 		dockable = new DefaultSingleCDockable("TERMINAL", title, scrollPane);
-		dockable.setFocusComponent(scrollPane);
+		dockable.setFocusComponent(scrollPane.getViewport());
 		dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base().minimalSouth());
 		dockable.setCloseable(true);
-		scrollPane.addKeyListener(new KeyAdapter() {
+		scrollPane.getViewport().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				int mods = e.getModifiers();
@@ -121,8 +121,8 @@ class Terminal {
 		// TODO set icon
 		
 		// set up selection and clipboard controls
-		SelectionControl selectionControl = new SelectionControl(scrollPane.getViewport(), eventSupport);
-		new TerminalClipboardManager(eventSupport, display, selectionControl);
+		SelectionControl selectionControl = new SelectionControl(eventSupport, scrollPane.getViewport());
+		new TerminalClipboardManager(eventSupport, selectionControl, scrollPane.getViewport());
 	}
 	
 	DefaultSingleCDockable getDockable() {
