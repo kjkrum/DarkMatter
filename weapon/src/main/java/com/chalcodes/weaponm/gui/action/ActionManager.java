@@ -188,7 +188,7 @@ public class ActionManager implements PropertyChangeListener {
 	 * @param action the action
 	 * @param key a key constant from {@link com.chalcodes.weaponm.gui.Strings}
 	 */
-	static void setText(AbstractAction action, String key) {
+	public static void setText(AbstractAction action, String key) {
 		String raw = Strings.getString(key);
 		String stripped = raw.replace("_", "");
 		action.putValue(Action.NAME, stripped);

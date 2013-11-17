@@ -5,9 +5,11 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ public class TerminalPasteAction extends AbstractAction {
 		this.eventSupport = eventSupport;
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		ActionManager.setText(this, "ACTION_PASTE");
+		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 	}
 
 	@Override

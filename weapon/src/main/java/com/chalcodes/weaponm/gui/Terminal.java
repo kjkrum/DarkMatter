@@ -1,5 +1,6 @@
 package com.chalcodes.weaponm.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -7,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.slf4j.Logger;
@@ -84,12 +86,19 @@ class Terminal {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.getViewport().setBackground(Color.DARK_GRAY);
 		scrollPane.setAutoscrolls(true);
+		scrollPane.setBorder(null);
+		
+		final JPanel parent = new JPanel(new BorderLayout());
+		parent.add(scrollPane, BorderLayout.CENTER);
+		parent.setBorder(null);
 		
 		String title = Strings.getString("TITLE_TERMINAL");
-		dockable = new DefaultSingleCDockable("TERMINAL", title, scrollPane);
+		//dockable = new DefaultSingleCDockable("TERMINAL", title, scrollPane);
+		dockable = new DefaultSingleCDockable("TERMINAL", title, parent);
 		dockable.setFocusComponent(scrollPane.getViewport());
 		dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base().minimalSouth());
 		dockable.setCloseable(true);
+		
 		scrollPane.getViewport().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -120,9 +129,10 @@ class Terminal {
 		});
 		// TODO set icon
 		
-		// set up selection and clipboard controls
+		// set up hotkey manager for copy, paste, and burst
 		SelectionControl selectionControl = new SelectionControl(eventSupport, scrollPane.getViewport());
-		new TerminalClipboardManager(eventSupport, selectionControl, scrollPane.getViewport());
+		new TerminalHotkeyManager(eventSupport, selectionControl, scrollPane.getViewport(), parent);
+
 	}
 	
 	DefaultSingleCDockable getDockable() {
