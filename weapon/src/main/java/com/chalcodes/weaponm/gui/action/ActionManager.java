@@ -1,5 +1,6 @@
 package com.chalcodes.weaponm.gui.action;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -10,10 +11,13 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.KeyStroke;
 
+import bibliothek.gui.Dockable;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.menu.SingleCDockableListMenuPiece;
 import bibliothek.gui.dock.facile.menu.RootMenuPiece;
@@ -78,7 +82,25 @@ public class ActionManager implements PropertyChangeListener {
 		
 		final JMenu viewMenu = new JMenu();
 		setText(viewMenu, "MENU_VIEW");
-		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl);
+		// these anonymous extensions give the menu icons a consistent size
+		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl) {
+			@Override
+			protected Item create(final Dockable dockable) {
+				return new Item(dockable) {
+					private static final long serialVersionUID = 1L;
+					{
+					    Icon icon = dockable.getTitleIcon();
+					    if(icon instanceof ImageIcon) {
+					    	Image image = ((ImageIcon) icon).getImage();
+					    	// TODO can the preferred size be obtained from the look & feel?
+					    	Image scaled = image.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH);
+					    	ImageIcon scaledIcon = new ImageIcon(scaled);
+					    	setIcon(scaledIcon);
+					    }
+					}
+				};
+			}
+		};
 		final RootMenuPiece root = new RootMenuPiece(viewMenu) {
 			@Override
 			protected void updateEnabled() {

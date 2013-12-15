@@ -37,6 +37,7 @@ import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.gui.action.ActionManager;
+import com.chalcodes.weaponm.gui.terminal.Terminal;
 import com.chalcodes.weaponm.network.NetworkManager;
 
 /**
@@ -181,6 +182,17 @@ public class Gui {
 
 	private void configureMainWindow() {
 		mainWindow.setIconImage(icon.getImage());
+
+		// TODO provide various sizes of icons
+//		ImageIcon icon16 = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/16.png"));
+//		ImageIcon icon32 = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/32.png"));
+//		ImageIcon icon64 = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/64.png"));
+//		List<Image> icons = new LinkedList<Image>();
+//		icons.add(icon16.getImage());
+//		icons.add(icon32.getImage());
+//		icons.add(icon64.getImage());
+//		mainWindow.setIconImages(icons);
+		
 		mainWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainWindow.addWindowListener(new WindowAdapter() {
 			@Override

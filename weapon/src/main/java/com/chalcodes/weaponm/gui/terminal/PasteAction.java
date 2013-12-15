@@ -1,4 +1,4 @@
-package com.chalcodes.weaponm.gui.action;
+package com.chalcodes.weaponm.gui.terminal;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -17,14 +17,15 @@ import org.slf4j.LoggerFactory;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.event.WeaponEvent;
+import com.chalcodes.weaponm.gui.action.ActionManager;
 
-public class TerminalPasteAction extends AbstractAction {
+public class PasteAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(TerminalPasteAction.class.getSimpleName());
+	private static final Logger log = LoggerFactory.getLogger(PasteAction.class.getSimpleName());
 	private final EventSupport eventSupport;
 	private final Clipboard clipboard;
 	
-	public TerminalPasteAction(EventSupport eventSupport) {
+	public PasteAction(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		ActionManager.setText(this, "ACTION_PASTE");
