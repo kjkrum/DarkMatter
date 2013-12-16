@@ -16,11 +16,16 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.BadLocationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 
 class BurstPanel {
+	private static final Logger log = LoggerFactory.getLogger(BurstPanel.class.getSimpleName());
 	private final JPanel panel = new JPanel(new GridBagLayout());
 	private final JTextField inputField;
 	
@@ -88,7 +93,24 @@ class BurstPanel {
 		};
 		sendButton.setAction(sendAction);
 		
-		// TODO convenient way to insert "^M"... shift-enter?
+		final AbstractAction insertNewlineAction = new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(inputField.isFocusOwner()) {
+					try {
+						inputField.getDocument().insertString(inputField.getCaretPosition(), "^M", null);
+					}
+					catch (BadLocationException ex) {
+						log.warn("this shouldn't happen", ex);
+					}
+				}
+			}			
+		};
+		panel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+		.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, ActionEvent.SHIFT_MASK, true), "insertNewline");
+		panel.getActionMap().put("insertNewline", insertNewlineAction);
 		
 		/*
 		 * this was an attempt to solve the problem of focus changing to the
