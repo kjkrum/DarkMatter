@@ -1,11 +1,11 @@
-package com.chalcodes.weaponm.gui.action;
+package com.chalcodes.weaponm.gui.menu;
 
 import java.io.File;
 
 import javax.swing.AbstractAction;
 
 import com.chalcodes.weaponm.gui.Gui;
-import com.chalcodes.weaponm.gui.Strings;
+import com.chalcodes.weaponm.gui.I18n;
 
 @SuppressWarnings("serial") // class is abstract
 abstract class AbstractFileAction extends AbstractAction {
@@ -20,8 +20,8 @@ abstract class AbstractFileAction extends AbstractAction {
 	boolean interactiveClobber(File file) {
 		if(file.exists()) {
 			return gui.showYesNoDialog(
-					Strings.getString("QUESTION_CLOBBER_FILE"),
-					Strings.getString("TITLE_CONFIRM_CLOBBER"));
+					I18n.getString("QUESTION_CLOBBER_FILE"),
+					I18n.getString("TITLE_CONFIRM_CLOBBER"));
 		}
 		return true;
 	}

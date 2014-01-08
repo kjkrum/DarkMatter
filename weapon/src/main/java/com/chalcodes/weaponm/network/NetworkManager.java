@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.LogName;
-import com.chalcodes.weaponm.event.DatabaseStatus;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.event.NetworkStatus;
@@ -48,17 +47,17 @@ public class NetworkManager {
 						// ignore
 					}
 					break;
-				case DATABASE_STATUS:
-					DatabaseStatus status = (DatabaseStatus) evt.getNewValue();
-					if(status == DatabaseStatus.CLOSING) {
-						disconnect();
-					}
-					break;
+//				case DATABASE_OPEN:
+//					boolean open = (Boolean) evt.getNewValue();
+//					if(!open) {
+//						disconnect();
+//					}
+//					break;
 				}
 			}
 		};
 		eventSupport.addPropertyChangeListener(EventType.TEXT_TYPED, listener);
-		eventSupport.addPropertyChangeListener(EventType.DATABASE_STATUS, listener);
+//		eventSupport.addPropertyChangeListener(EventType.DATABASE_OPEN, listener);
 	}
 	
 	public void connect(String host, int port) {

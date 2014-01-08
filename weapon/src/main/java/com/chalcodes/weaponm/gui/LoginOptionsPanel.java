@@ -173,11 +173,11 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     }
 
     private void initComponents() {
-        gamePanel.setBorder(BorderFactory.createTitledBorder(Strings.getString("LABEL_GAME")));
-        titleLabel.setText(Strings.getString("LABEL_TITLE"));
-        hostLabel.setText(Strings.getString("LABEL_HOST"));
-        portLabel.setText(Strings.getString("LABEL_PORT"));
-        letterLabel.setText(Strings.getString("LABEL_GAME_LETTER"));
+        gamePanel.setBorder(BorderFactory.createTitledBorder(I18n.getString("LABEL_GAME")));
+        titleLabel.setText(I18n.getString("LABEL_TITLE"));
+        hostLabel.setText(I18n.getString("LABEL_HOST"));
+        portLabel.setText(I18n.getString("LABEL_PORT"));
+        letterLabel.setText(I18n.getString("LABEL_GAME_LETTER"));
 
         GroupLayout jPanel1Layout = new GroupLayout(gamePanel);
         gamePanel.setLayout(jPanel1Layout);
@@ -223,10 +223,10 @@ class LoginOptionsPanel extends javax.swing.JPanel {
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        playerPanel.setBorder(BorderFactory.createTitledBorder(Strings.getString("LABEL_PLAYER")));
-        nameLabel.setText(Strings.getString("LABEL_USER_NAME"));
-        passwordLabel.setText(Strings.getString("LABEL_PASSWORD"));
-        autoLoginLabel.setText(Strings.getString("LABEL_AUTOLOGIN"));
+        playerPanel.setBorder(BorderFactory.createTitledBorder(I18n.getString("LABEL_PLAYER")));
+        nameLabel.setText(I18n.getString("LABEL_USER_NAME"));
+        passwordLabel.setText(I18n.getString("LABEL_PASSWORD"));
+        autoLoginLabel.setText(I18n.getString("LABEL_AUTOLOGIN"));
 
         GroupLayout jPanel2Layout = new GroupLayout(playerPanel);
         playerPanel.setLayout(jPanel2Layout);

@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.gui.Strings;
+import com.chalcodes.weaponm.gui.I18n;
 
 class RecordPanel {
 	private final JPanel panel;
@@ -26,7 +26,7 @@ class RecordPanel {
 		
 		ImageIcon icon = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/record24.gif"));
 		JLabel iconLabel = new JLabel(icon);
-		JLabel textLabel = new JLabel(Strings.getString("RECORDING"));
+		JLabel textLabel = new JLabel(I18n.getString("RECORDING"));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;

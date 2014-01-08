@@ -7,7 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 
 import com.chalcodes.jtx.extensions.SelectionControl;
-import com.chalcodes.weaponm.gui.action.ActionManager;
+import com.chalcodes.weaponm.gui.I18n;
 
 public class CopyAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -15,7 +15,7 @@ public class CopyAction extends AbstractAction {
 
 	public CopyAction(SelectionControl selectionControl) {
 		this.selectionControl = selectionControl;
-		ActionManager.setText(this, "ACTION_COPY");
+		I18n.setText(this, "ACTION_COPY");
 		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 	}
 

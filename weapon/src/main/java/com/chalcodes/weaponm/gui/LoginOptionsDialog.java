@@ -19,7 +19,7 @@ public class LoginOptionsDialog {
 				JOptionPane.PLAIN_MESSAGE,
 				JOptionPane.OK_CANCEL_OPTION);  
 		final JDialog dialog = new JDialog(parent,
-				Strings.getString("TITLE_LOGIN_OPTIONS"), true);
+				I18n.getString("TITLE_LOGIN_OPTIONS"), true);
 		dialog.setContentPane(optionPane);
 		
 		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
@@ -37,7 +37,7 @@ public class LoginOptionsDialog {
 							optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 							JOptionPane.showMessageDialog(dialog,
 									ex.getMessage(),
-									Strings.getString("TITLE_ERROR"),
+									I18n.getString("TITLE_ERROR"),
 									JOptionPane.ERROR_MESSAGE);
 						}
 					}

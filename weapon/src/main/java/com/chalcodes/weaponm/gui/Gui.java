@@ -36,7 +36,7 @@ import com.chalcodes.weaponm.AppSettings;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.event.EventSupport;
-import com.chalcodes.weaponm.gui.action.ActionManager;
+import com.chalcodes.weaponm.gui.menu.MainMenuBar;
 import com.chalcodes.weaponm.gui.terminal.Terminal;
 import com.chalcodes.weaponm.network.NetworkManager;
 
@@ -54,7 +54,6 @@ public class Gui {
 	private final EventSupport eventSupport;
 	private final DatabaseManager dbm;
 	private final NetworkManager network;
-	private final ActionManager actionManager;
 	private final JFileChooser databaseFileChooser;
 	private final CreditsWindow creditsWindow;
 	private final Terminal terminal;
@@ -72,7 +71,6 @@ public class Gui {
 		eventSupport = new EventSupport();
 		dbm = new DatabaseManager(eventSupport);
 		network = new NetworkManager(eventSupport);
-		actionManager = new ActionManager(this, eventSupport, dbm, network, dockControl);
 		databaseFileChooser = new JFileChooser();
 		creditsWindow = new CreditsWindow(icon);
 		terminal = new Terminal(eventSupport);
@@ -182,17 +180,6 @@ public class Gui {
 
 	private void configureMainWindow() {
 		mainWindow.setIconImage(icon.getImage());
-
-		// TODO provide various sizes of icons
-//		ImageIcon icon16 = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/16.png"));
-//		ImageIcon icon32 = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/32.png"));
-//		ImageIcon icon64 = new ImageIcon(getClass().getResource("/com/chalcodes/weaponm/icons/64.png"));
-//		List<Image> icons = new LinkedList<Image>();
-//		icons.add(icon16.getImage());
-//		icons.add(icon32.getImage());
-//		icons.add(icon64.getImage());
-//		mainWindow.setIconImages(icons);
-		
 		mainWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainWindow.addWindowListener(new WindowAdapter() {
 			@Override
@@ -201,7 +188,7 @@ public class Gui {
 			}
 		});
 		mainWindow.add(dockControl.getContentArea());
-		mainWindow.setJMenuBar(actionManager.getMenuBar());
+		mainWindow.setJMenuBar(new MainMenuBar(this, dockControl, dbm, network, eventSupport));
 		mainWindow.setExtendedState(mainWindow.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		mainWindow.pack();		
 	}
@@ -270,7 +257,7 @@ public class Gui {
 				JOptionPane.YES_OPTION;
 	}
 	
-	public File showDatabaseOpenDialog() {
+	public File showOpenDialog() {
 		if(databaseFileChooser.showOpenDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
 			return databaseFileChooser.getSelectedFile();
 		}
@@ -279,7 +266,7 @@ public class Gui {
 		}
 	}
 	
-	public File showDatabaseSaveDialog() {
+	public File showSaveDialog() {
 		if(databaseFileChooser.showSaveDialog(mainWindow) == JFileChooser.APPROVE_OPTION) {
 			return databaseFileChooser.getSelectedFile();
 		}
@@ -307,8 +294,8 @@ public class Gui {
 	 */
 	public void interactiveShutdown() {
 		if(showYesNoDialog(
-				Strings.getString("QUESTION_EXIT"),
-				Strings.getString("TITLE_CONFIRM_EXIT"))) {
+				I18n.getString("QUESTION_EXIT"),
+				I18n.getString("TITLE_CONFIRM_EXIT"))) {
 			// TODO fire event to kill network & scripts
 			if(dbm.isDatabaseDirty()) {
 				if(interactiveClose()) {
@@ -338,13 +325,13 @@ public class Gui {
 	public boolean interactiveClose() {
 		if(dbm.isDatabaseOpen()) {
 			String[] options = {
-					Strings.getString("BUTTON_SAVE_CLOSE"),
-					Strings.getString("BUTTON_DISCARD_CLOSE"),
-					Strings.getString("BUTTON_CANCEL_CLOSE")
+					I18n.getString("BUTTON_SAVE_CLOSE"),
+					I18n.getString("BUTTON_DISCARD_CLOSE"),
+					I18n.getString("BUTTON_CANCEL_CLOSE")
 					};
 			int option = showOptionDialog(
-					Strings.getString("QUESTION_CLOSE"),
-					Strings.getString("TITLE_CONFIRM_CLOSE"),
+					I18n.getString("QUESTION_CLOSE"),
+					I18n.getString("TITLE_CONFIRM_CLOSE"),
 					JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					options,
@@ -355,7 +342,7 @@ public class Gui {
 					dbm.close();
 				} catch (IOException ex) {
 					log.error("error saving database", ex);
-					showMessageDialog(ex.getMessage(), Strings.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
+					showMessageDialog(ex.getMessage(), I18n.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 			else if(option == JOptionPane.NO_OPTION) {

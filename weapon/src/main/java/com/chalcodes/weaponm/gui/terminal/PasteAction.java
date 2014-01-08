@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.event.WeaponEvent;
-import com.chalcodes.weaponm.gui.action.ActionManager;
+import com.chalcodes.weaponm.gui.I18n;
 
 public class PasteAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class PasteAction extends AbstractAction {
 	public PasteAction(EventSupport eventSupport) {
 		this.eventSupport = eventSupport;
 		this.clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		ActionManager.setText(this, "ACTION_PASTE");
+		I18n.setText(this, "ACTION_PASTE");
 		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 	}
 

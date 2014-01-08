@@ -1,10 +1,13 @@
-package com.chalcodes.weaponm.gui.action;
+package com.chalcodes.weaponm.gui.menu;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,17 +15,18 @@ import org.slf4j.LoggerFactory;
 import com.chalcodes.weaponm.database.DatabaseManager;
 import com.chalcodes.weaponm.database.LoginOptions;
 import com.chalcodes.weaponm.gui.Gui;
-import com.chalcodes.weaponm.gui.Strings;
+import com.chalcodes.weaponm.gui.I18n;
 
-public class NewDatabaseAction extends AbstractFileAction {
+class NewDatabaseAction extends AbstractFileAction {
 	private static final long serialVersionUID = 1L;
 	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final DatabaseManager dbm;
 
-	public NewDatabaseAction(Gui gui, DatabaseManager dbm) {
+	NewDatabaseAction(Gui gui, DatabaseManager dbm) {
 		super(gui);
 		this.dbm = dbm;
-		ActionManager.setText(this, "ACTION_NEW");
+		I18n.setText(this, "ACTION_NEW");
+		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 	}
 
 	@Override
@@ -30,7 +34,7 @@ public class NewDatabaseAction extends AbstractFileAction {
 		if(gui.interactiveClose()) {
 			LoginOptions options = new LoginOptions();
 			if(gui.showLoginOptionsDialog(options, false) == JOptionPane.OK_OPTION) {
-				File file = gui.showDatabaseSaveDialog();
+				File file = gui.showSaveDialog();
 				if(file != null) {
 					String filename = file.getPath();
 					if(!filename.endsWith(".wmd")) {
@@ -44,7 +48,7 @@ public class NewDatabaseAction extends AbstractFileAction {
 						}
 						catch(IOException ex) {
 							log.error("error creating database", ex);
-							gui.showMessageDialog(ex.getMessage(), Strings.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
+							gui.showMessageDialog(ex.getMessage(), I18n.getString("TITLE_DATABASE_ERROR"), JOptionPane.ERROR_MESSAGE);
 						}
 					}
 				}

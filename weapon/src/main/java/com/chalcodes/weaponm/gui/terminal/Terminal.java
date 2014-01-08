@@ -44,7 +44,7 @@ import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.event.NetworkStatus;
 import com.chalcodes.weaponm.event.WeaponEvent;
-import com.chalcodes.weaponm.gui.Strings;
+import com.chalcodes.weaponm.gui.I18n;
 
 public class Terminal {
 //	private static final Logger log = LoggerFactory.getLogger(Terminal.class.getSimpleName());
@@ -94,7 +94,7 @@ public class Terminal {
 		borderPanel.add(scrollPane, BorderLayout.CENTER);
 		borderPanel.setBorder(null);
 
-		dockable = new DefaultSingleCDockable("TERMINAL", Strings.getString("TITLE_TERMINAL"), borderPanel);
+		dockable = new DefaultSingleCDockable("TERMINAL", I18n.getString("TITLE_TERMINAL"), borderPanel);
 		
 		configureTerminal();
 		configureModeHotkeys();
@@ -126,7 +126,7 @@ public class Terminal {
 						NetworkStatus oldStatus = (NetworkStatus) evt.getOldValue();
 						NetworkStatus newStatus = (NetworkStatus) evt.getNewValue();
 						if(oldStatus == NetworkStatus.CONNECTED && newStatus == NetworkStatus.DISCONNECTED) {
-							String msg = Strings.getString("DISCONNECTED");
+							String msg = I18n.getString("DISCONNECTED");
 							emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
 						}
 						break;					

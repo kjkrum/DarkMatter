@@ -1,10 +1,11 @@
-package com.chalcodes.weaponm.gui.action;
+package com.chalcodes.weaponm.gui.menu;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
 import com.chalcodes.weaponm.gui.Gui;
+import com.chalcodes.weaponm.gui.I18n;
 
 class ShowCreditsWindowAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -13,7 +14,7 @@ class ShowCreditsWindowAction extends AbstractAction {
 	
 	ShowCreditsWindowAction(Gui gui) {
 		this.gui = gui;
-		ActionManager.setText(this, "ACTION_CREDITS");
+		I18n.setText(this, "ACTION_CREDITS");
 	}
 	
 	@Override

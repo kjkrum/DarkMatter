@@ -16,10 +16,9 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.chalcodes.weaponm.event.DatabaseStatus;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.gui.Strings;
+import com.chalcodes.weaponm.gui.I18n;
 
 /**
  * Manages serialization and deserialization of databases. This class primarily
@@ -100,7 +99,7 @@ public class DatabaseManager {
 	public Database create(File file, LoginOptions loginOptions) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
-			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+			throw new IOException(I18n.getString("MESSAGE_LOCK_EXISTS")
 					.replace("{}", lockFile.getPath()));
 		}
 		Database database = new Database(loginOptions);
@@ -110,7 +109,7 @@ public class DatabaseManager {
 		this.file = file;
 		this.database = database;
 		database.setManager(this);
-		eventSupport.firePropertyChange(EventType.DATABASE_STATUS, null, DatabaseStatus.OPEN);
+		eventSupport.firePropertyChange(EventType.DATABASE_OPEN, null, true);
 		log.info("database created in {}", file.getPath());
 		return database;
 	}
@@ -125,7 +124,7 @@ public class DatabaseManager {
 	public Database open(File file) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
-			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+			throw new IOException(I18n.getString("MESSAGE_LOCK_EXISTS")
 					.replace("{}", lockFile.getPath()));
 		}
 		try {
@@ -138,7 +137,7 @@ public class DatabaseManager {
 			}
 			this.file = file;
 			database.setManager(this);
-			eventSupport.firePropertyChange(EventType.DATABASE_STATUS, null, DatabaseStatus.OPEN);
+			eventSupport.firePropertyChange(EventType.DATABASE_OPEN, null, true);
 			if (database.isInitialized()) {
 				// TODO weapon.gui.firePropertyChange(GUI.DATABASE_INITIALIZED,
 				// database, true);
@@ -159,7 +158,7 @@ public class DatabaseManager {
 			if (e instanceof IOException)
 				throw (IOException) e;
 			else { // ClassNotFoundException, ClassCastException
-				throw new IOException(Strings.getString(
+				throw new IOException(I18n.getString(
 						"MESSAGE_FILE_INCOMPATIBLE").replace("{}",
 								file.getPath()), e);
 			}
@@ -191,7 +190,7 @@ public class DatabaseManager {
 		// create new lock file
 		File lockFile = new File(newFile.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
-			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+			throw new IOException(I18n.getString("MESSAGE_LOCK_EXISTS")
 					.replace("{}", lockFile.getPath()));
 		}
 		save(newFile, database);
@@ -215,7 +214,7 @@ public class DatabaseManager {
 	public void saveCopy(File copyFile) throws IOException {
 		File lockFile = new File(file.getPath() + ".lock");
 		if (!lockFile.createNewFile()) {
-			throw new IOException(Strings.getString("MESSAGE_LOCK_EXISTS")
+			throw new IOException(I18n.getString("MESSAGE_LOCK_EXISTS")
 					.replace("{}", lockFile.getPath()));
 		}
 		save(copyFile, database);
@@ -225,7 +224,7 @@ public class DatabaseManager {
 
 	private void save(File file, Database database) throws IOException {
 		if (file.isDirectory())
-			throw new IOException(Strings.getString("MESSAGE_FILE_IS_DIR"));
+			throw new IOException(I18n.getString("MESSAGE_FILE_IS_DIR"));
 		File tmpFile = new File(file.getPath() + ".tmp");
 		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
 				tmpFile));
@@ -237,10 +236,10 @@ public class DatabaseManager {
 			out.close();
 		}
 		if (file.exists() && !file.delete()) {
-			throw new IOException(Strings.getString("MESSAGE_DELETE_FAILED"));
+			throw new IOException(I18n.getString("MESSAGE_DELETE_FAILED"));
 		}
 		if (!tmpFile.renameTo(file)) {
-			throw new IOException(Strings.getString("MESSAGE_RENAME_FAILED"));
+			throw new IOException(I18n.getString("MESSAGE_RENAME_FAILED"));
 		}
 	}
 
@@ -249,7 +248,7 @@ public class DatabaseManager {
 	 */
 	public void close() {
 		if (file != null) {
-			eventSupport.firePropertyChange(EventType.DATABASE_STATUS, null, DatabaseStatus.CLOSED);
+			eventSupport.firePropertyChange(EventType.DATABASE_OPEN, null, false);
 			new File(file.getPath() + ".lock").delete();
 			file = null;
 			database = null;

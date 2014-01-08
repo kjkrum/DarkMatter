@@ -8,7 +8,7 @@ package com.chalcodes.weaponm.event;
  * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
  */
 public enum EventType {
-	// TODO is source ever used?
+	// ******************** TEXT STUFF ********************
 	
 	/**
 	 * The complete content of a network read.  Scripts cannot register for
@@ -46,6 +46,8 @@ public enum EventType {
 	 */
 	TEXT_TYPED,
 	
+	// ******************** DATABASE STUFF ********************
+	
 	/**
 	 * The database loaded status.  Scripts cannot register for this event,
 	 * since script lifecycles are bounded by the database lifecycle.
@@ -53,10 +55,10 @@ public enum EventType {
 	 * <table border="1">
 	 * <tr><td>source</td><td>null</td></tr>
 	 * <tr><td>oldValue</td><td>null</td></tr>
-	 * <tr><td>newValue</td><td>{@link DatabaseStatus}</td></tr>
+	 * <tr><td>newValue</td><td>Boolean</td></tr>
 	 * </table>
 	 */
-	DATABASE_STATUS,
+	DATABASE_OPEN,
 	
 	/**
 	 * Fired when the database is modified or saved.
@@ -79,6 +81,8 @@ public enum EventType {
 	 * </table>
 	 */
 	DATABASE_TITLE,
+	
+	// ******************** NETWORK STUFF ********************
 	
 	/**
 	 * The network connection status.
