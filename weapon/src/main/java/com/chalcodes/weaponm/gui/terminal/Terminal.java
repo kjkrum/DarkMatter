@@ -42,9 +42,9 @@ import com.chalcodes.weaponm.emulation.EmulationParser;
 import com.chalcodes.weaponm.emulation.lexer.EmulationLexer;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.event.NetworkStatus;
 import com.chalcodes.weaponm.event.WeaponEvent;
 import com.chalcodes.weaponm.gui.I18n;
+import com.chalcodes.weaponm.network.NetworkState;
 
 public class Terminal {
 //	private static final Logger log = LoggerFactory.getLogger(Terminal.class.getSimpleName());
@@ -122,10 +122,10 @@ public class Terminal {
 						String text = (String) evt.getNewValue();
 						emulation.write(text);
 						break;
-					case NETWORK_STATUS:
-						NetworkStatus oldStatus = (NetworkStatus) evt.getOldValue();
-						NetworkStatus newStatus = (NetworkStatus) evt.getNewValue();
-						if(oldStatus == NetworkStatus.CONNECTED && newStatus == NetworkStatus.DISCONNECTED) {
+					case NETWORK_STATE:
+						NetworkState oldStatus = (NetworkState) evt.getOldValue();
+						NetworkState newStatus = (NetworkState) evt.getNewValue();
+						if(oldStatus == NetworkState.CONNECTED && newStatus == NetworkState.DISCONNECTED) {
 							String msg = I18n.getString("DISCONNECTED");
 							emulation.write("\r\n\r\n\033[1;31m<< " + msg + " >>\033[0m\r\n");
 						}
@@ -135,7 +135,7 @@ public class Terminal {
 			}
 		};
 		eventSupport.addPropertyChangeListener(EventType.TEXT_RECEIVED, listener);
-		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATUS, listener);
+		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATE, listener);
 		
 		// sends keystrokes
 		scrollPane.getViewport().addKeyListener(new KeyAdapter() {
@@ -173,8 +173,8 @@ public class Terminal {
 		PropertyChangeListener propertyListener = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				if(e.getPropertyName().equals(EventType.NETWORK_STATUS.name())) {
-					connected = (NetworkStatus) e.getNewValue() == NetworkStatus.CONNECTED;
+				if(e.getPropertyName().equals(EventType.NETWORK_STATE.name())) {
+					connected = (NetworkState) e.getNewValue() == NetworkState.CONNECTED;
 					pasteAction.setEnabled(connected && textOnClipboard);
 					if(!connected) {
 						removePanels();
@@ -185,7 +185,7 @@ public class Terminal {
 				}
 			}
 		};
-		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATUS, propertyListener);
+		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATE, propertyListener);
 		eventSupport.addPropertyChangeListener(SelectionControl.PROPERTY_SELECTION_ACTIVE, propertyListener);
 		
 		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -318,7 +318,7 @@ public class Terminal {
 	}
 	
 	private void send(String string) {
-		WeaponEvent event = new WeaponEvent(EventType.TEXT_TYPED, null, string);
+		WeaponEvent event = new WeaponEvent(this, EventType.TEXT_TYPED, null, string);
 		eventSupport.firePropertyChange(event);
 	}
 	

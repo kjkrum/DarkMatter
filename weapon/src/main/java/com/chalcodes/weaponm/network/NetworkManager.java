@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.LogName;
+import com.chalcodes.weaponm.database.DatabaseState;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.event.NetworkStatus;
 import com.chalcodes.weaponm.event.WeaponEvent;
 
 /**
@@ -25,7 +25,7 @@ public class NetworkManager {
 	private final Logger log = LoggerFactory.getLogger(LogName.forObject(this));
 	private final EventSupport eventSupport;
 	private final ByteBuffer writeBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
-	private NetworkStatus status = NetworkStatus.DISCONNECTED;
+	private NetworkState status = NetworkState.DISCONNECTED;
 	private Thread networkThread;
 	private int threadCount = 0;
 	private SocketChannel channel;
@@ -47,44 +47,44 @@ public class NetworkManager {
 						// ignore
 					}
 					break;
-//				case DATABASE_OPEN:
-//					boolean open = (Boolean) evt.getNewValue();
-//					if(!open) {
-//						disconnect();
-//					}
-//					break;
+				case DATABASE_STATE:
+					DatabaseState state = (DatabaseState) evt.getNewValue();
+					if(state == DatabaseState.CLOSING) {
+						disconnect();
+					}
+					break;
 				}
 			}
 		};
 		eventSupport.addPropertyChangeListener(EventType.TEXT_TYPED, listener);
-//		eventSupport.addPropertyChangeListener(EventType.DATABASE_OPEN, listener);
+		eventSupport.addPropertyChangeListener(EventType.DATABASE_STATE, listener);
 	}
 	
 	public void connect(String host, int port) {
-		if(status == NetworkStatus.DISCONNECTED) {
-			setStatus(NetworkStatus.CONNECTING);
+		if(status == NetworkState.DISCONNECTED) {
+			setStatus(NetworkState.CONNECTING);
 			networkThread = new Thread(new NetworkSession(this, host, port, eventSupport), "Network" + threadCount++);
 			networkThread.start();
 		}
 	}
 	
 	public void disconnect() {
-		if(status != NetworkStatus.DISCONNECTED) {
+		if(status != NetworkState.DISCONNECTED) {
 			networkThread.interrupt();
 		}
 	}
 	
 	public boolean isConnected() {
-		return status == NetworkStatus.CONNECTED;
+		return status == NetworkState.CONNECTED;
 	}
 	
 	public boolean isConnecting() {
-		return status == NetworkStatus.CONNECTING;
+		return status == NetworkState.CONNECTING;
 	}
 	
-	void setStatus(NetworkStatus newStatus) {
+	void setStatus(NetworkState newStatus) {
 		if(this.status != newStatus) {
-			NetworkStatus oldStatus = this.status;
+			NetworkState oldStatus = this.status;
 			this.status = newStatus;
 			switch(newStatus) {
 			case CONNECTING:
@@ -106,7 +106,7 @@ public class NetworkManager {
 				channel = null;
 				break;
 			}
-			eventSupport.firePropertyChange(EventType.NETWORK_STATUS, oldStatus, newStatus);
+			eventSupport.fireEvent(this, EventType.NETWORK_STATE, oldStatus, newStatus);
 		}
 	}
 
@@ -124,7 +124,7 @@ public class NetworkManager {
 		if(locked) {
 			throw new NetworkLockedException();
 		}
-		else if(status != NetworkStatus.CONNECTED){
+		else if(status != NetworkState.CONNECTED){
 			throw new IOException("Network is not connected.");
 		}
 		else {
@@ -156,7 +156,7 @@ public class NetworkManager {
 	 * network manager.  Used by event dispatch tasks to determine if anything
 	 * wrote to the network during the current batch of events.
 	 * 
-	 * @return
+	 * @return the number of bytes sent
 	 */
 	long getBytesWritten() {
 		return bytesWritten;

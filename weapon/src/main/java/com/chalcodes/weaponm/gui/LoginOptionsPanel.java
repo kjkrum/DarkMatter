@@ -13,8 +13,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 
 import com.chalcodes.weaponm.database.LoginOptions;
-import com.chalcodes.weaponm.event.EventSupport;
-import com.chalcodes.weaponm.event.EventType;
 
 /**
  * This was mocked up in NetBeans and then completed by hand.
@@ -52,9 +50,8 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     final JTextField nameField;
     final JTextField passwordField;
     final JCheckBox autoLoginCheckBox;
-    final EventSupport eventSupport;
 	
-    public LoginOptionsPanel(LoginOptions options, EventSupport eventSupport) {
+    public LoginOptionsPanel(LoginOptions options) {
     	this.options = options;
         gamePanel = new JPanel();
         titleLabel = new JLabel();
@@ -77,7 +74,6 @@ class LoginOptionsPanel extends javax.swing.JPanel {
         passwordField = new JTextField();
         passwordField.addFocusListener(SelectOnFocus.getInstance());
         autoLoginCheckBox = new JCheckBox();
-        this.eventSupport = eventSupport;
         
         initComponents();
         
@@ -89,7 +85,7 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     	hostField.setText(options.getHost());
     	portField.setText(Integer.toString(options.getPort()));
     	letterComboBox.setSelectedItem(options.getGameLetter());
-    	nameField.setText(options.getUserName());
+    	nameField.setText(options.getLoginName());
     	passwordField.setText(options.getPassword());
     	autoLoginCheckBox.setSelected(options.isAutoLogin());
     }
@@ -160,14 +156,11 @@ class LoginOptionsPanel extends javax.swing.JPanel {
     }
     
     void saveFields() {
-    	if(eventSupport != null) {
-    		eventSupport.firePropertyChange(EventType.DATABASE_TITLE, null, titleField.getText());
-    	}
     	options.setTitle(titleField.getText());
     	options.setHost(hostField.getText());
     	options.setPort(Integer.parseInt(portField.getText()));
     	options.setGameLetter((char) letterComboBox.getSelectedItem());
-    	options.setUserName(nameField.getText());
+    	options.setLoginName(nameField.getText());
     	options.setPassword(passwordField.getText());
     	options.setAutoLogin(autoLoginCheckBox.isSelected());
     }

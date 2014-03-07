@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.chalcodes.weaponm.LogName;
 import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.event.NetworkStatus;
 import com.chalcodes.weaponm.event.WeaponEvent;
 
 class NetworkSession implements Runnable {
@@ -78,7 +77,7 @@ class NetworkSession implements Runnable {
 					// ignore
 				}
 			}
-			reportStatus(NetworkStatus.DISCONNECTED);
+			reportStatus(NetworkState.DISCONNECTED);
 			log.debug("network thread exiting");
 		}
 	}
@@ -88,7 +87,7 @@ class NetworkSession implements Runnable {
 	 * 
 	 * @param status the new state
 	 */
-	private void reportStatus(final NetworkStatus status) {
+	private void reportStatus(final NetworkState status) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -105,7 +104,7 @@ class NetworkSession implements Runnable {
 			@Override
 			public void run() {
 				manager.setChannel(channel);
-				manager.setStatus(NetworkStatus.CONNECTED);
+				manager.setStatus(NetworkState.CONNECTED);
 			}
 		});
 	}
@@ -118,7 +117,7 @@ class NetworkSession implements Runnable {
 	 * @param newValue
 	 */
 	private void dispatchEvent(EventType type, Object oldValue, Object newValue) {
-		final WeaponEvent event = new WeaponEvent(type, oldValue, newValue);
+		final WeaponEvent event = new WeaponEvent(manager, type, oldValue, newValue);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -126,22 +125,4 @@ class NetworkSession implements Runnable {
 			}
 		});
 	}
-	
-//	/**
-//	 * Dispatch a list of events in the UI thread.
-//	 * 
-//	 * @param events the events
-//	 */
-//	private void dispatchEvents(final List<Event> events) {
-//		// TODO on write, lock the network for the remainder of the list
-//		SwingUtilities.invokeLater(new Runnable() {
-//			@Override
-//			public void run() {
-//				for(Event event : events) {
-//					eventSupport.dispatchEvent(event);
-//				}
-//			}
-//		});
-//	}
-
 }

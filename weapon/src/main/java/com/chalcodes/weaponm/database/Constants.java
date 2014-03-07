@@ -1,5 +1,7 @@
 package com.chalcodes.weaponm.database;
 
-public interface Constants {
+public class Constants {
 	public static final int UNKNOWN = -1;
+	
+	private Constants() { }
 }

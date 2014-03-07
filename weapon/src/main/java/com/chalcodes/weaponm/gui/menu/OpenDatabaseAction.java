@@ -21,9 +21,9 @@ class OpenDatabaseAction extends AbstractFileAction {
 	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final DatabaseManager dbm;
 	
-	OpenDatabaseAction(Gui gui, DatabaseManager dbm) {
+	OpenDatabaseAction(Gui gui) {
 		super(gui);
-		this.dbm = dbm;
+		this.dbm = gui.getWeapon().getDatabaseManager();
 		I18n.setText(this, "ACTION_OPEN");
 		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 	}

@@ -11,16 +11,16 @@ public class WeaponEvent extends PropertyChangeEvent {
 	 * 
 	 * @param source the source of the event
 	 * @param type the event type
-	 * @param oldValue
-	 * @param newValue
+	 * @param oldValue the old value
+	 * @param newValue the new value
 	 */
-	public WeaponEvent(EventType type, Object oldValue, Object newValue) {
-		super("", type.name(), oldValue, newValue);
+	public WeaponEvent(Object source, EventType type, Object oldValue, Object newValue) {
+		super(source, type.name(), oldValue, newValue);
 		this.type = type;
 	}
 
 	/**
-	 * Gets the enum type of this event.  Use this instead of
+	 * Gets the enum type of this event.  This can be used instead of
 	 * {@link #getPropertyName()} to distinguish the event type.
 	 * 
 	 * @return the event type

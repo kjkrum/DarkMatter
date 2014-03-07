@@ -85,7 +85,7 @@ class BurstPanel {
 					input = input.replaceAll("\\^[mM]", "\r\n");
 					int repeat = (Integer) repeatSpinner.getValue();
 					for(int i = 0; i < repeat; ++i) {
-						eventSupport.firePropertyChange(EventType.TEXT_TYPED, null, input);
+						eventSupport.fireEvent(this, EventType.TEXT_TYPED, null, input);
 					}
 					terminal.removePanels();
 				}

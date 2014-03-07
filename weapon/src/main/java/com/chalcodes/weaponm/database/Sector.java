@@ -1,68 +1,147 @@
 package com.chalcodes.weaponm.database;
 
-import java.util.Arrays;
+import static com.chalcodes.weaponm.database.Constants.UNKNOWN;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-// TODO uncomment things as classes are added
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-public class Sector extends DataObject implements Constants {
-	private static final long serialVersionUID = 1L;
+/**
+ * A sector.  Sectors can contain many things.
+ *
+ * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
+ */
+@XmlRootElement
+public class Sector implements DataObject {
+	@XmlTransient
+	private Database db;
+	@XmlAttribute
 	private final int number;
-	//transient List<Trader> traders = new LinkedList<Trader>();
-	//transient List<Alien> aliens = new LinkedList<Alien>();
-	//transient List<Ship> ships = new LinkedList<Ship>();
-	//transient List<Planet> planets = new LinkedList<Planet>();
+	@XmlElement(name="WarpsOut") @XmlList
+	private final Set<Integer> warpsOut = new TreeSet<Integer>();
+	@XmlTransient
+	private final Set<Integer> warpsIn = new TreeSet<Integer>();
+	@XmlElement(name="WarpsParsed")
+	private Boolean warpsParsed;
 	
+	// use wrappers instead of primitives
+	// use null to represent the default value
+	// write getters and setters accordingly
+	
+	@XmlElement(name="WarpDensity")
+	private Integer warpDensity;
+	@XmlElement(name="Density")
+	private Integer density;
+	@XmlElement(name="DensityDate")
+	private Date densityDate;
+	@XmlElement(name="NavHaz")
+	private Integer navhaz;
+	@XmlElement(name="Anomaly")
+	private Boolean anomaly;
+	@XmlElement(name="HoloDate")
+	private Date holoDate;
+	@XmlElement(name="Explored")
+	private Boolean explored;
+	@XmlElement(name="Avoided")
+	private Boolean avoided;
+	@XmlElement(name="Nebula")
+	private String nebulaName;
+	@XmlElement(name="Beacon")
+	private String beaconMessage;
+	
+	@XmlElement(name="Fighters")
+	private Integer fighters;
+	@XmlElement(name="FighterOwner")
+	private Integer fighterOwner;
+	@XmlElement(name="FighterMode")
+	private FighterMode fighterMode;
+	@XmlElement(name="FighterDate")
+	private Date fighterDate;
+	
+	@XmlElement(name="Notes")
+	private final Map<String, String> notes = new HashMap<String, String>();
+	
+	/**
+	 * Creates a new sector.
+	 * 
+	 * @param db the parent database
+	 * @param number the sector number
+	 */
 	Sector(Database db, int number) {
-		setDatabase(db);
+		this.db = db;
 		this.number = number;
 	}
+
+	/**
+	 * Required by JAXB.
+	 */
+	@SuppressWarnings("unused")
+	private Sector() {
+		number = UNKNOWN;
+	}
 	
+	/**
+	 * Restores the reference to the parent database.
+	 * 
+	 * @param u the JAXB unmarshaller
+	 * @param parent the parent object
+	 */
+	@SuppressWarnings("unused")
+	private void afterUnmarshal(Unmarshaller u, Object parent) {
+		db = (Database) parent;
+	}
+	
+	@Override
+	public Database getDatabase() {
+		return db;
+	}
+	
+	/**
+	 * Gets the sector number.
+	 * 
+	 * @return the sector number
+	 */
 	public int getNumber() {
 		return number;
 	}
-
-	private int[] warpsOut = new int[0];
-	private boolean warpsOutSorted = true;
-
-	void addWarpTo(int sector) {
-		synchronized(Database.lock) {
-			if(fullyMapped || hasWarpTo(sector)) return;
-			warpsOut = Arrays.copyOf(warpsOut, warpsOut.length + 1);
-			warpsOut[warpsOut.length - 1] = sector;
-			if(warpsOut.length > 1 && warpsOut[warpsOut.length - 1] < warpsOut[warpsOut.length - 2]) {
-				warpsOutSorted = false;
-			}
-			if(warpsOut.length == 6 || warpsOut.length == warpDensity) fullyMapped = true;
-			Sector warp = getDatabase().getSector(sector);
-			warp.addWarpFrom(number);
-		}
+	
+	/**
+	 * Tests if this sector is known to have a warp to the specified sector.
+	 * 
+	 * @param sector
+	 * @return
+	 */
+	public boolean hasWarpTo(Integer sector) {
+		return warpsOut.contains(sector);
 	}
-
-	void setWarpsOut(int[] warpsOut) {
-		synchronized(Database.lock) {
-			if(this.warpsOut.length == warpsOut.length) {
-				if(warpsOutSorted) {
-					// should be identical; nothing to do
-					return;
-				}
-			}
-			else {
-				// only needed if length changed
-				for (int i = 0; i < warpsOut.length; ++i) {
-					Sector warp = getDatabase().getSector(warpsOut[i]);
-					warp.addWarpFrom(number);
-				}
-			}
-			this.warpsOut = warpsOut;
-			warpsOutSorted = true;
-			explored = true;
-			fullyMapped = true;			
-		}
+	
+	/**
+	 * Adds a warp to the specified sector.
+	 * 
+	 * @param sector
+	 */
+	void addWarpTo(Integer sector) {
+		if(!warpsOut.contains(sector)) {
+			warpsOut.add(sector);
+			db.fireChanged(this);
+			// TODO db.fireEvent(db, EventType.WARP_DISCOVERED, this, warp);
+			
+			Sector other = db.getSector(sector);
+			other.addWarpFrom(number);
+		}			
 	}
-
+	
 	/**
 	 * Returns the number of warps this sector is known to have.  This is the
 	 * larger of the number of known warps and the number of warps reported by
@@ -72,244 +151,157 @@ public class Sector extends DataObject implements Constants {
 	 * @see #getNumKnownWarpsOut()
 	 */
 	public int getNumWarpsOut() {
-		synchronized(Database.lock) {
-			return Math.max(warpDensity, warpsOut.length);
-		}
+		return Math.max(getWarpDensity(), warpsOut.size());
 	}
 
 	/**
-	 * Returns the number of known warps out.  This differs from
-	 * {@link #getNumWarpsOut()} in that this method returns the number of
-	 * warps with known destinations.  This may be less than the number of
-	 * warps the sector is known to have if, for example, your only
-	 * knowledge of the sector is a density scan.
+	 * Returns the number of known warps out.  Note that this may be differ from
+	 * the number of warps that the sector is known to have.
 	 * 
 	 * @see #getNumWarpsOut()
 	 */
 	public int getNumKnownWarpsOut() {
-		synchronized(Database.lock) {
-			return warpsOut.length;
-		}
+		return warpsOut.size();
 	}
-
-	/**
-	 * Returns true if this sector is known to have a warp to the specified
-	 * sector.
-	 */
-	public boolean hasWarpTo(int sector) {
-		synchronized(Database.lock) {
-			for(int i = 0; i < warpsOut.length; ++i) {
-				if(warpsOut[i] == sector) return true;
-			}
-			return false;
-		}
-	}
-
+	
 	/**
 	 * Gets the known warps out.  The array will be sorted in ascending order.
 	 */
-	public int[] getWarpsOut() {
-		synchronized(Database.lock) {
-			if(!warpsOutSorted) {
-				Arrays.sort(warpsOut);
-				warpsOutSorted = true;
-			}
-			return Arrays.copyOf(warpsOut, warpsOut.length);
-		}
+	public List<Integer> getWarpsOut() {
+		return new ArrayList<Integer>(warpsOut);
 	}
-
-	private transient int[] warpsIn = new int[0];
-	private transient boolean warpsInSorted = true;
 	
-	void addWarpFrom(int sector) {
-		synchronized(Database.lock) {
-			if(hasWarpFrom(sector)) return;
-			warpsIn = Arrays.copyOf(warpsIn, warpsIn.length + 1);
-			warpsIn[warpsIn.length - 1] = sector;
-			if(warpsIn.length > 1 && warpsIn[warpsIn.length - 1] < warpsIn[warpsIn.length - 2]) {
-				warpsInSorted = false;
-			}
+	void setWarpsOut(List<Integer> parsedWarps) {
+		if(warpsOut.size() < parsedWarps.size()) {
+			warpsOut.addAll(parsedWarps);
+			explored = Boolean.TRUE;
+			warpsParsed = Boolean.TRUE;
+			db.fireChanged(this);
 		}
 	}
-
-	/**
-	 * Returns the number of known warps into the sector.
-	 */
-	public int getNumWarpsIn() {
-		synchronized(Database.lock) {
-			return warpsIn.length;
-		}
-	}
-
+	
 	/**
 	 * Returns true if this sector is known to have a warp from the specified
 	 * sector.
 	 */
-	public boolean hasWarpFrom(int sector) {
-		synchronized(Database.lock) {
-			for(int i = 0; i < warpsIn.length; ++i) {
-				if(warpsIn[i] == sector) return true;
-			}
-			return false;
-		}
+	public boolean hasWarpFrom(Integer sector) {
+		return warpsIn.contains(sector);
 	}
-
+	
+	/**
+	 * Adds a warp from the specified sector.
+	 * 
+	 * @param sector
+	 */
+	void addWarpFrom(Integer sector) {
+		// do not fire changed
+		warpsIn.add(sector);
+	}
+	
+	/**
+	 * Returns the number of known warps into the sector.
+	 */
+	public int getNumWarpsIn() {
+		return warpsIn.size();
+	}
+	
 	/**
 	 * Gets the known warps in.  The array will be sorted in ascending order.
 	 */
-	public int[] getWarpsIn() {
-		synchronized(Database.lock) {
-			if(!warpsInSorted) {
-				Arrays.sort(warpsIn);
-				warpsInSorted = true;
-			}
-			return Arrays.copyOf(warpsIn, warpsIn.length);
-		}
+	public List<Integer> getWarpsIn() {
+		return new ArrayList<Integer>(warpsIn);
 	}
-
-	private int density = UNKNOWN;
 	
-	void setDensityData(int density, int warpDensity, int navhaz, boolean anomaly) {
-		synchronized(Database.lock) {
-			this.density = density;
-			this.warpDensity = warpDensity;
-			this.navhaz = navhaz;
-			this.anomaly = anomaly;
-			this.densityDate = new Date();
-			if(warpDensity == warpsOut.length) fullyMapped = true;
-		}
-	}
-
-	/**
-	 * Returns true if this sector has been density scanned.
-	 */
-	public boolean hasDensityData() {
-		synchronized(Database.lock) {
-			return densityDate != null;
-		}
-	}
-
-	/**
-	 * Returns the sector's density.  Returns <tt>UNKNOWN</tt> if the sector
-	 * has not been density scanned.
-	 */
-	public int getDensity() {
-		synchronized(Database.lock) {
-			return density;
-		}
-	}
-
-	private int warpDensity = UNKNOWN;
-	
-	/**
-	 * Returns the number of warps reported by a density scan.  Returns
-	 * <tt>UNKNOWN</tt> if the sector has not been density scanned.
-	 * 
-	 * @see #getNumWarpsOut()
-	 */
-	public int getWarpDensity() {
-		synchronized(Database.lock) {
-			return warpDensity;
-		}
-	}
-
-	private Date densityDate; // date of last density scan
-	/**
-	 * Returns the date of the last density scan.  Returns null if the sector
-	 * has not been density scanned.
-	 */
-	public Date getDensityDate() {
-		synchronized(Database.lock) {
-			return densityDate;
-		}
-	}
-
-	private boolean fullyMapped;
-	
-	void setFullyMapped(boolean fullyMapped) {
-		synchronized(Database.lock) {
-			this.fullyMapped = fullyMapped;
-		}
-	}
-
-	/**
-	 * Returns true if it is certain that all the sector's outbound warps are
-	 * known.  This is true if the sector's warps have been parsed, or it has
-	 * six known warps, or it has been density scanned and the number of known
-	 * warps equals the number reported by the density scan.
-	 */
-	public boolean isFullyMapped() {
-		synchronized(Database.lock) {
-			return fullyMapped;
-		}
-	}
-
-	private boolean explored;
-	
-	void setExplored(boolean explored) {
-		synchronized(Database.lock) {
-			this.explored = explored;
-		}
-	}
-
 	/**
 	 * Returns true if the sector is explored.
 	 */
 	public boolean isExplored() {
-		synchronized(Database.lock) {
-			return explored;
-		}
+		return explored == Boolean.TRUE;
 	}
-
-	private boolean avoided;
 	
-	void setAvoided(boolean avoided) {
-		synchronized(Database.lock) {
-			this.avoided = avoided;
+	void setExplored() {
+		if(explored != Boolean.TRUE) {
+			explored = Boolean.TRUE;
+			db.fireChanged(this);
 		}
 	}
 
 	/**
-	 * Returns true if the sector is avoided.
+	 * Returns true if it is certain that all of the sector's outbound warps
+	 * are known.  This is true if the sector's warps have been displayed, or
+	 * it has six known warps, or it has been density scanned and the number
+	 * of known warps equals the number reported by the density scan.
 	 */
-	public boolean isAvoided() {
-		synchronized(Database.lock) {
-			return avoided;
-		}
+	public boolean isFullyMapped() {
+		return warpsParsed == Boolean.TRUE || warpsOut.size() == 6 ||
+				warpsOut.size() == getWarpDensity();
 	}
-
-	private String nebula;
 	
-	void setNebula(String nebula) {
-		synchronized(Database.lock) {
-			this.nebula = nebula;
-		}
-	}
-
 	/**
-	 * Returns the sector's nebula name.  Returns null if the sector is not
-	 * part of a nebula.
+	 * Tests if the sector has been density scanned.
+	 * 
+	 * @return true if the sector has been density scanned; otherwise false
 	 */
-	public String getNebula() {
-		synchronized(Database.lock) {
-			return nebula;
-		}
+	public boolean isDensityScanned() {
+		return densityDate != null;
 	}
-
-	private int navhaz = UNKNOWN;
 	
 	/**
-	 * Returns the last known navhaz value, as recorded by a density scan,
-	 * holo scan, ether probe, or presence.  Returns <tt>UNKNOWN</tt> if the
+	 * Returns the date of the last density scan.  Returns null if the sector
+	 * has not been density scanned.
+	 * 
+	 * @see #isDensityScanned()
+	 */
+	public Date getDensityDate() {
+		return densityDate;
+	}
+	
+	/**
+	 * Returns the sector's density.  Returns {@link Constants#UNKNOWN} if the
+	 * sector has not been density scanned.
+	 *
+	 * @see #isDensityScanned()
+	 */
+	public int getDensity() {
+		if(density == null) {
+			return UNKNOWN;
+		}
+		else {
+			return density;
+		}
+	}
+	
+	/**
+	 * Returns the number of warps reported by a density scan.  Returns
+	 * {@link Constants#UNKNOWN} if the sector has not been density scanned.
+	 * 
+	 * @see #isDensityScanned()
+	 * @see #getNumWarpsOut()
+	 */
+	public int getWarpDensity() {
+		if(warpDensity == null) {
+			return UNKNOWN;
+		}
+		else {
+			return warpDensity;
+		}
+	}
+	
+	/**
+	 * Returns the last navhaz value recorded by a density scan, holo scan,
+	 * ether probe, or presence.  Returns {@link Constants#UNKNOWN} if the
 	 * navhaz level has never been recorded.
 	 */
 	public int getNavhaz() {
-		synchronized(Database.lock) {
+		if(navhaz == null) {
+			return UNKNOWN;
+		}
+		else {
 			return navhaz;
 		}
 	}
-
-	private boolean anomaly;
+	
+	// TODO method to calculate decayed navhaz?
 	
 	/**
 	 * Returns true if an anomaly was detected on the last density scan.
@@ -318,267 +310,324 @@ public class Sector extends DataObject implements Constants {
 	 * 
 	 * @see #hasDensityData()
 	 */
-	public boolean containsAnomaly() {
-		synchronized(Database.lock) {
-			return anomaly;
-		}
-	}
-
-	private Date holoDate;
-
-	void setHoloDate(Date holoDate) {
-		synchronized(Database.lock) {
-			this.holoDate = holoDate;
-		}
+	public boolean hasAnomaly() {
+		return anomaly == Boolean.TRUE;
 	}
 
 	/**
+	 * Called when a density scan is parsed.
+	 * 
+	 * @param density
+	 * @param warpDensity
+	 * @param navhaz
+	 * @param anomaly
+	 */
+	void setDensityData(int density, int warpDensity, int navhaz, boolean anomaly) {
+		// none of these values will be set to UNKNOWN
+		this.density = density;			
+		this.warpDensity = warpDensity;
+		this.navhaz = navhaz;
+		if(anomaly) {
+			this.anomaly = Boolean.TRUE;
+			// TODO fire anomaly event?
+		}
+		else {
+			this.anomaly = null;	
+		}
+		this.densityDate = new Date();
+		db.fireChanged(this);
+	}
+	
+	/**
 	 * Returns the date of your last holo scan, ether probe report, or
 	 * presence in the sector.  Returns null if no holo data has been
-	 * recorded.  The holo date is <em>not</em> updated when your probe is
-	 * destroyed in the sector.
+	 * recorded.  The holo date is not updated when your probe is destroyed in
+	 * the sector.
 	 */
 	public Date getHoloDate() {
-		synchronized(Database.lock) {
-			return holoDate;
-		}
+		return holoDate;
+	}
+	
+	void setHoloDate(Date holoDate) {
+		this.holoDate = holoDate;
+		db.fireChanged(this);
 	}
 
 	/**
 	 * Returns the date of your last density scan, holo scan, ether probe
 	 * report, or presence in the sector.  Returns null if the sector has not
-	 * been scanned.  This date is <em>not</em> updated when your probe is
-	 * destroyed in the sector.
+	 * been scanned.  This date is not updated when your probe is destroyed in
+	 * the sector.
 	 */
 	public Date getScanDate() {
-		synchronized(Database.lock) {
-			if(holoDate == null) return densityDate;
-			if(densityDate == null) return holoDate;
-			return densityDate.after(holoDate) ? densityDate : holoDate;
-		}
+		if(holoDate.getTime() == 0) return densityDate;
+		if(densityDate.getTime() == 0) return holoDate;
+		return densityDate.after(holoDate) ? densityDate : holoDate;
 	}
-
-	private final Map<String, String> notes = new HashMap<String, String>();
 	
 	/**
-	 * Sets the specified note for this sector.  Note names must be unique.
-	 * To avoid conflicts, it is recommended that note names be prefixed with
-	 * the fully qualified class name of the script that created them.
-	 * 
-	 * @param name the name of the note
-	 * @param note the content of the note
+	 * Returns true if the sector is avoided.
 	 */
-	public void setNote(String name, String note) {
-		synchronized(Database.lock) {
-			notes.put(name, note);
+	public boolean isAvoided() {
+		return avoided == Boolean.TRUE;
+	}
+	
+	/**
+	 * Sets the avoided state.
+	 * 
+	 * @param avoided
+	 */
+	void setAvoided(boolean avoided) {
+		Boolean value = avoided ? Boolean.TRUE : null;
+		if(this.avoided != value) {
+			this.avoided = value;
+			db.fireChanged(this);
 		}
+	}
+	
+	/**
+	 * Returns true if the sector is part of a nebula.
+	 */
+	public boolean hasNebulaName() {
+		return nebulaName != null;
 	}
 
 	/**
-	 * Gets the specified note for this sector.
+	 * Returns the sector's nebula name.
+	 * 
+	 * @return the nebula name, or null if none is known
+	 */
+	public String getNebulaName() {
+		return nebulaName;
+	}	
+	
+	void setNebulaName(String nebulaName) {
+		// this shouldn't be set back to null, but who knows with the game edits
+		if(this.nebulaName == null ? nebulaName != null : !this.nebulaName.equals(nebulaName)) {
+			this.nebulaName = nebulaName;
+			db.fireChanged(this);
+		}
+	}
+	
+	/**
+	 * Returns true if the sector contains a beacon.
+	 */
+	public boolean hasBeaconMessage() {
+		return beaconMessage != null;
+	}
+	
+	/**
+	 * Gets the beacon message.
+	 * 
+	 * @return the beacon message, or null if none is known
+	 */
+	public String getBeaconMessage() {
+		return beaconMessage;
+	}
+	
+	/**
+	 * Sets the beacon message.
+	 * 
+	 * @param beaconMessage the beacon message, or null if there is none
+	 */
+	void setBeaconMessage(String beaconMessage) {
+		// this could be set back to null
+		if(this.beaconMessage == null ? beaconMessage != null : !this.beaconMessage.equals(beaconMessage)) {
+			this.beaconMessage = beaconMessage;
+			db.fireChanged(this);
+		}
+	}	
+	
+	/**
+	 * Gets a note from this sector.
 	 * 
 	 * @param name the name of the note
 	 * @return the content of the note
 	 */
 	public String getNote(String name) {
-		synchronized(Database.lock) {	
-			return notes.get(name);
+		return notes.get(name);
+	}
+	
+	/**
+	 * Sets a note on this sector.  To avoid conflicts, note names should be
+	 * prefixed with a unique string such as the class or package name of the
+	 * script that created them.
+	 * 
+	 * @param name the name of the note
+	 * @param note the content of the note
+	 * @throws NullPointerException if the name or the note is null
+	 */
+	public void setNote(String name, String note) {
+		if(name == null || note == null) {
+			throw new NullPointerException();
+		}
+		if(!notes.containsKey(name) || !notes.get(name).equals(note)) {
+			notes.put(name, note);
+			db.fireChanged(this);
 		}
 	}
 
 	/**
-	 * Removes the specified note from this sector.
+	 * Removes a note from this sector.
 	 * 
 	 * @param name the name of the note
 	 */
 	public void removeNote(String name) {
-		synchronized(Database.lock) {
+		if(notes.containsKey(name)) {
 			notes.remove(name);
+			db.fireChanged(this);
 		}
 	}
-
-	//private volatile Port port;
-	
-	private String beaconMessage;
-	
-	void setBeaconMessage(String message) {
-		synchronized(Database.lock) {
-			beaconMessage = message;
-		}
-	}
-
-	public String getBeaconMessage() {
-		synchronized(Database.lock) {
-			return beaconMessage;
-		}
-	}
-	
-	//private FighterMode fighterMode;
-		
-		/**
-		 * Returns the mode of the fighters in this sector.  Returns null if there
-		 * are no fighters in the sector, or their owner is unknown.
-		 * 
-		 * @see #getFighters()
-		 */
-	//	synchronized public FighterMode getFighterMode() {
-	//		return fighterMode;
-	//	}
-		
-		
-		
-	//	synchronized void setFighters(int fighters, Owner owner, FighterMode mode) {
-	//		// don't update fighter date if nothing has changed
-	//		if(this.fighters == fighters && fighterOwner == owner && fighterMode == mode) return;
-	//		this.fighters = fighters;
-	//		fighterOwner = owner;
-	//		fighterMode = mode;
-	//		fighterDate = (fighters == 0) ? null : new Date();
-	//	}
-
-	private int fighters;
 	
 	/**
 	 * Returns the number of fighters the sector is known to contain.  Unlike
-	 * most other numeric fields, this value is initialized to zero.  A value
-	 * of <tt>UNKNOWN</tt> indicates that enemy fighters destroyed one of your
-	 * probes in the sector.
+	 * most other numeric fields, this value defaults to zero.  A value of
+	 * {@link Constants#UNKNOWN} indicates that enemy fighters destroyed one
+	 * of your probes in the sector.
 	 */
 	public int getFighters() {
-		synchronized(Database.lock) {
+		if(fighters == null) {
+			return 0;
+		}
+		else {
 			return fighters;
 		}
 	}
-
-	private Owner fighterOwner;
 	
 	/**
 	 * Gets the owner of the fighters in the sector.  Returns null if there
-	 * are no fighters in the sector, or their owner is unknown.
+	 * are no fighters in the sector.
 	 * 
 	 * @see #getFighters()
 	 */
 	public Owner getFighterOwner() {
-		synchronized(Database.lock) {
-			return fighterOwner;			
+		if(fighters == null) {
+			return null;
+		}
+		else {
+			return db.resolveOwner(fighterOwner);
 		}
 	}
 	
-	private Date fighterDate;
+	/**
+	 * Gets the fighter mode.  Returns null if there are no fighters in the
+	 * sector.
+	 * 
+	 * @return the fighter mode; may be null
+	 */
+	public FighterMode getFighterMode() {
+		return fighterMode;
+	}
 	
 	/**
-	 * Returns the date the fighters in this sector were placed or discovered.
-	 * Returns null if there are no fighters in the sector.
+	 * Returns the date when the fighters in this sector were placed or
+	 * discovered.  Returns null if there are no fighters in the sector.
 	 */
 	public Date getFighterDate() {
-		synchronized(Database.lock) {
-			return fighterDate;
-		}
-	}	
+		return fighterDate;
+	}
 
-	private String figHitName;
-	private Date figHitDate;
+	// TODO setter for fighter info
+	// also registerProbeHit(...) that does not overwrite known fighter data
 	
-	void setFigHit(String name, Date date) {
-		synchronized(Database.lock) {
-			figHitName = name;
-			figHitDate = date;
-		}
-	}
-		
-	/**
-	 * Returns the name of the last entity to hit your fighters in this
-	 * sector.  Includes hits by traders, aliens, probes, and Feds.  Returns
-	 * null if no fighter hit has been recorded in this sector.
-	 */
-	public String getFigHitName() {
-		synchronized(Database.lock) {
-			return figHitName;
-		}
-	}
-
-	/**
-	 * Returns the date of the last fighter hit in this sector.  Returns null
-	 * if no fighter hit has been recorded.
-	 */
-	public Date getFigHitDate() {
-		synchronized(Database.lock) {
-			return figHitDate;
-		}
-	}
-
-
-
-	private int armids = UNKNOWN;
-	private Owner armidOwner;
-
-	void setArmids(int armids, Owner owner) {
-		synchronized(Database.lock) {
-			this.armids = armids;
-			armidOwner = owner;
-		}
-	}
-
-	/**
-	 * Returns the number of armid mines in this sector.
-	 */
-	public int getArmids() {
-		synchronized(Database.lock) {
-			return armids;
-		}
-	}
+//	/**
+//	 * Returns the name of the last entity to hit your fighters in this
+//	 * sector.  Includes hits by traders, aliens, probes, and Feds.  Returns
+//	 * null if no fighter hit has been recorded in this sector.
+//	 */
+//	public String getFigHitName() {
+//		synchronized(Database.lock) {
+//			return figHitName;
+//		}
+//	}
+//
+//	/**
+//	 * Returns the date of the last fighter hit in this sector.  Returns null
+//	 * if no fighter hit has been recorded.
+//	 */
+//	public Date getFigHitDate() {
+//		synchronized(Database.lock) {
+//			return figHitDate;
+//		}
+//	}
+//
+//	void setFigHit(String name, Date date) {
+//		synchronized(Database.lock) {
+//			figHitName = name;
+//			figHitDate = date;
+//		}
+//	}
 	
-	/**
-	 * Returns the owner of the armid mines in this sector.  Returns null if
-	 * there are no armid mines in this sector.
-	 */
-	public Owner getArmidOwner() {
-		synchronized(Database.lock) {
-			return armidOwner;
-		}
-	}
+//	private int armids = UNKNOWN;
+//	private Owner armidOwner;
+//
+//	void setArmids(int armids, Owner owner) {
+//		synchronized(Database.lock) {
+//			this.armids = armids;
+//			armidOwner = owner;
+//		}
+//	}
+//
+//	/**
+//	 * Returns the number of armid mines in this sector.
+//	 */
+//	public int getArmids() {
+//		synchronized(Database.lock) {
+//			return armids;
+//		}
+//	}
+//	
+//	/**
+//	 * Returns the owner of the armid mines in this sector.  Returns null if
+//	 * there are no armid mines in this sector.
+//	 */
+//	public Owner getArmidOwner() {
+//		synchronized(Database.lock) {
+//			return armidOwner;
+//		}
+//	}
+//	
+//	private int limpets;
+//	private Owner limpetOwner;
+//	
+//	void setLimpets(int limpets, Owner owner) {
+//		synchronized(Database.lock) {
+//			this.limpets = limpets;
+//			limpetOwner = owner;
+//		}
+//	}
+//
+//	/**
+//	 * Returns the number of limpets in this sector.  Only returns information
+//	 * about your own limpets.
+//	 */
+//	public int getLimpets() {
+//		synchronized(Database.lock) {
+//			return limpets;
+//		}
+//	}
+//	
+//	/**
+//	 * Returns the owner of the limpets in this sector.  Returns null if there
+//	 * are no limpets in this sector.  Only returns information about your own
+//	 * limpets.
+//	 */
+//	public Owner getLimpetOwner() {
+//		synchronized(Database.lock) {
+//			return limpetOwner;
+//		}
+//	}
 	
-	private int limpets;
-	private Owner limpetOwner;
-	
-	void setLimpets(int limpets, Owner owner) {
-		synchronized(Database.lock) {
-			this.limpets = limpets;
-			limpetOwner = owner;
-		}
-	}
-
-	/**
-	 * Returns the number of limpets in this sector.  Only returns information
-	 * about your own limpets.
-	 */
-	public int getLimpets() {
-		synchronized(Database.lock) {
-			return limpets;
-		}
-	}
-	
-	/**
-	 * Returns the owner of the limpets in this sector.  Returns null if there
-	 * are no limpets in this sector.  Only returns information about your own
-	 * limpets.
-	 */
-	public Owner getLimpetOwner() {
-		synchronized(Database.lock) {
-			return limpetOwner;
-		}
-	}
-	
-	/**
-	 * Returns true if this sector is known to contain a port.
-	 */
+//	/**
+//	 * Returns true if this sector is known to contain a port.
+//	 */
 //	public boolean hasPort() {
 //		return port != null;
 //	}
 	
-	/**
-	 * Returns the port in this sector.  Returns null if no port is known.
-	 */
+//	/**
+//	 * Returns the port in this sector.  Returns null if no port is known.
+//	 */
 //	public Port getPort() {
 //			return port;
 //	}
@@ -597,20 +646,11 @@ public class Sector extends DataObject implements Constants {
 //		return this == db.getYou().getSector();
 //	}
 	
-	/************************************************************************/
+	
 	
 	@Override
 	public String toString() {
 		return "Sector " + number;
 	}
 	
-//	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-//		in.defaultReadObject();
-//		warpsIn = new int[0];
-//		warpsInSorted = true;
-//		traders = new LinkedList<Trader>();
-//		aliens = new LinkedList<Alien>();
-//		ships = new LinkedList<Ship>();
-//		planets = new LinkedList<Planet>();
-//	}
 }

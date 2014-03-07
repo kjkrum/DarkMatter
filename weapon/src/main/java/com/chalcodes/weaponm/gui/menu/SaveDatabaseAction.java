@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.database.DatabaseManager;
-import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.database.DatabaseState;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.I18n;
@@ -25,21 +25,21 @@ class SaveDatabaseAction extends AbstractAction {
 	private final Gui gui;
 	private final DatabaseManager dbm;
 	
-	SaveDatabaseAction(Gui gui, DatabaseManager dbm, EventSupport eventSupport) {
+	SaveDatabaseAction(Gui gui) {
 		this.gui = gui;
-		this.dbm = dbm;
+		this.dbm = gui.getWeapon().getDatabaseManager();
 		I18n.setText(this, "ACTION_SAVE");
 		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		
-		// enable on load
-		eventSupport.addPropertyChangeListener(EventType.DATABASE_OPEN, new PropertyChangeListener() {
+		// enable on dirty
+		gui.getWeapon().getEventSupport().addPropertyChangeListener(EventType.DATABASE_STATE, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				boolean open = (Boolean) e.getNewValue();
-				setEnabled(open);
+				DatabaseState state = (DatabaseState) e.getNewValue();
+				setEnabled(state == DatabaseState.OPEN_DIRTY);
 			}
 		});
-		setEnabled(false);
+		setEnabled(gui.getWeapon().getDatabaseManager().isDatabaseDirty());
 	}
 
 	@Override

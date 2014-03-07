@@ -18,8 +18,8 @@ public class EventSupport extends PropertyChangeSupport {
 		super.removePropertyChangeListener(type.name(), listener);
 	}
 	
-	public void firePropertyChange(EventType type, Object oldValue, Object newValue) {
-		WeaponEvent event = new WeaponEvent(type, oldValue, newValue);
+	public void fireEvent(Object source, EventType type, Object oldValue, Object newValue) {
+		WeaponEvent event = new WeaponEvent(source, type, oldValue, newValue);
 		super.firePropertyChange(event);
 	}
 

@@ -5,31 +5,29 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JMenu;
 
-import com.chalcodes.weaponm.database.DatabaseManager;
-import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.database.DatabaseState;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.I18n;
-import com.chalcodes.weaponm.network.NetworkManager;
 
 class NetworkMenu extends JMenu {
 	private static final long serialVersionUID = 1L;
 
-	NetworkMenu(Gui gui, DatabaseManager dbm, NetworkManager network, EventSupport eventSupport) {
+	NetworkMenu(Gui gui) {
 		I18n.setText(this, "MENU_NETWORK");
-		add(new ConnectAction(dbm, network, eventSupport));
-		add(new DisconnectAction(network, eventSupport));
+		add(new ConnectAction(gui));
+		add(new DisconnectAction(gui));
 		addSeparator();
-		add(new ShowLoginOptionsDialogAction(gui, dbm, eventSupport));
+		add(new ShowLoginOptionsDialogAction(gui));
 		
 		// enable on load
-		eventSupport.addPropertyChangeListener(EventType.DATABASE_OPEN, new PropertyChangeListener() {
+		gui.getWeapon().getEventSupport().addPropertyChangeListener(EventType.DATABASE_STATE, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				boolean open = (Boolean) e.getNewValue();
-				setEnabled(open);
+				DatabaseState state = (DatabaseState) e.getNewValue();
+				setEnabled(state == DatabaseState.OPEN_CLEAN || state == DatabaseState.OPEN_DIRTY);
 			}
 		});
-		setEnabled(false);
+		setEnabled(gui.getWeapon().getDatabaseManager().isDatabaseOpen());
 	}
 }

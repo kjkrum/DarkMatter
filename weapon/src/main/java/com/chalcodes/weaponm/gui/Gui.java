@@ -33,33 +33,30 @@ import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 
 import com.chalcodes.weaponm.AppSettings;
+import com.chalcodes.weaponm.WeaponM;
 import com.chalcodes.weaponm.database.DatabaseManager;
+import com.chalcodes.weaponm.database.DatabaseState;
 import com.chalcodes.weaponm.database.LoginOptions;
-import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.gui.menu.MainMenuBar;
 import com.chalcodes.weaponm.gui.terminal.Terminal;
-import com.chalcodes.weaponm.network.NetworkManager;
 
-/**
- * An abstraction of the UI.  This is the real "main class" of the program.
- *
- * @author <a href="mailto:kjkrum@gmail.com">Kevin Krumwiede</a>
- */
 public class Gui {
 	private static final String APP_TITLE = "Weapon M";
 	private final Logger log = LoggerFactory.getLogger(Gui.class.getSimpleName());
-	private final JFrame mainWindow;
+//	private final EventSupport eventSupport;
+	private final WeaponM weapon;
 	private final ImageIcon icon;
+	private final JFrame mainWindow;
 	private final CControl dockControl;
-	private final EventSupport eventSupport;
-	private final DatabaseManager dbm;
-	private final NetworkManager network;
 	private final JFileChooser databaseFileChooser;
 	private final CreditsWindow creditsWindow;
 	private final Terminal terminal;
 	
-	public Gui() throws ClassNotFoundException, IOException {
+	public Gui(WeaponM weapon) throws ClassNotFoundException, IOException {
 		log.info("{} started", APP_TITLE);
+//		eventSupport = new EventSupport();
+		this.weapon = weapon;
+		
 		// this is supposed to set the app title in the menu bar on OS X
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_TITLE);
 		setLookAndFeel();
@@ -68,18 +65,23 @@ public class Gui {
 		icon = new ImageIcon(getClass()
 				.getResource("/com/chalcodes/weaponm/DarkMatter.png"));
 		dockControl = new CControl(mainWindow);
-		eventSupport = new EventSupport();
-		dbm = new DatabaseManager(eventSupport);
-		network = new NetworkManager(eventSupport);
 		databaseFileChooser = new JFileChooser();
 		creditsWindow = new CreditsWindow(icon);
-		terminal = new Terminal(eventSupport);
+		terminal = new Terminal(weapon.getEventSupport());
 		
 		configureFileChoosers();
 		configureDocking();
 		configureDockables();
 		configureMainWindow();
 		loadAppleExtensions();
+	}
+	
+//	public EventSupport getEventSupport() {
+//		return eventSupport;
+//	}
+	
+	public WeaponM getWeapon() {
+		return weapon;
 	}
 
 	public void setVisible(boolean visible) {
@@ -188,7 +190,7 @@ public class Gui {
 			}
 		});
 		mainWindow.add(dockControl.getContentArea());
-		mainWindow.setJMenuBar(new MainMenuBar(this, dockControl, dbm, network, eventSupport));
+		mainWindow.setJMenuBar(new MainMenuBar(this, dockControl));
 		mainWindow.setExtendedState(mainWindow.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		mainWindow.pack();		
 	}
@@ -285,8 +287,8 @@ public class Gui {
 		creditsWindow.setLocationRelativeTo(mainWindow);
 	}
 
-	public int showLoginOptionsDialog(LoginOptions loginOptions, boolean fireTitleEventOnSave) {
-		return LoginOptionsDialog.showDialog(mainWindow, loginOptions, fireTitleEventOnSave ? eventSupport : null);
+	public int showLoginOptionsDialog(LoginOptions loginOptions) {
+		return LoginOptionsDialog.showDialog(mainWindow, loginOptions);
 	}
 	
 	/**
@@ -297,13 +299,14 @@ public class Gui {
 				I18n.getString("QUESTION_EXIT"),
 				I18n.getString("TITLE_CONFIRM_EXIT"))) {
 			// TODO fire event to kill network & scripts
-			if(dbm.isDatabaseDirty()) {
+			final DatabaseManager dbm = weapon.getDatabaseManager();
+			if(dbm.getState() == DatabaseState.OPEN_DIRTY) {
 				if(interactiveClose()) {
 					shutdown();
 				}
 			}
 			else {
-				if(dbm.isDatabaseOpen()) {
+				if(dbm.getState() == DatabaseState.OPEN_CLEAN) {
 					dbm.close();
 				}
 				shutdown();
@@ -323,7 +326,8 @@ public class Gui {
 	 * @return true if the database is now closed, false if it is still open
 	 */
 	public boolean interactiveClose() {
-		if(dbm.isDatabaseOpen()) {
+		final DatabaseManager dbm = weapon.getDatabaseManager();
+		if(dbm.getState() == DatabaseState.OPEN_CLEAN || dbm.getState() == DatabaseState.OPEN_DIRTY) {
 			String[] options = {
 					I18n.getString("BUTTON_SAVE_CLOSE"),
 					I18n.getString("BUTTON_DISCARD_CLOSE"),

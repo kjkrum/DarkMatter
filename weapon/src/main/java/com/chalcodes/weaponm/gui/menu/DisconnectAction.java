@@ -6,26 +6,26 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 
-import com.chalcodes.weaponm.event.EventSupport;
 import com.chalcodes.weaponm.event.EventType;
-import com.chalcodes.weaponm.event.NetworkStatus;
+import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.I18n;
 import com.chalcodes.weaponm.network.NetworkManager;
+import com.chalcodes.weaponm.network.NetworkState;
 
 class DisconnectAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
 	private final NetworkManager network;
 	
-	DisconnectAction(NetworkManager network, EventSupport eventSupport) {
-		this.network = network;
+	DisconnectAction(Gui gui) {
+		this.network = gui.getWeapon().getNetworkManager();
 		I18n.setText(this, "ACTION_DISCONNECT");
 		
 		// enable on connect
-		eventSupport.addPropertyChangeListener(EventType.NETWORK_STATUS, new PropertyChangeListener() {
+		gui.getWeapon().getEventSupport().addPropertyChangeListener(EventType.NETWORK_STATE, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				NetworkStatus status = (NetworkStatus) e.getNewValue();
-				setEnabled(status == NetworkStatus.CONNECTING || status == NetworkStatus.CONNECTED);
+				NetworkState status = (NetworkState) e.getNewValue();
+				setEnabled(status == NetworkState.CONNECTING || status == NetworkState.CONNECTED);
 			}
 		});
 		setEnabled(false);

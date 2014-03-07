@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.chalcodes.weaponm.database.DatabaseManager;
-import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.database.DatabaseState;
 import com.chalcodes.weaponm.event.EventType;
 import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.I18n;
@@ -24,20 +24,20 @@ class SaveAsDatabaseAction extends AbstractAction {
 	private final Gui gui;
 	private final DatabaseManager dbm;
 	
-	SaveAsDatabaseAction(Gui gui, DatabaseManager dbm, EventSupport eventSupport) {
+	SaveAsDatabaseAction(Gui gui) {
 		this.gui = gui;
-		this.dbm = dbm;
+		this.dbm = gui.getWeapon().getDatabaseManager();
 		I18n.setText(this, "ACTION_SAVE_AS");
 		
 		// enable on load
-		eventSupport.addPropertyChangeListener(EventType.DATABASE_OPEN, new PropertyChangeListener() {
+		gui.getWeapon().getEventSupport().addPropertyChangeListener(EventType.DATABASE_STATE, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				boolean open = (Boolean) e.getNewValue();
-				setEnabled(open);
+				DatabaseState state = (DatabaseState) e.getNewValue();
+				setEnabled(state == DatabaseState.OPEN_CLEAN || state == DatabaseState.OPEN_DIRTY);
 			}
 		});
-		setEnabled(false);
+		setEnabled(dbm.isDatabaseOpen());
 	}
 	
 	@Override

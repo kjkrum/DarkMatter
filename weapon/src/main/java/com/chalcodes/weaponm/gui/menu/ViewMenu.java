@@ -13,14 +13,15 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.menu.SingleCDockableListMenuPiece;
 import bibliothek.gui.dock.facile.menu.RootMenuPiece;
 
-import com.chalcodes.weaponm.event.EventSupport;
+import com.chalcodes.weaponm.database.DatabaseState;
 import com.chalcodes.weaponm.event.EventType;
+import com.chalcodes.weaponm.gui.Gui;
 import com.chalcodes.weaponm.gui.I18n;
 
 class ViewMenu extends JMenu {
 	private static final long serialVersionUID = 1L;
 
-	ViewMenu(CControl dockControl, EventSupport eventSupport) {
+	ViewMenu(Gui gui, CControl dockControl) {
 		I18n.setText(this, "MENU_VIEW");
 		// anonymous extensions give the menu icons a consistent size
 		final SingleCDockableListMenuPiece piece = new SingleCDockableListMenuPiece(dockControl) {
@@ -53,13 +54,13 @@ class ViewMenu extends JMenu {
 		// TODO "save", "reset", "make default"
 		
 		// enable on load
-		eventSupport.addPropertyChangeListener(EventType.DATABASE_OPEN, new PropertyChangeListener() {
+		gui.getWeapon().getEventSupport().addPropertyChangeListener(EventType.DATABASE_STATE, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				boolean open = (Boolean) e.getNewValue();
-				setEnabled(open);
+				DatabaseState state = (DatabaseState) e.getNewValue();
+				setEnabled(state == DatabaseState.OPEN_CLEAN || state == DatabaseState.OPEN_DIRTY);
 			}
 		});
-		setEnabled(false);
+		setEnabled(gui.getWeapon().getDatabaseManager().isDatabaseOpen());
 	}
 }

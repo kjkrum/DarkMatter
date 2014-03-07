@@ -22,9 +22,9 @@ class NewDatabaseAction extends AbstractFileAction {
 	private final Logger log = LoggerFactory.getLogger(getClass().getSimpleName());
 	private final DatabaseManager dbm;
 
-	NewDatabaseAction(Gui gui, DatabaseManager dbm) {
+	NewDatabaseAction(Gui gui) {
 		super(gui);
-		this.dbm = dbm;
+		this.dbm = gui.getWeapon().getDatabaseManager();
 		I18n.setText(this, "ACTION_NEW");
 		putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 	}
@@ -32,8 +32,8 @@ class NewDatabaseAction extends AbstractFileAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(gui.interactiveClose()) {
-			LoginOptions options = new LoginOptions();
-			if(gui.showLoginOptionsDialog(options, false) == JOptionPane.OK_OPTION) {
+			LoginOptions options = new LoginOptions(null);
+			if(gui.showLoginOptionsDialog(options) == JOptionPane.OK_OPTION) {
 				File file = gui.showSaveDialog();
 				if(file != null) {
 					String filename = file.getPath();

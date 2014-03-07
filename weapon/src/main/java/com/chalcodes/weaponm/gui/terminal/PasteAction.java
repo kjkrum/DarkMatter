@@ -38,7 +38,7 @@ public class PasteAction extends AbstractAction {
 			try {
 				String string = (String) clipboard.getData(DataFlavor.stringFlavor);
 				string = string.replaceAll("(\n|\r\n?)", "\r\n");
-				WeaponEvent event = new WeaponEvent(EventType.TEXT_TYPED, null, string);
+				WeaponEvent event = new WeaponEvent(this, EventType.TEXT_TYPED, null, string);
 				eventSupport.firePropertyChange(event);	
 			}
 			catch (UnsupportedFlavorException | IOException ex) {
