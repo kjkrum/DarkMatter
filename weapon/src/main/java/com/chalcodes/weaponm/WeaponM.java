@@ -1,13 +1,16 @@
 package com.chalcodes.weaponm;
 
+import bibliothek.gui.dock.ScreenDockStation;
 import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.intern.station.CScreenDockStationWindowClosingStrategy;
+import bibliothek.gui.dock.common.theme.ThemeMap;
+import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
 import bibliothek.gui.dock.support.util.ApplicationResourceManager;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -29,42 +32,46 @@ public class WeaponM {
 		});
 	}
 
-	private WeaponM() {
-		final AppComponent component = DaggerAppComponent.builder().appModule(new AppModule()).build();
-		component.inject(this);
-	}
+	private final JFrame mMainWindow;
+	private final CControl mDockControl;
+	private final ApplicationResourceManager mDockResources;
+	private final File mLayoutFile;
 
-	@Inject	JFrame mMainWindow;
-	@Inject	CControl mDockControl;
-	@Inject ApplicationResourceManager mResources;
-	@Inject @Named("layout_file") File mLayoutFile;
+	private WeaponM() {
+		mMainWindow = new JFrame();
+		mDockControl = new CControl(mMainWindow);
+		mDockResources = mDockControl.getResources();
+		mLayoutFile = new File(AppData.findDataDir(), "layout.bin");
+	}
 
 	private void start() {
 		configureMainWindow();
+		configureDockControl();
 		loadLayout();
 		mMainWindow.setVisible(true);
 	}
 
 	private void configureMainWindow() {
 		mMainWindow.add(mDockControl.getContentArea());
+		mMainWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		mMainWindow.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				confirmExit();
 			}
 		});
+		mMainWindow.setSize(800, 600);
 	}
 
-	private void confirmExit() {
-		if (JOptionPane.showOptionDialog(mMainWindow, "Shut down Weapon M?", "Confirm exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null) == JOptionPane.YES_OPTION) {
-			exit();
-		}
-	}
-
-	private void exit() {
-		saveLayout();
-		// TODO shut down other components
-		System.exit(0);
+	private void configureDockControl() {
+		mDockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
+		/* Set a window factory that puts externalized dockables in floating JFrames. */
+		final DefaultScreenDockWindowFactory windowFactory = new DefaultScreenDockWindowFactory();
+		windowFactory.setKind(DefaultScreenDockWindowFactory.Kind.FRAME);
+		windowFactory.setUndecorated(false);
+		mDockControl.putProperty(ScreenDockStation.WINDOW_FACTORY, windowFactory);
+		/* Set a window closing strategy that allows floating JFrames to be closed. */
+		mDockControl.putProperty(ScreenDockStation.WINDOW_CLOSING_STRATEGY, new CScreenDockStationWindowClosingStrategy());
 	}
 
 	private static final String LAYOUT_NAME = "default";
@@ -72,7 +79,7 @@ public class WeaponM {
 	private void loadLayout() {
 		if(mLayoutFile.exists() && mLayoutFile.canRead()) {
 			try {
-				mResources.readFile(mLayoutFile);
+				mDockResources.readFile(mLayoutFile);
 				mDockControl.load(LAYOUT_NAME);
 				/* If a dockable isn't in the layout file, it's made invisible. */
 				final int count = mDockControl.getCDockableCount();
@@ -89,10 +96,22 @@ public class WeaponM {
 	private void saveLayout() {
 		try {
 			mDockControl.save(LAYOUT_NAME);
-			mResources.writeFile(mLayoutFile);
+			mDockResources.writeFile(mLayoutFile);
 		} catch (IllegalArgumentException | IOException e) {
 			e.printStackTrace(); // TODO use logging framework
 		}
+	}
+
+	private void confirmExit() {
+		if (JOptionPane.showOptionDialog(mMainWindow, "Shut down Weapon M?", "Confirm exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null) == JOptionPane.YES_OPTION) {
+			exit();
+		}
+	}
+
+	private void exit() {
+		saveLayout();
+		// TODO shut down other components
+		System.exit(0);
 	}
 
 	// TODO docking frames: minimize other dockables when one is maximized?
