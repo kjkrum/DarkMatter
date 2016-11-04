@@ -7,14 +7,12 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
 import bibliothek.gui.dock.support.util.ApplicationResourceManager;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Main class.
@@ -45,13 +43,32 @@ public class WeaponM {
 	}
 
 	private void start() {
+		setLookAndFeel();
 		configureMainWindow();
 		configureDockControl();
 		loadLayout();
 		mMainWindow.setVisible(true);
 	}
 
+	private void setLookAndFeel() {
+		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					return;
+				}
+			}
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			Log.w("error setting look and feel", e);
+		}
+	}
+
 	private void configureMainWindow() {
+		mMainWindow.setTitle("Weapon M");
+		final URL url = getClass().getResource("/icon.png");
+		final ImageIcon icon = new ImageIcon(url);
+		mMainWindow.setIconImage(icon.getImage());
 		mMainWindow.add(mDockControl.getContentArea());
 		mMainWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		mMainWindow.addWindowListener(new WindowAdapter() {
