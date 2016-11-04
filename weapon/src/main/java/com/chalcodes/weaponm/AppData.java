@@ -16,8 +16,10 @@ public class AppData {
 		final String os = System.getProperty("os.name");
 		String name;
 		if(os.contains("Windows")) {
+			//noinspection SpellCheckingInspection
 			name = System.getenv("LOCALAPPDATA");
 			if(name == null) {
+				//noinspection SpellCheckingInspection
 				name = System.getenv("APPDATA");
 			}
 			if(!name.endsWith(File.separator)) {
