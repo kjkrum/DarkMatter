@@ -87,9 +87,8 @@ public class WeaponM {
 					mDockControl.getCDockable(i).setVisible(true);
 				}
 			} catch (IOException | IllegalArgumentException e) {
-				e.printStackTrace(); // TODO use logging framework
+				Log.w("error loading layout", e);
 			}
-
 		}
 	}
 
@@ -98,12 +97,13 @@ public class WeaponM {
 			mDockControl.save(LAYOUT_NAME);
 			mDockResources.writeFile(mLayoutFile);
 		} catch (IllegalArgumentException | IOException e) {
-			e.printStackTrace(); // TODO use logging framework
+			Log.w("error saving layout", e);
 		}
 	}
 
 	private void confirmExit() {
-		if (JOptionPane.showOptionDialog(mMainWindow, "Shut down Weapon M?", "Confirm exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null) == JOptionPane.YES_OPTION) {
+		if (JOptionPane.showOptionDialog(mMainWindow, "Exit Weapon M?", "Confirm exit",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null) == JOptionPane.YES_OPTION) {
 			exit();
 		}
 	}
