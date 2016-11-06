@@ -2,6 +2,7 @@ package com.chalcodes.weaponm;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * TODO javadoc
@@ -12,9 +13,18 @@ class Environment {
 	private Environment() {}
 
 	@Nonnull
-	static File findDataDir() {
+	static File findDataDir() throws IOException {
+		String name = System.getenv("WEAPON_DATA");
+		if(name != null) {
+			final File file = new File(name).getAbsoluteFile();
+			if(file.exists() && file.isDirectory() && file.canRead() && file.canWrite()) {
+				return file;
+			}
+			else {
+				throw new IOException('\'' + name + "' is not a readable and writable directory");
+			}
+		}
 		final String os = System.getProperty("os.name");
-		String name;
 		if(os.contains("Windows")) {
 			//noinspection SpellCheckingInspection
 			name = System.getenv("LOCALAPPDATA");
@@ -56,10 +66,20 @@ class Environment {
 			}
 			name += ".WeaponM";
 		}
-		final File dir = new File(name);
-		if(dir.exists() || dir.mkdirs()) {
-			return dir.getAbsoluteFile();
+		final File file = new File(name).getAbsoluteFile();
+		if(file.exists()) {
+			if(file.isDirectory() && file.canRead() && file.canWrite()) {
+				return file;
+			}
+			else {
+				throw new IOException('\'' + name + "' is not a readable and writable directory");
+			}
 		}
-		throw new RuntimeException("unable to locate data dir");
+		else if(file.mkdirs()) {
+			return file;
+		}
+		else {
+			throw new IOException("unable to locate data directory");
+		}
 	}
 }

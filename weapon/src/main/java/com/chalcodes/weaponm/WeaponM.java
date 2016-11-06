@@ -7,6 +7,7 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
 import bibliothek.gui.dock.support.util.ApplicationResourceManager;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -25,7 +26,14 @@ public class WeaponM {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new WeaponM().start();
+				try {
+					final File dataDir = Environment.findDataDir();
+					final WeaponM weapon = new WeaponM(dataDir);
+					weapon.start();
+				} catch (IOException e) {
+					System.err.println(e.getMessage());
+					System.exit(1);
+				}
 			}
 		});
 	}
@@ -35,11 +43,11 @@ public class WeaponM {
 	private final ApplicationResourceManager mDockResources;
 	private final File mLayoutFile;
 
-	private WeaponM() {
+	private WeaponM(@Nonnull final File dataDir) {
 		mMainWindow = new JFrame();
 		mDockControl = new CControl(mMainWindow);
 		mDockResources = mDockControl.getResources();
-		mLayoutFile = new File(Environment.findDataDir(), "layout.bin");
+		mLayoutFile = new File(dataDir, "layout.bin");
 	}
 
 	private void start() {
