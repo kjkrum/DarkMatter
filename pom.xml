@@ -20,7 +20,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
-		<!--<dagger.version>2.7</dagger.version>-->
+		<dagger.version>2.7</dagger.version>
 	</properties>
 
 	<modules>
@@ -47,11 +47,11 @@
 				<artifactId>slf4j-simple</artifactId>
 				<version>1.7.21</version>
 			</dependency>
-			<!--<dependency>-->
-				<!--<groupId>com.google.dagger</groupId>-->
-				<!--<artifactId>dagger</artifactId>-->
-				<!--<version>${dagger.version}</version>-->
-			<!--</dependency>-->
+			<dependency>
+				<groupId>com.google.dagger</groupId>
+				<artifactId>dagger</artifactId>
+				<version>${dagger.version}</version>
+			</dependency>
 			<!-- build and install from https://github.com/Benoker/DockingFrames -->
 			<dependency>
 				<groupId>org.dockingframes</groupId>
