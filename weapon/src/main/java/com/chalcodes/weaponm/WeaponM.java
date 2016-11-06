@@ -39,7 +39,7 @@ public class WeaponM {
 		mMainWindow = new JFrame();
 		mDockControl = new CControl(mMainWindow);
 		mDockResources = mDockControl.getResources();
-		mLayoutFile = new File(AppData.findDataDir(), "layout.bin");
+		mLayoutFile = new File(Environment.findDataDir(), "layout.bin");
 	}
 
 	private void start() {

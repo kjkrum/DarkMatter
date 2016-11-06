@@ -8,11 +8,11 @@ import java.io.File;
  *
  * @author Kevin Krumwiede
  */
-public class AppData {
-	private AppData() {}
+class Environment {
+	private Environment() {}
 
 	@Nonnull
-	public static File findDataDir() {
+	static File findDataDir() {
 		final String os = System.getProperty("os.name");
 		String name;
 		if(os.contains("Windows")) {
