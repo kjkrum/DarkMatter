@@ -44,17 +44,9 @@ class AppModule {
 	@Provides
 	@Singleton
 	@Nonnull
-	File layoutFile() {
-		return new File(mDataDir, "layout.bin");
-	}
-
-	@Provides
-	@Singleton
-	@Nonnull
 	Ui ui(@Nonnull final Database database,
 	      @Nonnull final Network network,
-	      @Nonnull final Plugins plugins,
-	      @Nonnull final File layoutFile) {
-		return new Ui(database, network, plugins, layoutFile);
+	      @Nonnull final Plugins plugins) {
+		return new Ui(database, network, plugins, mDataDir);
 	}
 }

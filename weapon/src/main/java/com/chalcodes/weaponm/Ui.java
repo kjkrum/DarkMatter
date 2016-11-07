@@ -38,15 +38,14 @@ class Ui {
 	private final ApplicationResourceManager mDockResources;
 	private final File mLayoutFile;
 
-
 	Ui(@Nonnull final Database database,
 	   @Nonnull final Network network,
 	   @Nonnull final Plugins plugins,
-	   @Nonnull final File layoutFile) {
+	   @Nonnull final File dataDir) {
 		mMainWindow = new JFrame();
 		mDockControl = new CControl(mMainWindow);
 		mDockResources = mDockControl.getResources();
-		mLayoutFile = layoutFile;
+		mLayoutFile = new File(dataDir, "layout.bin");
 		setLookAndFeel();
 		configureMainWindow();
 		configureDockControl();
