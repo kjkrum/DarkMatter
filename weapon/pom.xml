@@ -28,10 +28,30 @@
             <groupId>com.google.dagger</groupId>
             <artifactId>dagger</artifactId>
         </dependency>
+	    <dependency>
+		    <groupId>org.dockingframes</groupId>
+		    <artifactId>docking-frames-common</artifactId>
+	    </dependency>
         <dependency>
-            <groupId>org.dockingframes</groupId>
-            <artifactId>docking-frames-common</artifactId>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
         </dependency>
+	    <dependency>
+		    <groupId>org.neo4j</groupId>
+		    <artifactId>neo4j-ogm-core</artifactId>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.neo4j</groupId>
+		    <artifactId>neo4j-ogm-embedded-driver</artifactId>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.neo4j</groupId>
+		    <artifactId>neo4j-ogm-http-driver</artifactId>
+	    </dependency>
+	    <dependency>
+		    <groupId>org.neo4j</groupId>
+		    <artifactId>neo4j-ogm-bolt-driver</artifactId>
+	    </dependency>
     </dependencies>
 
     <build>

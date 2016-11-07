@@ -24,7 +24,7 @@ class AppModule {
 	@Singleton
 	@Nonnull
 	Database database() {
-		return new Database();
+		return new Database(mDataDir);
 	}
 
 	@Provides
