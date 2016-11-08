@@ -1,9 +1,6 @@
 package com.chalcodes.weaponm;
 
-import javax.annotation.Nonnull;
 import javax.swing.SwingUtilities;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Main class.
@@ -17,11 +14,10 @@ public class WeaponM {
 			@Override
 			public void run() {
 				try {
-					final File dataDir = Environment.findDataDir();
-					final AppModule module = new AppModule(dataDir);
+					final AppModule module = new AppModule();
 					final AppComponent component = DaggerAppComponent.builder().appModule(module).build();
 					component.ui().show();
-				} catch (IOException e) {
+				} catch (RuntimeException e) {
 					System.err.println(e.getMessage());
 					System.exit(1);
 				}
@@ -29,5 +25,5 @@ public class WeaponM {
 		});
 	}
 
-	private WeaponM(@Nonnull final File dataDir) {}
+	private WeaponM() {}
 }

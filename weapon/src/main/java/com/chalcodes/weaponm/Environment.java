@@ -13,7 +13,7 @@ class Environment {
 	private Environment() {}
 
 	@Nonnull
-	static File findDataDir() throws IOException {
+	static File getDataDir() throws IOException {
 		String name = System.getenv("WEAPON_DATA");
 		if(name != null) {
 			final File file = new File(name).getAbsoluteFile();

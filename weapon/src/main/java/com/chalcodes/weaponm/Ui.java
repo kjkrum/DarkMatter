@@ -6,6 +6,7 @@ import bibliothek.gui.dock.common.intern.station.CScreenDockStationWindowClosing
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
 import bibliothek.gui.dock.support.util.ApplicationResourceManager;
+import org.neo4j.ogm.session.Session;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -38,10 +39,9 @@ class Ui {
 	private final ApplicationResourceManager mDockResources;
 	private final File mLayoutFile;
 
-	Ui(@Nonnull final Database database,
-	   @Nonnull final Network network,
-	   @Nonnull final Plugins plugins,
-	   @Nonnull final File dataDir) {
+	// TODO create everything with Dagger?
+
+	Ui(@Nonnull final File dataDir, @Nonnull final Session session) {
 		mMainWindow = new JFrame();
 		mDockControl = new CControl(mMainWindow);
 		mDockResources = mDockControl.getResources();
