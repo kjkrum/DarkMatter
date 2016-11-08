@@ -5,13 +5,19 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * TODO javadoc
+ * Utility methods related to the runtime environment.
  *
  * @author Kevin Krumwiede
  */
 class Environment {
 	private Environment() {}
 
+	/**
+	 * Locates the OS-specific application data directory.
+	 *
+	 * @return the data directory
+	 * @throws IOException if the data directory cannot be found
+	 */
 	@Nonnull
 	static File getDataDir() throws IOException {
 		String name = System.getenv("WEAPON_DATA");

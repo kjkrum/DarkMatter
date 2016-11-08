@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.Properties;
 
 /**
- * TODO javadoc
+ * Utility methods related to the Neo4j OGM library.
  *
  * @author Kevin Krumwiede
  */
