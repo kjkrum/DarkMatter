@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -77,7 +78,7 @@ public class WeaponM {
 	}
 
 	private void configureMainWindow() {
-		mMainWindow.add(mDockControl.getContentArea());
+		mMainWindow.add(mDockControl.getContentArea(), BorderLayout.CENTER);
 		mMainWindow.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(final WindowEvent e) {
