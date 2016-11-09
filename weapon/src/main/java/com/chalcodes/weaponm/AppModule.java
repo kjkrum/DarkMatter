@@ -5,6 +5,7 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.intern.station.CScreenDockStationWindowClosingStrategy;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.station.screen.window.DefaultScreenDockWindowFactory;
+import com.chalcodes.event.*;
 import dagger.Module;
 import dagger.Provides;
 import org.neo4j.ogm.config.Configuration;
@@ -16,12 +17,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executor;
 
 /**
  * Dagger module.  Makes all the things.
@@ -72,7 +77,7 @@ class AppModule {
 	@Nonnull
 	@Singleton
 	Session ogmSession(@Nonnull final Configuration config) {
-		final SessionFactory factory = new SessionFactory(config, "com.example.foo"); // TODO use real package name
+		final SessionFactory factory = new SessionFactory(config, "com.chalcodes.weaponm.entity");
 		return factory.openSession();
 	}
 
@@ -130,5 +135,36 @@ class AppModule {
 	               @Named(LAYOUT_FILE) @Nonnull final File layoutFile,
 	               @Nonnull final Session session) {
 		return new WeaponM(mainWindow, dockControl, layoutFile, session);
+	}
+
+	@Provides
+	@Nonnull
+	@Singleton
+	Executor swingExecutor() {
+		return new Executor() {
+			@Override
+			public void execute(@Nonnull final Runnable command) {
+				SwingUtilities.invokeLater(command);
+			}
+		};
+	}
+
+	@Provides
+	@Nonnull
+	@Singleton
+	EventBus<Exception> exceptionBus(@Nonnull final Executor swingExecutor) {
+		return new SimpleEventBus<Exception>(swingExecutor, null);
+	}
+
+	@Provides
+	@Nonnull
+	@Singleton
+	ClassBusFactory eventBuses(@Nonnull final Executor swingExecutor,
+	                           @Nonnull final EventBus<Exception> exceptionBus) {
+		// TODO use randomizing iterator set factory by default?
+		final BusFactory<?> busFactory = new SimpleBusFactory<Object>(swingExecutor, exceptionBus);
+		final Map<Class<?>, EventBus<?>> buses = new HashMap<>();
+		// TODO create any buses that need to be sticky or use a different receiver set factory
+		return new ClassBusFactory(busFactory, buses);
 	}
 }

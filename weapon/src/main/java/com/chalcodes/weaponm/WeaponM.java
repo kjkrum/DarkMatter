@@ -30,7 +30,7 @@ public class WeaponM {
 					final AppComponent component = DaggerAppComponent.builder().appModule(module).build();
 					component.weapon().start();
 				} catch (RuntimeException e) {
-					System.err.println(e.getMessage());
+					Log.e("something bad happened", e);
 					System.exit(1);
 				}
 			}

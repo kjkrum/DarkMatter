@@ -53,7 +53,7 @@
 				<artifactId>dagger</artifactId>
 				<version>${dagger.version}</version>
 			</dependency>
-			<!-- download and install from https://github.com/Benoker/DockingFrames -->
+			<!-- install from https://github.com/Benoker/DockingFrames -->
 			<dependency>
 				<groupId>org.dockingframes</groupId>
 				<artifactId>docking-frames-common</artifactId>
@@ -83,6 +83,12 @@
 				<groupId>org.neo4j</groupId>
 				<artifactId>neo4j-ogm-bolt-driver</artifactId>
 				<version>${neo4j-ogm.version}</version>
+			</dependency>
+			<!-- install from https://github.com/kjkrum/simple-event-bus -->
+			<dependency>
+				<groupId>com.chalcodes.event</groupId>
+				<artifactId>simple-event-bus</artifactId>
+				<version>0.11-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

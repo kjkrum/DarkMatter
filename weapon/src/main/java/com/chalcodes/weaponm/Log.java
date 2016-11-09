@@ -13,35 +13,15 @@ public class Log {
 
 	private static final Logger LOG = LoggerFactory.getLogger("default");
 
-	public static void d(String s) {
-		LOG.debug(s);
+	public static void i(String message) {
+		LOG.info(message);
 	}
 
-	public static void d(String s, Throwable throwable) {
-		LOG.debug(s, throwable);
+	public static void w(String message, Throwable throwable) {
+		LOG.warn(message, throwable);
 	}
 
-	public static void i(String s) {
-		LOG.info(s);
-	}
-
-	public static void i(String s, Throwable throwable) {
-		LOG.info(s, throwable);
-	}
-
-	public static void w(String s) {
-		LOG.warn(s);
-	}
-
-	public static void w(String s, Throwable throwable) {
-		LOG.warn(s, throwable);
-	}
-
-	public static void e(String s) {
-		LOG.error(s);
-	}
-
-	public static void e(String s, Throwable throwable) {
-		LOG.error(s, throwable);
+	public static void e(String message, Throwable throwable) {
+		LOG.error(message, throwable);
 	}
 }

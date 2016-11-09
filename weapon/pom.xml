@@ -52,6 +52,10 @@
 		    <groupId>org.neo4j</groupId>
 		    <artifactId>neo4j-ogm-bolt-driver</artifactId>
 	    </dependency>
+	    <dependency>
+		    <groupId>com.chalcodes.event</groupId>
+		    <artifactId>simple-event-bus</artifactId>
+	    </dependency>
     </dependencies>
 
     <build>
