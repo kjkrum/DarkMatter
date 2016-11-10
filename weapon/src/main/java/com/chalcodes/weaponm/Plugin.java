@@ -20,7 +20,6 @@ import java.util.Map;
  * @author Kevin Krumwiede
  */
 abstract public class Plugin {
-	// TODO this will probably be a different type
 	private ClassBusFactory mEventBuses;
 
 	/**

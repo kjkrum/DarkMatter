@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 /**
@@ -153,18 +154,37 @@ class AppModule {
 	@Nonnull
 	@Singleton
 	EventBus<Exception> exceptionBus(@Nonnull final Executor swingExecutor) {
-		return new SimpleEventBus<Exception>(swingExecutor, null);
+		return new SimpleEventBus<>(swingExecutor, null);
 	}
 
 	@Provides
 	@Nonnull
 	@Singleton
-	ClassBusFactory eventBuses(@Nonnull final Executor swingExecutor,
-	                           @Nonnull final EventBus<Exception> exceptionBus) {
-		// TODO use randomizing iterator set factory by default?
-		final BusFactory<?> busFactory = new SimpleBusFactory<Object>(swingExecutor, exceptionBus);
+	ReceiverSetFactory<Object> defaultReceiverSetFactory() {
+		return new ReceiverSetFactory<Object>() {
+			@Nonnull
+			@Override
+			public Set<EventReceiver<Object>> newSet(@Nonnull final Set<EventReceiver<Object>> current) {
+				return new RotatingIteratorSet<>(current);
+			}
+		};
+	}
+
+	@Provides
+	@Nonnull
+	@Singleton
+	BusFactory<?> defaultBusFactory(@Nonnull final Executor swingExecutor,
+	                                @Nonnull final EventBus<Exception> exceptionBus,
+	                                @Nonnull final ReceiverSetFactory<Object> defaultReceiverSetFactory) {
+		return new SimpleBusFactory<>(swingExecutor, exceptionBus, defaultReceiverSetFactory);
+	}
+
+	@Provides
+	@Nonnull
+	@Singleton
+	ClassBusFactory eventBuses(@Nonnull final BusFactory<?> defaultBusFactory) {
 		final Map<Class<?>, EventBus<?>> buses = new HashMap<>();
 		// TODO create any buses that need to be sticky or use a different receiver set factory
-		return new ClassBusFactory(busFactory, buses);
+		return new ClassBusFactory(defaultBusFactory, buses);
 	}
 }
