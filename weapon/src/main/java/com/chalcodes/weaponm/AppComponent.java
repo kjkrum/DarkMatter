@@ -12,5 +12,5 @@ import javax.inject.Singleton;
 @Singleton
 @Component(modules = AppModule.class)
 interface AppComponent {
-	WeaponM weapon();
+	Ui ui();
 }

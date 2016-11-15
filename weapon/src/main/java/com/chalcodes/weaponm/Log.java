@@ -17,6 +17,10 @@ public class Log {
 		LOG.info(message);
 	}
 
+	public static void w(String message) {
+		LOG.warn(message);
+	}
+
 	public static void w(String message, Throwable throwable) {
 		LOG.warn(message, throwable);
 	}

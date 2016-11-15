@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.Action;
 import java.awt.Component;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,7 @@ abstract public class Plugin {
 	 * Sets private fields that we don't want to expose as constructor
 	 * arguments.
 	 */
-	void init(@Nonnull final ClassBusFactory eventBuses) {
+	final void setPrivateFields(@Nonnull final ClassBusFactory eventBuses) {
 		mEventBuses = eventBuses;
 	}
 
@@ -39,7 +38,7 @@ abstract public class Plugin {
 	 * @param receiver the event receiver
 	 * @param <T> the event type
 	 */
-	protected <T extends Event> void register(@Nonnull final Class<T> klass,
+	protected final <T extends Event> void register(@Nonnull final Class<T> klass,
 	                                          @Nonnull final EventReceiver<T> receiver) {
 		mEventBuses.getBus(klass).register(receiver);
 		mRegisteredReceivers.put(receiver, klass);
@@ -51,7 +50,7 @@ abstract public class Plugin {
 	 * @param receiver the receiver to unregister
 	 * @param <T> the event type
 	 */
-	protected <T extends Event> void unregister(@Nonnull final EventReceiver<T> receiver) {
+	protected final <T extends Event> void unregister(@Nonnull final EventReceiver<T> receiver) {
 		if(mRegisteredReceivers.containsKey(receiver)) {
 			// noinspection unchecked - I think this is unavoidable
 			final Class<T> klass = (Class<T>) mRegisteredReceivers.get(receiver);
@@ -61,12 +60,23 @@ abstract public class Plugin {
 	}
 
 	/**
+	 * Unregisters all event receivers.
+	 */
+	public final void unregisterReceivers() {
+		for(Map.Entry<EventReceiver<? extends Event>, Class<? extends Event>> entry : mRegisteredReceivers.entrySet()) {
+			// noinspection unchecked - I think this is unavoidable
+			mEventBuses.getBus(entry.getValue()).unregister((EventReceiver) entry.getKey());
+		}
+		mRegisteredReceivers.clear();
+	}
+
+	/**
 	 * Broadcasts a custom event.
 	 *
 	 * @param event the event
 	 * @param <T> the event type
 	 */
-	protected <T extends PluginEvent> void broadcast(@Nonnull final T event) {
+	protected final <T extends PluginEvent> void broadcast(@Nonnull final T event) {
 		// noinspection unchecked - I think this is unavoidable
 		final Class<T> klass = (Class<T>) event.getClass();
 		mEventBuses.getBus(klass).broadcast(event);
@@ -87,12 +97,12 @@ abstract public class Plugin {
 	/**
 	 * Gets the UI actions associated with this plugin. The actions will
 	 * appear in the plugin menu and action bar. The default implementation
-	 * returns an empty list.
+	 * returns null.
 	 *
 	 * @return the actions
 	 */
-	@Nonnull public List<Action> getActions() {
-		return Collections.emptyList();
+	@Nullable public List<Action> getActions() {
+		return null;
 	}
 
 	/**
@@ -106,5 +116,31 @@ abstract public class Plugin {
 		return null;
 	}
 
-	// TODO lifecycle methods
+	/**
+	 * Initializes this plugin.  This is called once when the plugin is
+	 * loaded.  To make a plugin enable itself automatically, override this
+	 * method and have it call {@link #enable}.
+	 */
+	public void init() {}
+
+	/**
+	 * Enables this plugin.  This is where plugins should register their event
+	 * receivers.  Receivers are unregistered automatically when the plugin is
+	 * disabled.
+	 */
+	public void enable() {}
+
+	/**
+	 * Override this method to close any system resources used by this plugin,
+	 * such as files or sockets.  This is called when the plugin is disabled.
+	 */
+	public void closeSystemResources() {}
+
+	/**
+	 * Disables this plugin.
+	 */
+	public final void disable() {
+		unregisterReceivers();
+		closeSystemResources();
+	}
 }
