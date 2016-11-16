@@ -25,6 +25,10 @@ public class Log {
 		LOG.warn(message, throwable);
 	}
 
+	public static void e(String message) {
+		LOG.error(message);
+	}
+
 	public static void e(String message, Throwable throwable) {
 		LOG.error(message, throwable);
 	}

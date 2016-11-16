@@ -4,6 +4,7 @@ import com.chalcodes.event.ClassBusFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.Action;
+import javax.swing.JMenu;
 import java.util.List;
 
 /**
@@ -18,5 +19,9 @@ class NetworkManager {
 
 	List<Action> getActions() {
 		return null; // TODO
+	}
+
+	JMenu getMenu() {
+		return new JMenu(); // TODO
 	}
 }

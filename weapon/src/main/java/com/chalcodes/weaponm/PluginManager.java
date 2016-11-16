@@ -1,7 +1,7 @@
 package com.chalcodes.weaponm;
 
 import com.chalcodes.event.ClassBusFactory;
-import com.chalcodes.weaponm.plugins.Terminal;
+import com.chalcodes.weaponm.plugin.Terminal;
 
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
@@ -25,8 +25,8 @@ class PluginManager {
 	private final URL mClasspath;
 	private final ClassBusFactory mEventBuses;
 
-	PluginManager(@Nonnull final File dataDir,
-	              @Nonnull final ClassBusFactory eventBuses) {
+	PluginManager(@Nonnull final ClassBusFactory eventBuses,
+	              @Nonnull final File dataDir) {
 		mConfigFile = new File(dataDir, "plugins.cfg");
 		try {
 			mClasspath = new File(dataDir, "plugins").toURI().toURL();
@@ -79,6 +79,10 @@ class PluginManager {
 			plugin.disable();
 		}
 		mPlugins.clear();
+	}
+
+	JMenu getMenu() {
+		return new JMenu(); // TODO
 	}
 
 	private final Action mReloadAction = new AbstractAction() {

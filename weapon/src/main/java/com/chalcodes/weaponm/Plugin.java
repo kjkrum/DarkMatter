@@ -8,7 +8,7 @@ import com.chalcodes.weaponm.event.PluginEvent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.Action;
-import java.awt.Component;
+import javax.swing.JMenu;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ abstract public class Plugin {
 	 * @param <T> the event type
 	 */
 	protected final <T extends Event> void register(@Nonnull final Class<T> klass,
-	                                          @Nonnull final EventReceiver<T> receiver) {
+	                                                @Nonnull final EventReceiver<T> receiver) {
 		mEventBuses.getBus(klass).register(receiver);
 		mRegisteredReceivers.put(receiver, klass);
 	}
@@ -86,45 +86,70 @@ abstract public class Plugin {
 
 	/**
 	 * Gets the name of this plugin. The name will appear in the plugin menu.
-	 * The default implementation returns the simple class name.
+	 * If the name is null or empty, the simple class name will be used.
 	 *
 	 * @return the plugin name
 	 */
-	@Nonnull public String getName() {
-		return getClass().getSimpleName();
+	@Nullable public String getName() {
+		return null;
+	}
+
+	@Nonnull final String resolveName() {
+		final String name = getName();
+		return name == null || name.isEmpty() ? getClass().getSimpleName() : name;
 	}
 
 	/**
-	 * Gets the UI actions associated with this plugin. The actions will
-	 * appear in the plugin menu and action bar. The default implementation
-	 * returns null.
+	 * Gets the UI actions for this plugin. The default implementation returns
+	 * null.
 	 *
-	 * @return the actions
+	 * @return the actions, or null
 	 */
 	@Nullable public List<Action> getActions() {
 		return null;
 	}
 
 	/**
-	 * Gets the UI component associated with this plugin. The component will
-	 * be displayed in a dockable frame. The default implementation returns
+	 * Gets the menu for this plugin. This will appear as a submenu of the
+	 * plugins menu. The default implementation returns a menu based on {@link
+	 * #getName()} and {@link #getActions()}, or null if {@code getActions()}
+	 * returns null.
+	 *
+	 * @return the menu, or null
+	 */
+	@Nullable public JMenu getMenu() {
+		final List<Action> actions = getActions();
+		if(actions != null && !actions.isEmpty()) {
+			final JMenu menu = new JMenu(resolveName());
+			for(final Action action : actions) {
+				menu.add(action);
+			}
+			return menu;
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Get the dockable UI for this plugin. The default implementation returns
 	 * null.
 	 *
-	 * @return the component, or null
+	 * @return the dockable, or null
 	 */
-	@Nullable public Component getComponent() {
+	@Nullable public Dockable getDockable() {
 		return null;
 	}
 
 	/**
-	 * Initializes this plugin.  This is called once when the plugin is
-	 * loaded.  To make a plugin enable itself automatically, override this
-	 * method and have it call {@link #enable}.
+	 * Initializes this plugin. This is called once when the plugin is loaded.
+	 * To make a plugin enable itself automatically, override this method and
+	 * have it call {@link #enable}.
 	 */
 	public void init() {}
 
 	/**
-	 * Enables this plugin.  This is where plugins should register their event
+	 * Enables this plugin. This is where plugins should register their event
 	 * receivers.  Receivers are unregistered automatically when the plugin is
 	 * disabled.
 	 */

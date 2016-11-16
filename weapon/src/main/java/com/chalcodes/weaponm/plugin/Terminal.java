@@ -1,4 +1,4 @@
-package com.chalcodes.weaponm.plugins;
+package com.chalcodes.weaponm.plugin;
 
 import com.chalcodes.weaponm.Plugin;
 
