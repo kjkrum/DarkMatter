@@ -1,0 +1,27 @@
+<assembly>
+	<id>zip-with-dependencies</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>true</includeBaseDirectory>
+	<baseDirectory>WeaponM</baseDirectory>
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>/</outputDirectory>
+			<unpack>false</unpack>
+			<includes>
+				<include>com.chalcodes.weaponm:weapon</include>
+			</includes>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+		</dependencySet>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>/lib</outputDirectory>
+			<unpack>false</unpack>
+			<excludes>
+				<exclude>com.chalcodes.weaponm:weapon</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

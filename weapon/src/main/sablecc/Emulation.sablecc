@@ -1,0 +1,37 @@
+/* A subset of ANSI X3.64, VT, and Telnet emulation for clients of the TradeWars Game Server. */
+
+Package com.chalcodes.weaponm.emulation;
+
+Helpers
+    esc                 = 27 91;
+    printable           = [32..255];
+    digit               = ['0'..'9'];
+    letter              = [['a'..'z'] + ['A'..'Z']];
+    not_letter          = [printable - letter];
+
+Tokens
+    telnet_option       = 255 [251..254] [0..255];
+
+    cursor_position     = esc digit+ ';' digit+ ['H' + 'f'];
+    cursor_up           = esc digit* 'A';
+    cursor_down         = esc digit* 'B';
+    cursor_right        = esc digit* 'C';
+    cursor_left         = esc digit* 'D';
+    save_cursor         = esc 's';
+    restore_cursor      = esc 'u';
+    clear_screen        = esc '2J';
+    clear_line          = esc 'K';
+    set_attributes      = esc digit+ (';' digit+)* 'm';
+    unknown_ansi        = esc not_letter* letter;
+
+    bell                = 7;
+    backspace           = 8;
+    tab                 = 9;
+    line_feed           = 10;
+    carriage_return     = 13;
+    text                = printable+;
+
+/* No parser. */
+
+
+

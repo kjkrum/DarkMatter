@@ -1,7 +1,7 @@
 package com.chalcodes.weaponm.event;
 
 /**
- * A custom event that can be broadcast by a plugin.
+ * An event that can be broadcast by plugins.
  *
  * @author Kevin Krumwiede
  */

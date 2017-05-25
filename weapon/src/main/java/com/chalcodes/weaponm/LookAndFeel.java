@@ -1,14 +1,18 @@
 package com.chalcodes.weaponm;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.UIManager;
 
 /**
- * TODO javadoc
+ * Sets the look and feel.
  *
  * @author Kevin Krumwiede
  */
-class SwingUtil {
-	private SwingUtil() {}
+class LookAndFeel {
+	private static final Logger LOG = LoggerFactory.getLogger(LookAndFeel.class);
+	private LookAndFeel() {}
 
 	static void setLookAndFeel() {
 		try {
@@ -20,7 +24,7 @@ class SwingUtil {
 			}
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			Log.w("error setting look and feel", e);
+			LOG.warn("error setting look and feel", e);
 		}
 	}
 }

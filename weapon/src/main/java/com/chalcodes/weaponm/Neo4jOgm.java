@@ -1,18 +1,37 @@
 package com.chalcodes.weaponm;
 
 import org.neo4j.ogm.config.Configuration;
+import org.neo4j.ogm.session.SessionFactory;
 
 import javax.annotation.Nonnull;
 import java.io.*;
 import java.util.Properties;
 
 /**
- * Utility methods related to the Neo4j OGM library.
+ * Utility methods related to Neo4j OGM.
  *
  * @author Kevin Krumwiede
  */
-class Neo4jOgmUtil {
-	Neo4jOgmUtil() {}
+public class Neo4jOgm {
+	private Neo4jOgm() {}
+
+	/**
+	 * Gets a session factory configured from the specified properties file.
+	 * If the properties file does not exist, a default configuration will be
+	 * written to it.
+	 *
+	 * @param ogmProperties
+	 * @param packages
+	 * @return
+	 * @throws IOException
+	 */
+	public static SessionFactory getSessionFactory(@Nonnull final File ogmProperties, @Nonnull final String... packages) throws IOException {
+		if (!ogmProperties.exists()) {
+			writeDefaultConfig(ogmProperties);
+		}
+		final Configuration config = loadConfig(ogmProperties);
+		return new SessionFactory(config, packages);
+	}
 
 	/**
 	 * Writes the default configuration to the specified file.
@@ -20,8 +39,9 @@ class Neo4jOgmUtil {
 	 * @param ogmProperties the file to write
 	 * @throws IOException if the file cannot be written
 	 */
-	static void writeDefaultConfig(@Nonnull final File ogmProperties) throws IOException {
+	private static void writeDefaultConfig(@Nonnull final File ogmProperties) throws IOException {
 		try(final PrintWriter file = new PrintWriter(new FileWriter(ogmProperties))) {
+			file.println("# https://neo4j.com/docs/ogm-manual/current/reference/#reference:configuration");
 			file.println("driver=org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver");
 			file.println("URI=" + new File(ogmProperties.getParentFile(), "data").toURI());
 		}
@@ -34,7 +54,7 @@ class Neo4jOgmUtil {
 	 * @return the configuration
 	 * @throws IOException if the file does not exist or cannot be read
 	 */
-	static Configuration loadConfig(@Nonnull final File ogmProperties) throws IOException {
+	private static Configuration loadConfig(@Nonnull final File ogmProperties) throws IOException {
 		final Properties props = new Properties();
 		try (final InputStream in = new FileInputStream(ogmProperties)) {
 			props.load(in);

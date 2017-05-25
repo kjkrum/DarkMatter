@@ -1,6 +1,7 @@
 package com.chalcodes.weaponm;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 
@@ -9,83 +10,90 @@ import java.io.IOException;
  *
  * @author Kevin Krumwiede
  */
-class Environment {
-	private Environment() {}
+public class Environment {
+	private Environment() {
+	}
 
 	/**
-	 * Locates the OS-specific application data directory.
+	 * Locates the Weapon M data directory. Verifies that it is a readable and
+	 * writable directory, and creates it if it does not exist.
 	 *
 	 * @return the data directory
-	 * @throws IOException if the data directory cannot be found
+	 * @throws IOException if something goes wrong
 	 */
 	@Nonnull
-	static File getDataDir() throws IOException {
-		String name = System.getenv("WEAPON_DATA");
-		if(name != null) {
-			final File file = new File(name).getAbsoluteFile();
-			if(file.exists() && file.isDirectory() && file.canRead() && file.canWrite()) {
-				return file;
+	public static File getDataDir() throws IOException {
+		String name = getEnvDir("WEAPON_DATA");
+
+		if (name == null) {
+			final String os = System.getProperty("os.name");
+			if (os.contains("Windows")) {
+				name = getEnvDir("LOCALAPPDATA");
+				if (name == null) {
+					name = getEnvDir("APPDATA");
+				}
+			}
+			else if (os.contains("Linux")) {
+				name = getEnvDir("XDG_DATA_HOME");
+				if (name == null) {
+					name = getEnvDir("HOME");
+					if (name != null) {
+						name += ".local/share/";
+					}
+				}
+			}
+			else if (os.contains("OS X")) {
+				name = getEnvDir("HOME");
+				if (name != null) {
+					name += "Library/Application Support/";
+				}
 			}
 			else {
-				throw new IOException('\'' + name + "' is not a readable and writable directory");
-			}
-		}
-		final String os = System.getProperty("os.name");
-		if(os.contains("Windows")) {
-			//noinspection SpellCheckingInspection
-			name = System.getenv("LOCALAPPDATA");
-			if(name == null) {
-				//noinspection SpellCheckingInspection
-				name = System.getenv("APPDATA");
-			}
-			if(!name.endsWith(File.separator)) {
-				name += File.separator;
-			}
-			name += "WeaponM";
-		}
-		else if(os.contains("Linux")) {
-			name = System.getenv("XDG_DATA_HOME");
-			if(name == null) {
-				name = System.getenv("HOME");
-				if(!name.endsWith(File.separator)) {
-					name += File.separator;
+				// assume generic unix
+				name = getEnvDir("HOME");
+				if (name != null) {
+					name += '.';
 				}
-				name += ".local/share/";
 			}
-			if(!name.endsWith(File.separator)) {
-				name += File.separator;
+
+			if (name != null) {
+				name += "WeaponM";
 			}
-			name += "WeaponM";
 		}
-		else if(os.contains("OS X")) {
-			name = System.getenv("HOME");
-			if(!name.endsWith(File.separator)) {
-				name += File.separator;
-			}
-			name += "Library/Application Support/WeaponM";
-		}
-		else {
-			// assume generic unix
-			name = System.getenv("HOME");
-			if(!name.endsWith(File.separator)) {
-				name += File.separator;
-			}
-			name += ".WeaponM";
+
+		if (name == null) {
+			throw new IOException("unable to locate data directory");
 		}
 		final File file = new File(name).getAbsoluteFile();
-		if(file.exists()) {
-			if(file.isDirectory() && file.canRead() && file.canWrite()) {
+		if (file.exists()) {
+			if (file.isDirectory() && file.canRead() && file.canWrite()) {
 				return file;
 			}
 			else {
-				throw new IOException('\'' + name + "' is not a readable and writable directory");
+				throw new IOException(file.getPath() + " is not a readable and writable directory");
 			}
 		}
-		else if(file.mkdirs()) {
+		else if (file.mkdirs()) {
 			return file;
 		}
 		else {
-			throw new IOException("unable to locate data directory");
+			throw new IOException("could not create " + file.getPath());
 		}
+	}
+
+	/**
+	 * Gets an environment variable that refers to a directory. Appends the
+	 * system file separator if not already present.
+	 *
+	 * @param name the variable name
+	 * @return the variable value, or null
+	 */
+	@Nullable
+	private static String getEnvDir(@Nonnull final String name) {
+		final String value = System.getenv(name);
+		if (value == null) {
+			return null;
+		}
+		return value.endsWith(File.separator) ? value : value + File.separator;
 	}
 }

@@ -1,11 +1,11 @@
-package com.chalcodes.weaponm;
+package com.chalcodes.weaponm.ui;
 
 import javax.swing.SwingUtilities;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- * TODO javadoc
+ * A simple Swing worker.
  *
  * @author Kevin Krumwiede
  */

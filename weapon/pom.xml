@@ -2,79 +2,142 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>parent</artifactId>
         <groupId>com.chalcodes.weaponm</groupId>
         <version>2.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>weapon</artifactId>
 
-    <dependencies>
-	    <dependency>
-		    <groupId>junit</groupId>
-		    <artifactId>junit</artifactId>
-		    <scope>test</scope>
-	    </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-        </dependency>
-	    <dependency>
-		    <groupId>org.dockingframes</groupId>
-		    <artifactId>docking-frames-common</artifactId>
-	    </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-        </dependency>
-	    <dependency>
-		    <groupId>org.neo4j</groupId>
-		    <artifactId>neo4j-ogm-core</artifactId>
-	    </dependency>
-	    <dependency>
-		    <groupId>org.neo4j</groupId>
-		    <artifactId>neo4j-ogm-embedded-driver</artifactId>
-	    </dependency>
-	    <dependency>
-		    <groupId>org.neo4j</groupId>
-		    <artifactId>neo4j-ogm-http-driver</artifactId>
-	    </dependency>
-	    <dependency>
-		    <groupId>org.neo4j</groupId>
-		    <artifactId>neo4j-ogm-bolt-driver</artifactId>
-	    </dependency>
-	    <dependency>
-		    <groupId>com.chalcodes.event</groupId>
-		    <artifactId>simple-event-bus</artifactId>
-	    </dependency>
-    </dependencies>
+	<properties>
+		<dagger.version>2.10</dagger.version>
+		<!--<neo4j-ogm.version>2.1.2</neo4j-ogm.version>-->
+		<neo4j-ogm.version>2.1.3-SNAPSHOT</neo4j-ogm.version>
+	</properties>
 
-    <!--<build>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<artifactId>maven-compiler-plugin</artifactId>-->
-                <!--<dependencies>-->
-                    <!--<dependency>-->
-                        <!--<groupId>com.google.dagger</groupId>-->
-                        <!--<artifactId>dagger-compiler</artifactId>-->
-                        <!--<version>${dagger.version}</version>-->
-                    <!--</dependency>-->
-                <!--</dependencies>-->
-                <!--<configuration>-->
-                    <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</build>-->
+	<dependencies>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-ogm-core</artifactId>
+			<version>${neo4j-ogm.version}</version>
+		</dependency>
+
+		<!--<dependency>-->
+			<!--<groupId>com.chalcodes.event</groupId>-->
+			<!--<artifactId>simple-event-bus</artifactId>-->
+			<!--<version>0.13-SNAPSHOT</version>-->
+		<!--</dependency>-->
+
+		<dependency>
+			<groupId>com.google.dagger</groupId>
+			<artifactId>dagger</artifactId>
+			<version>${dagger.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-ogm-http-driver</artifactId>
+			<version>${neo4j-ogm.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-ogm-bolt-driver</artifactId>
+			<version>${neo4j-ogm.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-ogm-embedded-driver</artifactId>
+			<version>${neo4j-ogm.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j</artifactId>
+			<version>3.1.3</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.25</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+	            <version>3.6.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.google.dagger</groupId>
+                        <artifactId>dagger-compiler</artifactId>
+                        <version>${dagger.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                </configuration>
+            </plugin>
+	        <plugin>
+		        <groupId>com.github.verylazyboy</groupId>
+		        <artifactId>sablecc-maven-plugin</artifactId>
+		        <version>2.0-beta.6-SNAPSHOT</version>
+		        <executions>
+			        <execution>
+				        <id>terminal</id>
+				        <goals>
+					        <goal>sablecc</goal>
+				        </goals>
+				        <configuration>
+					        <grammar>Emulation.sablecc</grammar>
+				        </configuration>
+			        </execution>
+			        <!--<execution>-->
+				        <!--<id>data</id>-->
+				        <!--<goals>-->
+					        <!--<goal>sablecc</goal>-->
+				        <!--</goals>-->
+				        <!--<configuration>-->
+					        <!--<grammar>Data.sablecc</grammar>-->
+				        <!--</configuration>-->
+			        <!--</execution>-->
+		        </executions>
+		        <dependencies>
+			        <dependency>
+				        <groupId>com.chalcodes</groupId>
+				        <artifactId>sablecc-streams</artifactId>
+				        <version>3.7-SNAPSHOT</version>
+			        </dependency>
+		        </dependencies>
+	        </plugin>
+        </plugins>
+    </build>
 
 </project>
