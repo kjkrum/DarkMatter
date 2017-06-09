@@ -1,6 +1,8 @@
 Weapon M: Dark Matter
 =====================
-Dark Matter is the reincarnation of [Weapon M](http://github.org/kjkrum/WeaponM), a cross-platform client for the classic BBS game [TradeWars 2002](http://classictw.com).
+Dark Matter is a complete rewrite of [Weapon M](http://github.org/kjkrum/WeaponM), a cross-platform client for the classic BBS game [TradeWars 2002](http://classictw.com).
+
+This is a very early preview. Weapon M helped me land a job as an Android developer, but it never had the impact on the game community that I hoped it would. Now I'm applying the experience I've gained to a new and greatly improved version.
 
 # Configuration
 If you run Weapon M with no configuration, it chooses a default location for its configuration and data files based on what OS you're running.
